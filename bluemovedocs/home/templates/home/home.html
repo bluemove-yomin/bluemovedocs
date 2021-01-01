@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4home.html' %}
+<main>
+  <!-- Carousel -->
+  <div id="carouselControls" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <a href="#"><img src="/static/images/slide01.png" class="d-block w-100" alt="블루무브 닥스에 오신 것을 환영합니다."></a>
+      </div>
+      {% for notice in all_noticies %}
+      {% if notice.image %}
+      <div class="carousel-item">
+        <a href="{% url 'notice:read' notice.id %}"><img data-src="{{ notice.image.url }}" class="lozad d-block w-100" alt="{{ notice.title }}"></a>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    <a class="carousel-control-prev" href="#carouselControls" role="button" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">이전 슬라이드 보기</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselControls" role="button" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">다음 슬라이드 보기</span>
+    </a>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
+  <script>
+    const observer = lozad();
+    observer.observe();
+  </script>
+
+</main>
+{% endblock %}

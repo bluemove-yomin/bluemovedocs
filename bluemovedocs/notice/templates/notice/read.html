@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4notice.html' %}
+<main>
+    <div class="container-md my-5">
+        <p style="font-weight: 600;">
+            {% if notice.category == 'bluemover' %}
+            블루무버 대상 공지사항
+            {% endif %}
+            {% if notice.category == 'posongvi' %}
+            뽀송비 학생 대상 공지사항
+            {% endif %}
+            {% if notice.category == 'applicant' %}
+            블루무버 희망자 대상 공지사항
+            {% endif %}
+        </p>
+        <h2 style="font-weight: 600; color: #58595B;">{{ notice.title }}</h2>
+        <small>
+            {% if notice.writer %}
+                {% if 'user' in notice.writer.username %}
+                {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+                {% else %}
+                {{ notice.writer }}
+                {% endif %}
+            {% else %}
+            -
+            {% endif %}
+            │
+            {% if notice.created_at == notice.updated_at %}
+            {{ notice.created_at }}
+            {% else %}
+            {{ notice.created_at }} ({{ notice.updated_at }} 수정)
+            {% endif %}
+        </small>
+        <hr class="text-black-50">
+        {% if notice.image %}
+        <div class="mb-4 d-flex justify-content-center">
+            <img src="{{ notice.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
+        </div>
+        {% endif %}
+        <div style="white-space:pre-wrap;">{{ notice.content }}</div>
+    </div>
+    {% if user == notice.writer %}
+    <div class="container-md mb-3 d-grid gap-2 d-sm-flex justify-content-sm-end">
+        <!-- Button trigger modal -->
+        <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                <a type="button" href="{% url 'notice:delete' notice.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                </div>
+            </div>
+            </div>
+        </div>
+        <a href="{% url 'notice:updateimage' notice.id %}" class="btn btn-outline-secondary">
+            {% if notice.image %}
+            이미지 변경하기
+            {% else %}
+            이미지 추가하기
+            {% endif %}
+        </a>
+        <a href="{% url 'notice:update' notice.id %}" class="btn btn-outline-secondary">수정하기</a>
+    </div>
+    {% endif %}
+
+    <div class="container-md">
+        <form id="commentForm" name="commentForm" action="{% url 'notice:create_comment' notice.id %}" method="POST">
+            {% csrf_token %}
+            <div class="card">
+                <div class="form-floating">
+                    <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" {% if not user.is_authenticated %}disabled{% endif %}></textarea>
+                    <label for="content">
+                        {% if user.is_authenticated %}
+                            {% if 'user' in user.username %}
+                            {{ user.last_name }}{{ user.first_name }}님의 댓글 작성
+                            {% else %}
+                            {{ user }}님의 댓글 작성
+                            {% endif %}
+                        {% else %}
+                        댓글을 작성하려면 로그인하세요.
+                        {% endif %}
+                    </label>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <div>
+                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
+                    </div>
+                    <div>
+                        <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" {% if not user.is_authenticated %}disabled{% endif %}>등록</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- textarea의 엔터 키 이벤트를 form의 submit으로 처리 (form 뒤에 위치해야 함) -->
+        <script>
+            $(function() {
+                $('textarea').on('keydown', function(event) {
+                    if (event.keyCode == 13)
+                        if (!event.shiftKey){
+                            event.preventDefault();
+                            $('#commentForm').submit();
+                        }
+                });
+                
+                $('#commentForm').on('submit', function() {
+                    button_click();
+                });
+                
+                function button_click() {}
+            });
+        </script>
+    </div>
+
+    <div class="container-md mt-1">
+        {% for comment in all_comments %}
+        <div class="border-bottom">
+            <div class="card-body px-0">
+                <h6 class="card-title m-0" style="font-weight: 600; color: #58595B;">
+                    {% if 'user' in comment.writer.username %}
+                    {{ comment.writer.last_name }}{{ comment.writer.first_name }}
+                    {% else %}
+                    {{ comment.writer }}
+                    {% endif %}
+                </h6>
+                <small class="card-subtitle mb-2 text-muted">
+                    {% if comment.created_at == comment.updated_at %}
+                    {{ comment.created_at }}
+                    {% else %}
+                    {{ comment.created_at }} ({{ comment.updated_at }} 수정)
+                    {% endif %}
+                </small>
+                <p class="card-text mt-1" style="white-space:pre-wrap;">{{ comment.content }}</p>
+                {% if user == comment.writer %}
+                <div class="d-grid justify-content-end">
+                    <small>
+                        <a href="{% url 'notice:delete_comment' comment.id %}" class="card-link" style="color: #dc3545;">삭제하기</a>
+                        <a href="{% url 'notice:updatecomment' comment.id %}" class="card-link" style="color: #58595B;">수정하기</a>
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="container-md my-5">
+        <!-- <h1 class="mb-4" style="font-weight: 600; color: #58595B;">공지사항</h1> -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">대상</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">담당</th>
+                        <th scope="col">작성일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notice in all_noticies %}
+                    <tr>
+                        <th scope="row">
+                            {% if notice.category == 'bluemover' %}
+                            블루무버
+                            {% endif %}
+                            {% if notice.category == 'posongvi' %}
+                            뽀송비 학생
+                            {% endif %}
+                            {% if notice.category == 'applicant' %}
+                            블루무버 희망자
+                            {% endif %}
+                        </th>
+                        <td><a href="{% url 'notice:read' notice.id %}">{{ notice.title }}</a></td>
+                        <td>
+                            {% if notice.writer %}
+                                {% if 'user' in notice.writer.username %}
+                                {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+                                {% else %}
+                                {{ notice.writer }}
+                                {% endif %}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if notice.created_at == notice.updated_at %}
+                            {{ notice.created_at }}
+                            {% else %}
+                            {{ notice.created_at }} <small>({{ notice.updated_at }} 수정)</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="container-md d-grid sm-flex justify-content-sm-end">
+        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}

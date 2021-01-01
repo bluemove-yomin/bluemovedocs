@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4notice.html' %}
+<main>
+    <div class="container-md my-5 table-responsive">
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">공지사항 작성</h1>
+        <form action="{% url 'notice:create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="category" class="form-label">대상</label>
+                <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." required>
+                    <option value="" selected disabled>대상을 선택하세요.</option>
+                    <option value="bluemover">블루무버</option>
+                    <option value="posongvi">뽀송비 학생</option>
+                    <option value="applicant">블루무버 희망자</option>
+                </select>
+                <div class="invalid-feedback">대상을 선택하세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="title" class="form-label">제목</label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." required>
+                <div class="invalid-feedback">제목을 입력하세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required></textarea>
+                <div class="invalid-feedback">내용을 입력하세요.</div>
+                <div id="contentHelp" class="form-text">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
+            </div>
+            <div class="form-group mb-5">
+                <label for="image" class="form-label">이미지</label>
+                <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
+                <div id="imageHelp" class="form-text">이미지 크기는 반드시 1800 x 800이어야 합니다.</div>
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <!-- Button trigger modal -->
+                <a type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">취소하기</a>
+                <!-- Modal -->
+                <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModalLabel" style="font-weight: 600;">😱 취소 확인</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            입력된 정보가 모두 삭제됩니다.<br>정말 취소하시겠습니까?
+                        </div>
+                        <div class="modal-footer">
+                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                        <a type="button" class="btn btn-outline-danger" onclick="goBack()">네, 취소할게요!</a>
+                        <!-- goBack Script -->
+                        <script>
+                            function goBack() {
+                              window.history.back();
+                            }
+                        </script>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <input type="submit" value="등록하기" class="btn btn-outline-primary">
+            </div>
+        </form>
+
+        <!-- Forms Validation -->
+        <script>
+        // Disable form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+            // Get the forms we want to add validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+                }, false);
+            });
+            }, false);
+        })();
+        </script>
+    </div>
+</main>
+{% endblock %}

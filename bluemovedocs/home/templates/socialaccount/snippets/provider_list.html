@@ -1,0 +1,45 @@
+{% load socialaccount %}
+
+{% get_providers as socialaccount_providers %}
+
+{% for provider in socialaccount_providers %}
+
+<!-- Google로 로그인 -->
+{% if provider.name == 'Google' %}
+<a href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}" type="button" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-4" id="google"><img src="/static/images/google.png" height="18">{{provider.name}} 계정으로 로그인</a>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+    // executes when HTML-Document is loaded and DOM is ready
+    console.log("document is ready");
+    
+
+    $( "#google" ).hover(
+    function() {
+        $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+    }, function() {
+        $(this).removeClass('shadow-lg');
+    }
+    );
+    
+    // document ready  
+    });
+</script>
+{% else %}
+
+{% if provider.id == "openid" %}
+{% for brand in provider.get_brands %}
+<li>
+  <a title="{{brand.name}}" 
+     class="socialaccount_provider {{provider.id}} {{brand.id}}" 
+     href="{% provider_login_url provider.id openid=brand.openid_url process=process %}"
+     >{{brand.name}}</a>
+</li>
+{% endfor %}
+{% endif %}
+<li>
+  <a title="{{provider.name}}" class="socialaccount_provider {{provider.id}}" 
+     href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}">{{provider.name}}</a>
+</li>
+{% endif %}
+{% endfor %}

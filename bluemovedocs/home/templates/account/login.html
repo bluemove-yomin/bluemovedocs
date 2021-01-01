@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block content %}
+{% include 'shared/_navbar4home.html' %}
+<main>
+<div class="container-md mt-5">
+  <h1 class="mb-4" style="font-weight: 600; color: #58595B;">로그인</h1>
+
+  {% get_providers as socialaccount_providers %}
+  {% providers_media_js %}
+
+  <div class="card-group pt-2">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title text-center m-0" style="color: #58595B; font-weight: 600;">블루무버 / 게스트</h5>
+      </div>
+      <div class="card-body d-grid px-lg-5" style="height: 17rem;">
+        <div class="d-grid align-items-center">
+          <p class="card-text m-0">블루무브 닥스를 이용하려면 Google 계정으로 로그인하세요.</p>
+          <small class="align-middle mt-lg-3 mt-0" style="color: #6C757D;">
+            <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">블루무버</span>: 블루무버 계정으로 로그인<br>
+            <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">게스트</span>: 개인 Google 계정으로 로그인
+          </small>
+          <div class="d-flex justify-content-center mb-0 mt-4">{% include "socialaccount/snippets/provider_list.html" with process="login" %}</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title text-center m-0" style="color: #58595B; font-weight: 600;">사무국</h5>
+      </div>
+      <div class="card-body d-grid px-md-5" style="height: 17rem;">
+        <form class="login d-grid align-items-center" method="POST" action="{% url 'account_login' %}">
+          {% csrf_token %}
+          <div class="form-group">
+            <input type="text" class="form-control mb-2" id="id_login" placeholder="아이디" name="login" required>
+            <input type="password" class="form-control" id="id_password" placeholder="비밀번호" name="password" required>
+          </div>
+          {% if redirect_field_value %}
+          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+          {% endif %}
+          <div><input type="checkbox" name="remember" id="id_remember"> <label for="id_remember">아이디 저장</label></div>
+          <div class="d-flex justify-content-center"><button class="primaryAction btn shadow-sm bg-white rounded mt-0" style="width: 231.36px; height: 38px;" type="submit" id="login">로그인</button></div>
+          <script type="text/javascript">
+            $(document).ready(function() {
+            // executes when HTML-Document is loaded and DOM is ready
+            console.log("document is ready");
+            
+        
+            $( "#login" ).hover(
+            function() {
+                $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+            }, function() {
+                $(this).removeClass('shadow-lg');
+            }
+            );
+            
+            // document ready  
+            });
+          </script>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-light alert-dismissible fade show shadow-sm mt-3" id="google_account_alert" role="alert">
+    Google 계정이 없다면 <a href="https://accounts.google.com/Signup" target="_blank" rel="noopener">여기를 클릭</a>해서 만들어보세요.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+    // executes when HTML-Document is loaded and DOM is ready
+    console.log("document is ready");
+    
+
+    $( "#google_account_alert" ).hover(
+    function() {
+        $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+    }, function() {
+        $(this).removeClass('shadow-lg');
+    }
+    );
+    
+    // document ready  
+    });
+  </script>
+
+</div>
+</main>
+{% endblock %}

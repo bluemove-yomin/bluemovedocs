@@ -1,0 +1,95 @@
+<header>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark">
+        <div class="container-md">
+            <a class="navbar-brand" href="{% url 'home:home' %}" style="font-weight: 600;">
+                <img src="/static/images/bluemovelogo.png" alt="블루무브" height="28" class="d-inline-block align-top">
+                Docs
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav flex-row flex-wrap bd-navbar-nav pt-2 py-md-0">
+                    <li class="nav-item col-6 col-md-auto">
+                        <a class="nav-link p-2" href="{% url 'notice:main' %}">📢 공지사항</a>
+                    </li>
+                    <li class="nav-item col-6 col-md-auto">
+                        <a class="nav-link p-2 active" aria-current="page" href="{% url 'box:main' %}">📁 문서함</a>
+                    </li>
+                    <!--
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    -->
+                </ul>
+                <hr class="d-md-none text-white-50">
+                <ul class="navbar-nav flex-row flex-wrap ms-md-auto mb-2">
+                    <li class="nav-item col-6 col-md-auto">
+                        <a class="nav-link p-2" href="http://drive.bluemove.or.kr" target="_blank" rel="noopener">
+                            <img src="/static/images/googledrivelogo.png" alt="구글 드라이브로 이동" title="구글 드라이브" height="20" class="d-inline-block">
+                            <small class="d-md-none ms-2">Google Drive</small>
+                        </a>
+                    </li>
+                    <li class="nav-item col-6 col-md-auto">
+                        <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
+                            <img src="/static/images/slacklogo.png" alt="슬랙으로 이동" title="슬랙" height="20" class="d-inline-block">
+                            <small class="d-md-none ms-2">Slack</small>
+                        </a>
+                    </li>
+                    <li class="nav-item col-6 col-md-auto">
+                        <a class="nav-link p-2" href="https://notion.so/bluemove" target="_blank" rel="noopener">
+                            <img src="/static/images/notionlogo.png" alt="노션으로 이동" title="노션" height="20" class="d-inline-block">
+                            <small class="d-md-none ms-2">Notion</small>
+                        </a>
+                    </li>
+                    {% if not user.is_authenticated %}
+                    <li class="nav-item col-6 col-md-auto">
+                        <a class="nav-link p-2" href="{% url 'account_login' %}?next={{ request.path }}">
+                            <img src="/static/images/account_notauth.png" alt="로그인" title="로그인" height="20" class="d-inline-block">
+                            <small class="d-md-none ms-2">Login</small>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item col-6 col-md-auto dropdown">
+                        <a class="nav-link p-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="/static/images/account_auth.png" alt="내 계정" title="내 계정" height="20" class="d-inline-block">
+                            <small class="d-md-none ms-2">My account</small>
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">마이 페이지</a></li>
+                            <li>
+                                <form class="logout" method="POST" action="{% url 'account_logout' %}?next={{ request.path }}">
+                                    {% csrf_token %}
+                                    {% if redirect_field_value %}
+                                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                                    {% endif %}
+                                    <button class="dropdown-item" type="submit">로그아웃</button>
+                                </form>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="text-center">
+                                <small>
+                                    {% if not user.username == 'management' %}
+                                    안녕하세요, {{ user.last_name }}{{ user.first_name }}님!
+                                    {% else %}
+                                    안녕하세요, 사무국원님!
+                                    {% endif %}
+                                </small>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+      </nav>
+</header>

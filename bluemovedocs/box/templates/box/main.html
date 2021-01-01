@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4box.html' %}
+<main>
+    <div class="container-md my-5">
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">문서함</h1>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">대상</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">업로드 허용기간</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for box in all_boxes %}
+                    <tr>
+                        <th scope="row">
+                            {% if box.category == 'bluemover' %}
+                            블루무버
+                            {% endif %}
+                            {% if box.category == 'posongvi' %}
+                            뽀송비 학생
+                            {% endif %}
+                            {% if box.category == 'applicant' %}
+                            블루무버 희망자
+                            {% endif %}
+                        </th>
+                        <td><a href="{% url 'box:read' box.id %}">{{ box.title }}</a></td>
+                        <td>
+                            {% if box.created_at == box.updated_at %}
+                            {{ box.created_at }} ~ {{ box.deadline }}
+                            {% else %}
+                            {{ box.created_at }} ~ {{ box.deadline }} <small>(변경)</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container-md d-grid sm-flex justify-content-sm-end">
+        <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
+    </div>
+</main>
+{% endblock %}

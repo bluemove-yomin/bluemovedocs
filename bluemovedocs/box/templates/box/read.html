@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4box.html' %}
+<main>
+    <div class="container-md my-5">
+        <p style="font-weight: 600;">
+            {% if box.category == 'bluemover' %}
+            블루무버 대상 문서함
+            {% endif %}
+            {% if box.category == 'posongvi' %}
+            뽀송비 학생 대상 문서함
+            {% endif %}
+            {% if box.category == 'applicant' %}
+            블루무버 희망자 대상 문서함
+            {% endif %}
+        </p>
+        <h2 style="font-weight: 600; color: #58595B;">{{ box.title }}</h2>
+        <small>
+            {% if box.created_at == box.updated_at %}
+            {{ box.created_at }} ~ {{ box.deadline }}
+            {% else %}
+            {{ box.created_at }} ~ {{ box.deadline }} (변경)
+            {% endif %}
+        </small>
+        <hr class="text-black-50">
+        {% if box.image %}
+        <div class="mb-4 d-flex justify-content-center">
+            <img src="{{ box.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
+        </div>
+        {% endif %}
+        <div style="white-space:pre-wrap;">{{ box.content }}</div>
+    </div>
+    <div class="container-md d-grid gap-2 d-sm-flex justify-content-sm-end">
+        <!-- Button trigger modal -->
+        <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
+                </div>
+                <div class="modal-footer">
+                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                <a type="button" href="{% url 'box:delete' box.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                </div>
+            </div>
+            </div>
+        </div>
+        <a href="{% url 'box:updateimage' box.id %}" class="btn btn-outline-secondary">
+            {% if box.image %}
+            이미지 변경하기
+            {% else %}
+            이미지 추가하기
+            {% endif %}
+        </a>
+        <a href="{% url 'box:update' box.id %}" class="btn btn-outline-secondary">수정하기</a>
+    </div>
+    
+    <div class="container-md my-5">
+        <!-- <h1 class="mb-4" style="font-weight: 600; color: #58595B;">문서함</h1> -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">대상</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">업로드 허용기간</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for box in all_boxes %}
+                    <tr>
+                        <th scope="row">
+                            {% if box.category == 'bluemover' %}
+                            블루무버
+                            {% endif %}
+                            {% if box.category == 'posongvi' %}
+                            뽀송비 학생
+                            {% endif %}
+                            {% if box.category == 'applicant' %}
+                            블루무버 희망자
+                            {% endif %}
+                        </th>
+                        <td><a href="{% url 'box:read' box.id %}">{{ box.title }}</a></td>
+                        <td>
+                            {% if box.created_at == box.updated_at %}
+                            {{ box.created_at }} ~ {{ box.deadline }}
+                            {% else %}
+                            {{ box.created_at }} ~ {{ box.deadline }} <small>(변경)</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container-md d-grid sm-flex justify-content-sm-end">
+        <a href="{% url 'box:write' %}" class="btn btn-outline-primary">작성하기</a>
+    </div>
+</main>
+{% endblock %}

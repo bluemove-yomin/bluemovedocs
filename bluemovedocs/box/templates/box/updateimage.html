@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4box.html' %}
+<main>
+    <div class="container-md my-5 table-responsive">
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">
+            {% if box.image %}
+            문서함 이미지 변경
+            {% else %}
+            문서함 이미지 추가
+            {% endif %}
+        </h1>
+        <form action="{% url 'box:updateimage' box.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="form-group mb-3">
+                <label for="category" class="form-label">대상</label>
+                <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." aria-describedby="categoryHelp" disabled>
+                    <option value="{{ box.category }}" selected hidden>
+                        {% if box.category == 'bluemover' %}
+                        블루무버
+                        {% endif %}
+                        {% if box.category == 'posongvi' %}
+                        뽀송비 학생
+                        {% endif %}
+                        {% if box.category == 'applicant' %}
+                        블루무버 희망자
+                        {% endif %}
+                    </option>
+                    <option value="" disabled>대상을 선택하세요.</option>
+                    <option value="bluemover">블루무버</option>
+                    <option value="posongvi">뽀송비 학생</option>
+                    <option value="applicant">블루무버 희망자</option>
+                </select>
+                <div class="invalid-feedback">대상을 선택하세요.</div>
+                <div id="categoryHelp" class="form-text">대상을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="title" class="form-label">제목</label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." aria-describedby="titleHelp" value="{{ box.title }}" disabled>
+                <div class="invalid-feedback">제목을 입력하세요.</div>
+                <div id="titleHelp" class="form-text">제목을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="deadline" class="form-label">기한</label>
+                <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
+                <div class="invalid-feedback">기한을 입력하세요.</div>
+                <div id="deadlineHelp" class="form-text">기한을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <script>
+                    var today = new Date().toISOString().split('T')[0];
+                    document.getElementsByName("deadline")[0].setAttribute('min', today);
+                </script>
+            </div>
+            <div class="form-group mb-3">
+                <label for="content" class="form-label">내용</label>
+                <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" disabled>{{ box.content }}</textarea>
+                <div class="invalid-feedback">내용을 입력하세요.</div>
+                <div id="contentHelp" class="form-text">내용을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요. 입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
+            </div>
+            <div class="form-group mb-5">
+                <label for="image" class="form-label">이미지</label>
+                {% if box.image %}
+                <div class="mb-4 d-flex justify-content-center">
+                    <img src="{{ box.image.url }}" class="img-fluid text-center" alt="이미지를 불러올 수 없습니다.">
+                </div>
+                {% endif %}
+                {% if box.image %}
+                <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
+                <div id="imageHelp" class="form-text">
+                    이미지 크기는 반드시 1800 x 800이어야 합니다.<br><br>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 변경</span>: 새로운 이미지를 첨부한 뒤 '이미지 변경 등록하기'를 누르세요.<br>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 삭제</span>: 아무것도 첨부하지 않은 채 '이미지 변경 등록하기'를 누르세요.
+                </div>
+                {% else %}
+                <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*" required>
+                <div class="invalid-feedback">추가할 이미지를 업로드하세요.</div>
+                <div id="imageHelp" class="form-text">이미지 크기는 반드시 1800 x 800이어야 합니다.</div>
+                {% endif %}
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <!-- Button trigger modal -->
+                <a type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                    {% if box.image %}
+                    이미지 변경 취소하기
+                    {% else %}
+                    이미지 추가 취소하기
+                    {% endif %}
+                </a>
+                <!-- Modal -->
+                <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="cancelModalLabel" style="font-weight: 600;">😱 취소 확인</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% if box.image %}
+                            이미지 변경 내역이 삭제됩니다.
+                            {% else %}
+                            이미지 추가 내역이 삭제됩니다.
+                            {% endif %}
+                            <br>정말 취소하시겠습니까?
+                        </div>
+                        <div class="modal-footer">
+                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                        <a type="button" class="btn btn-outline-danger" onclick="goBack()">네, 취소할게요!</a>
+                        <!-- goBack Script -->
+                        <script>
+                            function goBack() {
+                              window.history.back();
+                            }
+                        </script>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                {% if box.image %}
+                <input type="submit" value="이미지 변경 등록하기" class="btn btn-outline-primary">
+                {% else %}
+                <input type="submit" value="이미지 추가 등록하기" class="btn btn-outline-primary">
+                {% endif %}
+            </div>
+        </form>
+
+        <!-- Forms Validation -->
+        <script>
+        // Disable form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+            // Get the forms we want to add validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+                }, false);
+            });
+            }, false);
+        })();
+        </script>
+    </div>
+</main>
+{% endblock %}

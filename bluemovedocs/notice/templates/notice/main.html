@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'shared/_navbar4notice.html' %}
+<main>
+    <div class="container-md my-5">
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">공지사항</h1>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">대상</th>
+                        <th scope="col">제목</th>
+                        <th scope="col">담당</th>
+                        <th scope="col">작성일</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for notice in all_noticies %}
+                    <tr>
+                        <th scope="row">
+                            {% if notice.category == 'bluemover' %}
+                            블루무버
+                            {% endif %}
+                            {% if notice.category == 'posongvi' %}
+                            뽀송비 학생
+                            {% endif %}
+                            {% if notice.category == 'applicant' %}
+                            블루무버 희망자
+                            {% endif %}
+                        </th>
+                        <td><a href="{% url 'notice:read' notice.id %}">{{ notice.title }}</a></td>
+                        <td>
+                            {% if notice.writer %}
+                                {% if 'user' in notice.writer.username %}
+                                {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+                                {% else %}
+                                {{ notice.writer }}
+                                {% endif %}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if notice.created_at == notice.updated_at %}
+                            {{ notice.created_at }}
+                            {% else %}
+                            {{ notice.created_at }} <small>({{ notice.updated_at }} 수정)</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="container-md d-grid sm-flex justify-content-sm-end">
+        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}
