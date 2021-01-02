@@ -16,6 +16,11 @@ class Notice(models.Model):
     image = models.ImageField(upload_to='images/', null = True)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
+    favorite_user_set = models.ManyToManyField(User, blank=True, related_name="favorite_user_set", through="Favorite")
+
+    @property
+    def favorite_count(self):
+        return self.favorite_user_set.count()
 
 
 class Comment(models.Model):
@@ -24,3 +29,13 @@ class Comment(models.Model):
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE, related_name='comments')
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
+    created_at = models.DateField(auto_now_add=True)
+    updated_at = models.DateField(auto_now=True)
+
+    class Meta:
+        unique_together = (('user','notice'))

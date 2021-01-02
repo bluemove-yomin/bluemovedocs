@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from .models import *
 
 
@@ -40,6 +41,21 @@ def read(request, id):
     all_noticies = Notice.objects.all().order_by('-id')
     all_comments = notice.comments.all().order_by('-id')
     return render(request, 'notice/read.html', {'notice': notice, 'all_noticies': all_noticies, 'all_comments': all_comments})
+
+
+@login_required
+def notice_favorite(request, id):
+    notice = get_object_or_404(Notice, pk=id)
+    
+    if request.user in notice.favorite_user_set.all():
+        notice.favorite_user_set.remove(request.user)
+    else:
+        notice.favorite_user_set.add(request.user)
+
+    if 'next' in request.GET:
+        return redirect(request.GET['next'])
+    else:
+        return redirect('notice:main')
 
 
 @login_required

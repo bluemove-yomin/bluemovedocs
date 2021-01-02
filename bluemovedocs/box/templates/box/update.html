@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% include 'shared/_navbar4box.html' %}
-<main>
+<main class="px-3 px-md-5">
     <div class="container-md my-5 table-responsive">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">문서함 수정</h1>
         <form action="{% url 'box:update' box.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>

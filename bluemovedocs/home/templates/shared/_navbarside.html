@@ -1,0 +1,57 @@
+<ul class="navbar-nav flex-row flex-wrap ms-md-auto mb-2">
+    <li class="nav-item col-6 col-md-auto">
+        <a class="nav-link p-2" href="http://drive.bluemove.or.kr" target="_blank" rel="noopener">
+            <img src="/static/images/googledrivelogo.png" alt="구글 드라이브로 이동" title="구글 드라이브" height="20" class="d-inline-block">
+            <small class="d-md-none ms-2">Google Drive</small>
+        </a>
+    </li>
+    <li class="nav-item col-6 col-md-auto">
+        <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
+            <img src="/static/images/slacklogo.png" alt="슬랙으로 이동" title="슬랙" height="20" class="d-inline-block">
+            <small class="d-md-none ms-2">Slack</small>
+        </a>
+    </li>
+    <li class="nav-item col-6 col-md-auto">
+        <a class="nav-link p-2" href="https://notion.so/bluemove" target="_blank" rel="noopener">
+            <img src="/static/images/notionlogo.png" alt="노션으로 이동" title="노션" height="20" class="d-inline-block">
+            <small class="d-md-none ms-2">Notion</small>
+        </a>
+    </li>
+    {% if not user.is_authenticated %}
+    <li class="nav-item col-6 col-md-auto">
+        <a class="nav-link p-2" href="{% url 'account_login' %}?next={{ request.path }}">
+            <img src="/static/images/account_notauth.png" alt="로그인" title="로그인" height="20" class="d-inline-block">
+            <small class="d-md-none ms-2">Login</small>
+        </a>
+    </li>
+    {% else %}
+    <li class="nav-item col-6 col-md-auto dropdown">
+        <a class="nav-link p-2" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="/static/images/account_auth.png" alt="계정" title="계정" height="20" class="d-inline-block">
+            <small class="d-md-none ms-2">Account</small>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#">내 계정</a></li>
+            <li>
+                <form class="logout" method="POST" action="{% url 'account_logout' %}?next={{ request.path }}">
+                    {% csrf_token %}
+                    {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                    {% endif %}
+                    <button class="dropdown-item" type="submit">로그아웃</button>
+                </form>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="text-center">
+                <small>
+                    {% if not user.first_name == '' %}
+                    안녕하세요, {{ user.last_name }}{{ user.first_name }}님!
+                    {% else %}
+                    안녕하세요, {{ user }}님!
+                    {% endif %}
+                </small>
+            </li>
+        </ul>
+    </li>
+    {% endif %}
+</ul>

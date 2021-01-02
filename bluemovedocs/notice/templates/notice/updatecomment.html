@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% include 'shared/_navbar4notice.html' %}
-<main>
+<main class="px-3 px-md-5">
     <div class="container-md my-5">
         <p style="font-weight: 600;">
             {% if notice.category == 'bluemover' %}
@@ -16,6 +16,12 @@
         </p>
         <h2 style="font-weight: 600; color: #58595B;">{{ notice.title }}</h2>
         <small>
+            {% if not notice.writer.first_name == '' %}
+            {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+            {% else %}
+            {{ notice.writer }}
+            {% endif %}
+            │
             {% if notice.created_at == notice.updated_at %}
             {{ notice.created_at }}
             {% else %}
@@ -31,18 +37,20 @@
         <div style="white-space:pre-wrap;">{{ notice.content }}</div>
     </div>
 
+    <div id="commentBoxPosition"></div>
+
     <div class="container-md">
-        <form id="commentForm" name="commentForm" action="{% url 'notice:updatecomment' comment.id %}" method="POST">
+        <form id="commentForm" name="commentForm" action="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" method="POST">
             {% csrf_token %}
             <div class="card">
                 <div class="form-floating">
                     <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" {% if not user.is_authenticated %}disabled{% endif %}>{{ comment.content }}</textarea>
                     <label for="content">
                         {% if user.is_authenticated %}
-                            {% if 'user' in user.username %}
-                            {{ user.last_name }}{{ user.first_name }}님의 댓글 수정
+                            {% if not user.first_name == '' %}
+                            {{ user.last_name }}{{ user.first_name }}님의 댓글 작성
                             {% else %}
-                            {{ user }}님의 댓글 수정
+                            {{ user }}님의 댓글 작성
                             {% endif %}
                         {% else %}
                         댓글을 작성하려면 로그인하세요.
@@ -91,7 +99,7 @@
         <div class="border-bottom">
             <div class="card-body px-0">
                 <h6 class="card-title m-0" style="font-weight: 600; color: #58595B;">
-                    {% if 'user' in comment.writer.username %}
+                    {% if not comment.writer.first_name == '' %}
                     {{ comment.writer.last_name }}{{ comment.writer.first_name }}
                     {% else %}
                     {{ comment.writer }}
@@ -111,55 +119,7 @@
     </div>
     
     <div class="container-md my-5">
-        <!-- <h1 class="mb-4" style="font-weight: 600; color: #58595B;">공지사항</h1> -->
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">대상</th>
-                        <th scope="col">제목</th>
-                        <th scope="col">담당</th>
-                        <th scope="col">작성일</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for notice in all_noticies %}
-                    <tr>
-                        <th scope="row">
-                            {% if notice.category == 'bluemover' %}
-                            블루무버
-                            {% endif %}
-                            {% if notice.category == 'posongvi' %}
-                            뽀송비 학생
-                            {% endif %}
-                            {% if notice.category == 'applicant' %}
-                            블루무버 희망자
-                            {% endif %}
-                        </th>
-                        <td><a href="{% url 'notice:read' notice.id %}">{{ notice.title }}</a></td>
-                        <td>
-                            {% if notice.writer %}
-                                {% if 'user' in notice.writer.username %}
-                                {{ notice.writer.last_name }}{{ notice.writer.first_name }}
-                                {% else %}
-                                {{ notice.writer }}
-                                {% endif %}
-                            {% else %}
-                            -
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if notice.created_at == notice.updated_at %}
-                            {{ notice.created_at }}
-                            {% else %}
-                            {{ notice.created_at }} <small>({{ notice.updated_at }} 수정)</small>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        {% include 'shared/_noticetable.html' %}
     </div>
 </main>
 {% endblock %}

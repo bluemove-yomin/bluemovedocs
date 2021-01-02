@@ -8,6 +8,7 @@ urlpatterns = [
     path('<int:id>/create_comment/', create_comment, name="create_comment"),
     path('', main, name='main'),
     path('<int:id>/', read, name='read'),
+    path('<int:id>/notice_favorite/', notice_favorite, name="notice_favorite"),
     path('<int:id>/update/', update, name='update'),
     path('updatecomment/<int:comment_id>/', updatecomment, name='updatecomment'),
     path('<int:id>/updateimage/', updateimage, name='updateimage'),
