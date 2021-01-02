@@ -151,3 +151,15 @@ LOGOUT_REDIRECT_URL = '/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}

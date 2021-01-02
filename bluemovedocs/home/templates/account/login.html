@@ -66,8 +66,30 @@
     </div>
   </div>
 
+  <div class="alert alert-warning alert-dismissible fade show shadow-sm mt-3" id="account_data_alert" role="alert">
+    <strong>게스트로 처음 로그인하시나요?</strong><br><small>첫 로그인 시 자동으로 회원가입이 진행되며 Google 계정의 이메일 주소, 이름, 프로필 사진이 블루무브 닥스에 저장됩니다. 개인정보 보호를 위해 주기적으로 게스트 계정을 삭제하고 있으니 참고하시기 바랍니다. 자세한 사항은 이용방법을 참고해주세요.</small>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+    // executes when HTML-Document is loaded and DOM is ready
+    console.log("document is ready");
+    
+
+    $( "#account_data_alert" ).hover(
+    function() {
+        $(this).addClass('shadow-lg'); 
+    }, function() {
+        $(this).removeClass('shadow-lg');
+    }
+    );
+    
+    // document ready  
+    });
+  </script>
+
   <div class="alert alert-light alert-dismissible fade show shadow-sm mt-3" id="google_account_alert" role="alert">
-    Google 계정이 없다면 <a href="https://accounts.google.com/Signup" target="_blank" rel="noopener">여기를 클릭</a>해서 만들어보세요.
+    <strong>Google 계정이 없으신가요?</strong><br><small>블루무브 닥스는 Google 계정으로 이용할 수 있습니다. <a href="https://accounts.google.com/Signup" target="_blank" rel="noopener">여기를 클릭</a>해서 만들어보세요.</small>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
   <script type="text/javascript">
@@ -78,7 +100,7 @@
 
     $( "#google_account_alert" ).hover(
     function() {
-        $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+        $(this).addClass('shadow-lg'); 
     }, function() {
         $(this).removeClass('shadow-lg');
     }
