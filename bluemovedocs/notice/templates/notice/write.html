@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% include 'shared/_navbar4notice.html' %}
-<main class="px-3 px-md-5">
+<main class="px-2 px-md-5">
     <div class="container-md my-5 table-responsive">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">공지사항 작성</h1>
         <form action="{% url 'notice:create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
@@ -30,7 +30,7 @@
             <div class="form-group mb-5">
                 <label for="image" class="form-label">이미지</label>
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
-                <div id="imageHelp" class="form-text">이미지 크기는 반드시 1800 x 800이어야 합니다.</div>
+                <div id="imageHelp" class="form-text">(선택사항) 이미지 크기는 반드시 1800 x 800이어야 합니다.</div>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->

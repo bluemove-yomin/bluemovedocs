@@ -8,8 +8,8 @@ class BoxAdmin(admin.ModelAdmin):
         'category',
         'title',
         'image',
-        'deadline',
         'created_at',
+        'deadline',
         'updated_at',
     )
     search_fields = (

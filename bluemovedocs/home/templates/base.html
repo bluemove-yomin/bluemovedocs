@@ -70,6 +70,9 @@
                 color: #007DC5;
                 font-weight: 600;
             }
+            #pills-tab > .nav-item {
+                color: #58595B;
+            }
             .bookmark {
                 color: #58595B;
                 font-weight: 300;
@@ -167,6 +170,22 @@
                 color: #FFFFFF;
                 background-color: #007DC5;
             }
+            .card-group > .card {
+                margin-bottom: 1rem;
+            }
+            .nav-pills .nav-link:hover, .nav-pills .nav-link:focus {
+                background-color: #f3f3f3;
+            }
+            .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+                font-weight: 600;
+                background-color: #58595B;
+            }
+            #forBoxCSS > .nav-link {
+                color: #58595B;
+            }
+            #forBoxCSS > .nav-link.active {
+                color: #FFFFFF;
+            }
         </style>
         <title>블루무브 닥스</title>
     </head>
@@ -175,7 +194,7 @@
         {% block content %}
         {% endblock %}
         
-        <footer class="bd-footer p-3 p-md-5 mt-5 bg-light text-center text-md-start" style="position: sticky;">
+        <footer class="bd-footer px-2 py-3 p-md-5 mt-5 bg-light text-center text-md-start" style="position: sticky;">
             <div class="container-md">
                 <small>
                     <ul class="bd-footer-links ps-0 mb-3">

@@ -32,15 +32,15 @@ def create_comment(request, id):
 
 
 def main(request):
-    all_noticies = Notice.objects.all().order_by('-id')
-    return render(request, 'notice/main.html', {'all_noticies': all_noticies})
+    all_notices = Notice.objects.all().order_by('-id')
+    return render(request, 'notice/main.html', {'all_notices': all_notices})
 
 
 def read(request, id):
     notice = Notice.objects.get(pk=id)
-    all_noticies = Notice.objects.all().order_by('-id')
+    all_notices = Notice.objects.all().order_by('-id')
     all_comments = notice.comments.all().order_by('-id')
-    return render(request, 'notice/read.html', {'notice': notice, 'all_noticies': all_noticies, 'all_comments': all_comments})
+    return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
 @login_required
@@ -87,13 +87,13 @@ def updateimage(request, id):
 def updatecomment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
     notice = Notice.objects.get(pk=comment.notice.id)
-    all_noticies = Notice.objects.all().order_by('-id')
+    all_notices = Notice.objects.all().order_by('-id')
     all_comments = notice.comments.all().order_by('-id')
     if request.method == "POST":
         comment.content = request.POST['content']
         comment.save()
         return redirect('notice:read', id=comment.notice.id)
-    return render(request, 'notice/updatecomment.html', {'comment': comment, 'notice': notice, 'all_noticies': all_noticies, 'all_comments': all_comments})
+    return render(request, 'notice/updatecomment.html', {'comment': comment, 'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
 @login_required

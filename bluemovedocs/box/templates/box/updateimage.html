@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% include 'shared/_navbar4box.html' %}
-<main class="px-3 px-md-5">
+<main class="px-2 px-md-5">
     <div class="container-md my-5 table-responsive">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">
             {% if box.image %}
@@ -66,7 +66,7 @@
                 {% if box.image %}
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
                 <div id="imageHelp" class="form-text">
-                    이미지 크기는 반드시 1800 x 800이어야 합니다.<br><br>
+                    (선택사항) 이미지 크기는 반드시 1800 x 800이어야 합니다.<br><br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 변경</span>: 새로운 이미지를 첨부한 뒤 '이미지 변경 등록하기'를 누르세요.<br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 삭제</span>: 아무것도 첨부하지 않은 채 '이미지 변경 등록하기'를 누르세요.
                 </div>

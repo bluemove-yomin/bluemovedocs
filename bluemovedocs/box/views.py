@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+import datetime
 from .models import *
 
 
@@ -13,21 +15,22 @@ def create(request):
     if request.method == "POST":
         box_category = request.POST.get('category')
         box_title = request.POST.get('title')
+        box_writer = request.user
         box_deadline = request.POST.get('deadline')
         box_content = request.POST.get('content')
         box_image = request.FILES.get('image')
-        Box.objects.create(category=box_category, title=box_title, deadline=box_deadline, content=box_content, image=box_image)
+        Box.objects.create(category=box_category, title=box_title, writer=box_writer, deadline=box_deadline, content=box_content, image=box_image)
     return redirect('box:main')
 
 
 def main(request):
-    all_boxes = Box.objects.all().order_by('-id')
+    all_boxes = Box.objects.order_by('deadline')
     return render(request, 'box/main.html', {'all_boxes': all_boxes})
 
 
 def read(request, id):
     box = Box.objects.get(pk=id)
-    all_boxes = Box.objects.all().order_by('-id')
+    all_boxes = Box.objects.all().order_by('deadline')
     return render(request, 'box/read.html', {'box': box, 'all_boxes': all_boxes})
 
 

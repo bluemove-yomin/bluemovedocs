@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for notice in all_noticies %}
+            {% for notice in all_notices %}
             <tr>
                 <th scope="row">
                     {% if notice.category == 'bluemover' %}
@@ -90,8 +90,8 @@
 
 
 <!-- noticetable-list -->
-<div class="list-group list-group-flush pt-2" id="noticetable-list">
-    {% for notice in all_noticies %}
+<div class="list-group list-group-flush" id="noticetable-list">
+    {% for notice in all_notices %}
     <div class="list-group-item px-0">
         <div class="d-flex w-100 justify-content-between">
             <p class="mb-1" style="font-weight: 600;">
