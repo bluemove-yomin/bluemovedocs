@@ -15,13 +15,63 @@
             {% endif %}
         </p>
         <h2 style="font-weight: 600; color: #58595B;">{{ box.title }}</h2>
-        <small>
-            {% if box.created_at == box.updated_at %}
-            {{ box.created_at }} ~ {{ box.deadline }}
-            {% else %}
-            {{ box.created_at }} ~ {{ box.deadline }} (변경)
-            {% endif %}
-        </small>
+
+        <!-- boxBadge4Large -->
+        <div class="d-flex justify-content-sm-between" id="boxBadge4Large">
+            <small>
+                {% if not box.writer.first_name == '' %}
+                {{ box.writer.last_name }}{{ box.writer.first_name }}
+                {% else %}
+                {{ box.writer }}
+                {% endif %}
+                │
+                {% if box.created_at == box.updated_at %}
+                {{ box.created_at }} ~ {{ box.deadline }}
+                {% else %}
+                {{ box.created_at }} ~ {{ box.deadline }} (변경)
+                {% endif %}
+            </small>
+            <div class="d-flex align-items-stretch">
+                {% if box.deadline_is_yet_to_come %}
+                <span class="badge bg-primary">{{ box.days_left_until_deadline.days }}일 후 마감</span>
+                {% elif box.deadline_is_tomorrow %}
+                <span class="badge bg-warning text-dark">내일 마감</span>
+                {% elif box.deadline_is_today %}
+                <span class="badge bg-danger">오늘 마감</span>
+                {% elif box.deadline_is_over %}
+                <span class="badge bg-dark">마감</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- boxBadge4Small -->
+        <div id="boxBadge4Small">
+            <small>
+                {% if not box.writer.first_name == '' %}
+                {{ box.writer.last_name }}{{ box.writer.first_name }}
+                {% else %}
+                {{ box.writer }}
+                {% endif %}
+                │
+                {% if box.created_at == box.updated_at %}
+                {{ box.created_at }} ~ {{ box.deadline }}
+                {% else %}
+                {{ box.created_at }} ~ {{ box.deadline }} (변경)
+                {% endif %}
+            </small>
+            <div class="sm-flex d-grid align-items-stretch mt-2">
+                {% if box.deadline_is_yet_to_come %}
+                <span class="badge bg-primary">{{ box.days_left_until_deadline.days }}일 후 마감</span>
+                {% elif box.deadline_is_tomorrow %}
+                <span class="badge bg-warning text-dark">내일 마감</span>
+                {% elif box.deadline_is_today %}
+                <span class="badge bg-danger">오늘 마감</span>
+                {% elif box.deadline_is_over %}
+                <span class="badge bg-dark">마감</span>
+                {% endif %}
+            </div>
+        </div>
+
         <hr class="text-black-50">
         {% if box.image %}
         <div class="mb-4 d-flex justify-content-center">
@@ -30,6 +80,7 @@
         {% endif %}
         <div style="white-space:pre-wrap;">{{ box.content }}</div>
     </div>
+    {% if user == box.writer %}
     <div class="container-md d-grid gap-2 d-sm-flex justify-content-sm-end">
         <!-- Button trigger modal -->
         <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
@@ -60,6 +111,7 @@
         </a>
         <a href="{% url 'box:update' box.id %}" class="btn btn-outline-secondary">수정하기</a>
     </div>
+    {% endif %}
 
     <div class="container-md mt-5">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">문서함</h1>

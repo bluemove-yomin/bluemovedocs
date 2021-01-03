@@ -30,7 +30,7 @@
             <img src="/static/images/account_auth.png" alt="계정" title="계정" height="20" class="d-inline-block">
             <small class="d-md-none ms-2">Account</small>
         </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
             <li><a class="dropdown-item" href="{% url 'users:myaccount' user.id %}">내 계정</a></li>
             <li>
                 <form class="logout" method="POST" action="{% url 'account_logout' %}?next={{ request.path }}">

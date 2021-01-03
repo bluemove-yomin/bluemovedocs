@@ -20,13 +20,21 @@ class Box(models.Model):
     updated_at = models.DateField(auto_now = True)
 
     @property
-    def deadline_is_today(self):
-        return datetime.date.today() == self.deadline
+    def deadline_is_yet_to_come(self):
+        return datetime.date.today() + datetime.timedelta(days = 2) <= self.deadline
 
     @property
     def deadline_is_tomorrow(self):
         return datetime.date.today() + datetime.timedelta(days = 1) == self.deadline
 
     @property
+    def deadline_is_today(self):
+        return datetime.date.today() == self.deadline
+
+    @property
     def deadline_is_over(self):
         return datetime.date.today() > self.deadline
+
+    @property
+    def days_left_until_deadline(self):
+        return self.deadline - datetime.date.today()
