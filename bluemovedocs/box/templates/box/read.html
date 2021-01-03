@@ -25,10 +25,16 @@
                 {{ box.writer }}
                 {% endif %}
                 │
-                {% if box.created_at == box.updated_at %}
-                {{ box.created_at }} ~ {{ box.deadline }}
+                {% if box.deadline_update_flag %}
+                {{ box.created_at }} ~ {{ box.deadline }} (일정 변경)
                 {% else %}
-                {{ box.created_at }} ~ {{ box.deadline }} (변경)
+                {{ box.created_at }} ~ {{ box.deadline }}
+                {% endif %}
+                {% if box.content_update_flag %}
+                │
+                <span style="color: #58595B;">
+                    <i class="fas fa-sync"></i> {{ box.updated_at|date:'Y-m-d' }} 내용 수정
+                </span>
                 {% endif %}
             </small>
             <div class="d-flex align-items-stretch">
@@ -39,7 +45,7 @@
                 {% elif box.deadline_is_today %}
                 <span class="badge bg-danger">오늘 마감</span>
                 {% elif box.deadline_is_over %}
-                <span class="badge bg-dark">마감</span>
+                <span class="badge bg-dark">{{ box.deadline|date:'Y-m-d' }} 마감</span>
                 {% endif %}
             </div>
         </div>
@@ -53,10 +59,16 @@
                 {{ box.writer }}
                 {% endif %}
                 │
-                {% if box.created_at == box.updated_at %}
-                {{ box.created_at }} ~ {{ box.deadline }}
+                {% if box.deadline_update_flag %}
+                {{ box.created_at }} ~ {{ box.deadline }} (일정 변경)
                 {% else %}
-                {{ box.created_at }} ~ {{ box.deadline }} (변경)
+                {{ box.created_at }} ~ {{ box.deadline }}
+                {% endif %}
+                {% if box.content_update_flag %}
+                │
+                <span style="color: #58595B;">
+                    <i class="fas fa-sync"></i> {{ box.updated_at|date:'Y-m-d' }} 내용 수정
+                </span>
                 {% endif %}
             </small>
             <div class="sm-flex d-grid align-items-stretch mt-2">
@@ -67,7 +79,7 @@
                 {% elif box.deadline_is_today %}
                 <span class="badge bg-danger">오늘 마감</span>
                 {% elif box.deadline_is_over %}
-                <span class="badge bg-dark">마감</span>
+                <span class="badge bg-dark">{{ box.deadline|date:'Y-m-d' }} 마감</span>
                 {% endif %}
             </div>
         </div>
@@ -114,7 +126,7 @@
     {% endif %}
 
     <div class="container-md mt-5">
-        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">문서함</h1>
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📁 문서함</h1>
         {% include 'shared/_boxcard.html' %}
     </div>
     {% if user.is_authenticated %}

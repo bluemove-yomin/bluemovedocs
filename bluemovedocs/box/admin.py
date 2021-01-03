@@ -7,9 +7,12 @@ class BoxAdmin(admin.ModelAdmin):
         'id',
         'category',
         'title',
+        'content',
+        'content_update_flag',
         'image',
         'created_at',
         'deadline',
+        'deadline_update_flag',
         'updated_at',
     )
     search_fields = (

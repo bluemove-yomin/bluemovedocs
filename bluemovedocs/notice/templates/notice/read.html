@@ -25,7 +25,7 @@
             {% if notice.created_at == notice.updated_at %}
             {{ notice.created_at }}
             {% else %}
-            {{ notice.created_at }} ({{ notice.updated_at }} 수정)
+            {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
             {% endif %}
         </small>
         <hr class="text-black-50">
@@ -134,7 +134,7 @@
                     {% if comment.created_at == comment.updated_at %}
                     {{ comment.created_at }}
                     {% else %}
-                    {{ comment.created_at }} ({{ comment.updated_at }} 수정)
+                    {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
                     {% endif %}
                 </small>
                 <p class="card-text mt-1" style="white-space:pre-wrap;">{{ comment.content }}</p>
@@ -152,7 +152,7 @@
     </div>
     
     <div class="container-md mt-5">
-        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">공지사항</h1>
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📢 공지사항</h1>
         {% include 'shared/_noticetable.html' %}
     </div>
     {% if user.is_authenticated %}
