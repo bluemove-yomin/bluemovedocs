@@ -129,7 +129,7 @@
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📁 문서함</h1>
         {% include 'shared/_boxcard.html' %}
     </div>
-    {% if user.is_authenticated %}
+    {% if perms.box %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5">
         <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
     </div>

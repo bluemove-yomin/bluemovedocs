@@ -43,12 +43,23 @@
             </li>
             <li><hr class="dropdown-divider"></li>
             <li class="text-center">
+                {% if perms.notice %}
+                <img height="25" src="/static/images/favicons/favicon-32x32.png">
+                {% endif %}
+                {% for account in user.socialaccount_set.all %}
+                <img height="25" src="{{ account.get_avatar_url|add:'-rg-br100' }}"/>
+                {% endfor %}
                 <small>
-                    {% if not user.first_name == '' %}
-                    안녕하세요, {{ user.last_name }}{{ user.first_name }}님!
-                    {% else %}
-                    안녕하세요, {{ user }}님!
+                    {% if perms.notice %}
+                    {{ user.first_name }} 매니저님
                     {% endif %}
+                    {% for account in user.socialaccount_set.all %}
+                        {% if account.extra_data.hd == 'bluemove.or.kr' %}
+                        {{ account.extra_data.name }} 블루무버님
+                        {% else %}
+                        {{ account.extra_data.name }} 게스트님
+                        {% endif %}
+                    {% endfor %}
                 </small>
             </li>
         </ul>

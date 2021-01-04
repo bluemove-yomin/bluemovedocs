@@ -3,10 +3,9 @@
 {% include 'shared/_navbar4home.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md mt-5">
-        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">내 계정</h1>
+        <h1 class="mb-4" style="font-weight: 600; color: #58595B;">🐬 내 계정</h1>
         {% if user.is_authenticated %}
-        <h3 class="mb-4" style="font-weight: 600; color: #58595B;">내가 작성한 공지사항</h3>
-        {% include 'shared/_mynoticestable.html' %}
+        
 
         <span>{{ user }}님이 로그인중입니다.</span>
      
@@ -15,13 +14,17 @@
          {% comment %} show avatar from url {% endcomment %}
          <h2 style="text-transform:capitalize;">{{ account.provider }} account data</h2>
      
-         <p><img width="50" height="50" src="{{ account.get_avatar_url }}"/></p>
+         <p><img src="{{ account.get_avatar_url|add:'-rg-br100' }}"/></p>
      
          <p>UID: <a href="{{ account.extra_data.link }}">{{ account.uid }}</a></p>
      
-         <p>Username: {{ account.extra_data.username }}</p>
-          <p>First Name: {{ account.extra_data.first_name }}</p>
-          <p>Last Name: {{ account.extra_data.last_name }}</p>
+         <p>Username: {{ account.extra_data.name }}</p>
+          <p>First Name: {{ account.extra_data.given_name }}</p>
+          <p>Last Name: {{ account.extra_data.family_name }}</p>
+          <p>E-mail: {{ account.extra_data.email }}</p>
+          <p>DATE_JOINED: {{ account.date_joined }}</p>
+          <p>LAST_LOGIN: {{ account.last_login }}</p>
+          <p>블루무버 여부: {{ account.extra_data.hd }}</p>
      
           <p>Dashboard Link:
           <a href="{{ account.extra_data.link }}">{{ account.extra_data.link }}</a></p>
