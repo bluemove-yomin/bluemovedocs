@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %} 로그인 | 블루무브 닥스 {% endblock %}
 
 {% load i18n %}
 {% load account socialaccount %}
@@ -67,7 +68,7 @@
   </div>
 
   <div class="alert alert-warning alert-dismissible fade show shadow-sm mt-3" id="account_data_alert" role="alert">
-    <strong>처음 로그인하시나요?</strong><br><small>첫 로그인 시 자동으로 회원가입이 진행되며 Google 계정의 이메일 주소, 이름, 프로필 사진이 블루무브 닥스에 저장됩니다. 게스트 계정의 경우 개인정보 보호를 위해 주기적으로 삭제하고 있으니 참고하시기 바랍니다. 자세한 사항은 이용방법을 참고해주세요.</small>
+    <strong>처음 로그인하시나요?</strong><br><small>첫 로그인 시 자동으로 회원가입이 진행되며 이름, 이메일 주소, 프로필 사진이 블루무브 닥스에 저장됩니다. 게스트 계정의 경우 개인정보 보호를 위해 주기적으로 삭제하고 있으니 참고하시기 바랍니다. 자세한 사항은 이용방법을 참고해주세요.</small>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
   </div>
   <script type="text/javascript">

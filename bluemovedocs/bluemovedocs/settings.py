@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'p))=+%0jt3=tzv)i$vscj0+o-rypw^br6=ip+fre=mgmaidjf&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # 배포 시 도메인 입력
 ALLOWED_HOSTS = ['*']

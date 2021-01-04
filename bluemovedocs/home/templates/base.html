@@ -5,7 +5,7 @@
     <head>
         <!-- Required meta tags -->
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -42,6 +42,19 @@
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
         <style>
+            /* 에러 템플릿 모바일 최적화 */
+            @media screen and (max-width: 340px) {
+                #errorPageLarge {
+                    display: none;
+                }
+            }
+
+            @media screen and (min-width: 341px) {
+                #errorPageSmall {
+                    display: none;
+                }
+            }
+
             /* 모바일 최적화 */
             @media screen and (max-width: 650px) {
                 #boxBadge4Large {
@@ -54,12 +67,14 @@
                     display: none;
                 }
             }
+
             /* 태블릿 최적화 */
             @media screen and (max-width: 767px) {
                 #noticetable-table {
                     display: none;
                 }
             }
+
             /* 데스크탑 최적화 */
             @media screen and (min-width: 768px) {
                 #noticetable-list {
@@ -231,11 +246,12 @@
                 background-color: #007DC5!important;
             }
         </style>
-        <title>블루무브 닥스</title>
+        <title>{% block title %} Override Here {% endblock %}</title>
     </head>
 
     <body>
         {% block content %}
+        Override Here
         {% endblock %}
         
         <footer class="bd-footer px-2 py-3 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 70px;">

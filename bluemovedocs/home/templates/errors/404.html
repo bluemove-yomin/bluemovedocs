@@ -1,12 +1,43 @@
-{% extends 'errors/error_base.html' %}
-{% block title %} Page Not Found Error 404 {% endblock %}
+{% extends 'base.html' %}
+{% block title %} 404 Not Found | 블루무브 닥스 {% endblock %}
 {% block content %}
-<div class="card-header">
-  Page Not Found - Error 404
-</div>
-<div class="card-block">
-  <p class="lead">
-    Your requested page, Not Found.
-  </p>
-</div>
+{% include 'shared/_navbar4home.html' %}
+<main class="px-2 px-md-5">
+    <div class="container-md mt-5">
+        <h1 class="mb-4" id="errorPageLarge" style="font-weight: 600; color: #58595B;">👀 앗, 꾀꼬리!</h1>
+        <h2 class="mb-4" id="errorPageSmall" style="font-weight: 600; color: #58595B;">👀 앗, 꾀꼬리!</h2>
+        <p class="pt-1">
+            {% if perms.auth %}
+            {{ user.first_name }} 매니저님의
+            {% endif %}
+            {% for account in user.socialaccount_set.all %}
+                {% if account.extra_data.hd == 'bluemove.or.kr' %}
+                {{ account.extra_data.name }} 블루무버님의
+                {% else %}
+                {{ account.extra_data.name }} 게스트님의
+                {% endif %}
+            {% endfor %}
+            요청을 처리하려고 했으나 서버가 해당 리소스를 찾지 못 했어요. 😥<br>
+            오류가 반복된다면 사무국에 연락해주세요.
+        </p>
+        <small>
+            <br>
+            <strong>HTTP_STATUS_CODE:</strong> 404 Not Found<br>
+            <strong>HTTP_METHOD:</strong> {{ request.META.REQUEST_METHOD }}<br>
+            <strong>USER_AGENT:</strong> {{ request.META.HTTP_USER_AGENT }}<br>
+            <strong>USER_EMAIL:</strong> {% if request.user.is_authenticated %}{{ user.email }}{% else %}User is not authenticated{% endif %}{% for account in user.socialaccount_set.all %}{{ account.extra_data.email }}{% endfor %}<br>
+            <strong>PREVIOUS_URL:</strong> {{ request.META.HTTP_REFERER }}<br>
+            <strong>CURRENT_URI:</strong> {{ request.build_absolute_uri }}
+        </small>
+        <div class="d-grid sm-flex justify-content-sm-end mt-5">
+            <a type="button" class="btn btn-outline-secondary" onclick="goBack()">뒤로 가기</a>
+            <!-- goBack Script -->
+            <script>
+                function goBack() {
+                  window.history.back();
+                }
+            </script>
+        </div>
+    </div>
+</main>
 {% endblock %}

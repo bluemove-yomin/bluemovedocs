@@ -50,7 +50,7 @@
                 <img height="24" src="{{ account.get_avatar_url|add:'-rg-br100' }}"/>
                 {% endfor %}
                 <small>
-                    {% if perms.notice %}
+                    {% if perms.auth %}
                     {{ user.first_name }} 매니저님
                     {% endif %}
                     {% for account in user.socialaccount_set.all %}
