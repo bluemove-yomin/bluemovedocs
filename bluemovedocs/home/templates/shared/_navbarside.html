@@ -6,15 +6,15 @@
         </a>
     </li>
     <li class="nav-item col-6 col-md-auto">
-        <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
-            <img src="/static/images/slacklogo.png" alt="슬랙으로 이동" title="슬랙" height="20" class="d-inline-block">
-            <small class="d-md-none ms-2">Slack</small>
-        </a>
-    </li>
-    <li class="nav-item col-6 col-md-auto">
         <a class="nav-link p-2" href="https://notion.so/bluemove" target="_blank" rel="noopener">
             <img src="/static/images/notionlogo.png" alt="노션으로 이동" title="노션" height="20" class="d-inline-block">
             <small class="d-md-none ms-2">Notion</small>
+        </a>
+    </li>
+    <li class="nav-item col-6 col-md-auto">
+        <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
+            <img src="/static/images/slacklogo.png" alt="슬랙으로 이동" title="슬랙" height="20" class="d-inline-block">
+            <small class="d-md-none ms-2">Slack</small>
         </a>
     </li>
     {% if not user.is_authenticated %}
@@ -44,10 +44,10 @@
             <li><hr class="dropdown-divider"></li>
             <li class="text-center">
                 {% if perms.notice %}
-                <img height="25" src="/static/images/favicons/favicon-32x32.png">
+                <img height="24" src="/static/images/favicons/favicon-32x32.png">
                 {% endif %}
                 {% for account in user.socialaccount_set.all %}
-                <img height="25" src="{{ account.get_avatar_url|add:'-rg-br100' }}"/>
+                <img height="24" src="{{ account.get_avatar_url|add:'-rg-br100' }}"/>
                 {% endfor %}
                 <small>
                     {% if perms.notice %}

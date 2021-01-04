@@ -26,3 +26,9 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('users/', include('users.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+handler500 = 'home.views.handler500'
+handler404 = 'home.views.handler404'
+handler403 = 'home.views.handler403'
+handler400 = 'home.views.handler400'

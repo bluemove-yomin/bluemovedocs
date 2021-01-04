@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 import datetime
 from .models import *
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def write(request):
     return render(request, 'box/write.html')
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def create(request):
     if request.method == "POST":
         box_category = request.POST.get('category')
@@ -34,7 +35,7 @@ def read(request, id):
     return render(request, 'box/read.html', {'box': box, 'all_boxes': all_boxes})
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def update(request, id):
     box = get_object_or_404(Box, pk=id)
     if request.method == "POST":
@@ -47,7 +48,7 @@ def update(request, id):
     return render(request, 'box/update.html', {'box': box})
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
     if request.method == "POST":
@@ -61,7 +62,7 @@ def updateimage(request, id):
     return render(request, 'box/updateimage.html', {'box': box})
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def delete(request, id):
     box = get_object_or_404(Box, pk=id)
     box.delete()

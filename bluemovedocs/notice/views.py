@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
 from .models import *
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def write(request):
     return render(request, 'notice/write.html')
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def create(request):
     if request.method == "POST":
         notice_category = request.POST.get('category')
@@ -58,7 +58,7 @@ def notice_favorite(request, id):
         return redirect('notice:main')
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def update(request, id):
     notice = get_object_or_404(Notice, pk=id)
     if request.method == "POST":
@@ -70,7 +70,7 @@ def update(request, id):
     return render(request, 'notice/update.html', {'notice': notice})
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def updateimage(request, id):
     notice = get_object_or_404(Notice, pk=id)
     if request.method == "POST":
@@ -96,7 +96,7 @@ def updatecomment(request, comment_id):
     return render(request, 'notice/updatecomment.html', {'comment': comment, 'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
-@login_required
+@permission_required('auth.add_permission', raise_exception=True)
 def delete(request, id):
     notice = get_object_or_404(Notice, pk=id)
     notice.delete()
