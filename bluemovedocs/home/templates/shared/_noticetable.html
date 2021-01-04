@@ -41,7 +41,7 @@
                     {% if notice.created_at == notice.updated_at %}
                     {{ notice.created_at }}
                     {% else %}
-                    {{ notice.created_at }} │ <i class="fas fa-sync"></i> {{ notice.updated_at }} 수정
+                    {{ notice.created_at }}<small style="color: #6C757D;"> │ <i class="fas fa-sync"></i> {{ notice.updated_at }} 수정 </small>
                     {% endif %}
                 </td>
                 <td>
@@ -81,6 +81,12 @@
                         </div>
                     </div>
                     {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">
+                    <div class="text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p class="mb-4">공지사항이 없습니다.</p></div>
                 </td>
             </tr>
             {% endfor %}
@@ -150,10 +156,14 @@
                 {% if notice.created_at == notice.updated_at %}
                 {{ notice.created_at }}
                 {% else %}
-                {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
+                {{ notice.created_at }}<span style="color: #6C757D;"> │ <i class="fas fa-sync"></i> {{ notice.updated_at }} 수정 </span>
                 {% endif %}
             </small>
         </div>
+    </div>
+    {% empty %}
+    <div class="list-group-item px-0">
+        <div class="text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>공지사항이 없습니다.</p></div>
     </div>
     {% endfor %}
 </div>

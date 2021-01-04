@@ -145,8 +145,11 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
 SITE_ID = 1
+
 LOGIN_REDIRECT_URL = '/'
+
 LOGOUT_REDIRECT_URL = '/'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -158,9 +161,91 @@ SOCIALACCOUNT_PROVIDERS = {
         'SCOPE': [
             'profile',
             'email',
+            'openid',
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
         }
     }
 }
+
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+ACCOUNT_USERNAME_BLACKLIST = [
+    'bluewavebluemove',
+    'bluewavebluemove-secretariat',
+    'bluewavebluemove-management',
+    'bluewavebluemove-posongvi',
+    'bluewavebluemove-barrierfree',
+    'bluewavebluemove_secretariat',
+    'bluewavebluemove_management',
+    'bluewavebluemove_posongvi',
+    'bluewavebluemove_barrierfree',
+    'bluewavebluemove.secretariat',
+    'bluewavebluemove.management',
+    'bluewavebluemove.posongvi',
+    'bluewavebluemove.barrierfree',
+    'bluewavebluemove+secretariat',
+    'bluewavebluemove+management',
+    'bluewavebluemove+posongvi',
+    'bluewavebluemove+barrierfree',
+    'bluewavebluemove-management-team',
+    'bluewavebluemove-posongvi-team',
+    'bluewavebluemove-barrierfree-team',
+    'bluewavebluemove_management_team',
+    'bluewavebluemove_posongvi_team',
+    'bluewavebluemove_barrierfree_team',
+    'bluewavebluemove.management.team',
+    'bluewavebluemove.posongvi.team',
+    'bluewavebluemove.barrierfree.team',
+    'bluewavebluemove+management+team',
+    'bluewavebluemove+posongvi+team',
+    'bluewavebluemove+barrierfree+team',
+    'bluemove',
+    'bluemove-secretariat',
+    'bluemove-management',
+    'bluemove-posongvi',
+    'bluemove-barrierfree',
+    'bluemove_secretariat',
+    'bluemove_management',
+    'bluemove_posongvi',
+    'bluemove_barrierfree',
+    'bluemove.secretariat',
+    'bluemove.management',
+    'bluemove.posongvi',
+    'bluemove.barrierfree',
+    'bluemove+secretariat',
+    'bluemove+management',
+    'bluemove+posongvi',
+    'bluemove+barrierfree',
+    'bluemove-management-team',
+    'bluemove-posongvi-team',
+    'bluemove-barrierfree-team',
+    'bluemove_management_team',
+    'bluemove_posongvi_team',
+    'bluemove_barrierfree_team',
+    'bluemove.management.team',
+    'bluemove.posongvi.team',
+    'bluemove.barrierfree.team',
+    'bluemove+management+team',
+    'bluemove+posongvi+team',
+    'bluemove+barrierfree+team',
+    'secretariat',
+    'management',
+    'posongvi',
+    'barrierfree',
+    'management-team',
+    'posongvi-team',
+    'barrierfree-team',
+    'management_team',
+    'posongvi_team',
+    'barrierfree_team',
+    'management.team',
+    'posongvi.team',
+    'barrierfree.team',
+    'management+team',
+    'posongvi+team',
+    'barrierfree+team',
+]
