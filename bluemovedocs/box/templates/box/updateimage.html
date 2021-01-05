@@ -67,14 +67,14 @@
                 {% if box.image %}
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
                 <div id="imageHelp" class="form-text">
-                    (선택사항) 이미지 크기는 반드시 1800 x 800이어야 합니다.<br><br>
+                    (선택사항) 이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다. 권장 크기는 1800 x 900입니다.<br><br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 변경</span>: 새로운 이미지를 첨부한 뒤 '이미지 변경 등록하기'를 누르세요.<br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 삭제</span>: 아무것도 첨부하지 않은 채 '이미지 변경 등록하기'를 누르세요.
                 </div>
                 {% else %}
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*" required>
                 <div class="invalid-feedback">추가할 이미지를 업로드하세요.</div>
-                <div id="imageHelp" class="form-text">이미지 크기는 반드시 1800 x 800이어야 합니다.</div>
+                <div id="imageHelp" class="form-text">이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다. 권장 크기는 1800 x 900입니다.</div>
                 {% endif %}
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
@@ -144,6 +144,55 @@
             }, false);
         })();
         </script>
+
+        <!-- Image Validation -->
+        <script>
+            var _URL = window.URL || window.webkitURL;
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault(); // Stop the submit for now
+                // Replace with your selector to find the file input in your form
+                var fileInput = $(this).find("input[type=file]")[0],
+                    file = fileInput.files && fileInput.files[0];
+                if( file ) {
+                    var img = new Image();
+                    img.onerror = function() {
+                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 업로드하세요.");
+                        document.querySelector("#image").value = '';
+                    };
+                    img.src = _URL.createObjectURL( file );
+                    img.onload = function() {
+                        var width = img.naturalWidth,
+                            height = img.naturalHeight;
+                        _URL.revokeObjectURL( img.src );
+                        if( width == 1800 && height == 900 ) {
+                            form.submit();
+                        }
+                        else {
+                            ratio = width/height
+                            if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1)" + "  → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속 하시겠어요?") ) {
+                                form.submit();
+                            }
+                            else {
+
+                            }
+                        }
+                    };
+                }
+                else { // No file was input or browser doesn't support client side reading
+                    // 이미지 변경 작업에서 필드에 아무것도 입력되지 않을 경우 삭제 안내 메시지 출력
+                    if ( document.querySelector("body > main > div > form > div.form-group.mb-5 > div.mb-4.d-flex.justify-content-center > img") ) {
+                        if ( confirm("이미지를 삭제하시겠어요?") ) {
+                            form.submit();
+                        }
+                        else {}
+                    }
+                    // 이미지 추가 작업에서 필드에 아무것도 입력되지 않을 경우 Forms Validation 실행
+                    else {}
+                }
+            });
+        </script>
+
     </div>
 </main>
 {% endblock %}

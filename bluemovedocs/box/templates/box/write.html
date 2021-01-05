@@ -40,7 +40,7 @@
             <div class="form-group mb-5">
                 <label for="image" class="form-label">이미지</label>
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
-                <div id="imageHelp" class="form-text">(선택사항) 이미지 크기는 반드시 1800 x 800이어야 합니다.</div>
+                <div id="imageHelp" class="form-text">(선택사항) 이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다. 권장 크기는 1800 x 900입니다.</div>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
@@ -76,7 +76,7 @@
         <!-- Forms Validation -->
         <script>
         // Disable form submissions if there are invalid fields
-        (function() {
+        (function formCheck() {
             'use strict';
             window.addEventListener('load', function() {
             // Get the forms we want to add validation styles to
@@ -93,6 +93,46 @@
             });
             }, false);
         })();
+        </script>
+
+        <!-- Image Validation -->
+        <script>
+            var _URL = window.URL || window.webkitURL;
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault(); // Stop the submit for now
+                // Replace with your selector to find the file input in your form
+                var fileInput = $(this).find("input[type=file]")[0],
+                    file = fileInput.files && fileInput.files[0];
+                if( file ) {
+                    var img = new Image();
+                    img.onerror = function() {
+                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 업로드하세요.");
+                        document.querySelector("#image").value = '';
+                    };
+                    img.src = _URL.createObjectURL( file );
+                    img.onload = function() {
+                        var width = img.naturalWidth,
+                            height = img.naturalHeight;
+                        _URL.revokeObjectURL( img.src );
+                        if( width == 1800 && height == 900 ) {
+                            form.submit();
+                        }
+                        else {
+                            ratio = width/height
+                            if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1)" + "  → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속 하시겠어요?") ) {
+                                form.submit();
+                            }
+                            else {
+
+                            }
+                        }
+                    };
+                }
+                else { // 필드에 아무것도 입력되지 않더라도 등록 처리
+                    form.submit();
+                }
+            });
         </script>
 
     </div>
