@@ -26,7 +26,7 @@
             <strong>HTTP_METHOD:</strong> {{ request.META.REQUEST_METHOD }}<br>
             <strong>USER_AGENT:</strong> {{ request.META.HTTP_USER_AGENT }}<br>
             <strong>USER_EMAIL:</strong> {% if request.user.is_authenticated %}{{ user.email }}{% else %}User is not authenticated{% endif %}{% for account in user.socialaccount_set.all %}{{ account.extra_data.email }}{% endfor %}<br>
-            <strong>PREVIOUS_URL:</strong> {{ request.META.HTTP_REFERER }}<br>
+            <strong>PREVIOUS_URI:</strong> {{ request.META.HTTP_REFERER }}<br>
             <strong>CURRENT_URI:</strong> {{ request.build_absolute_uri }}
         </small>
         <div class="d-grid sm-flex justify-content-sm-end mt-5">

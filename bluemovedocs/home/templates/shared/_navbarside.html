@@ -36,7 +36,11 @@
             {% endif %}
             <li><a class="dropdown-item" href="{% url 'users:myaccount' user.id %}">💙 내 계정</a></li>
             <li>
+                {% if 'write' in request.path or 'update' in request.path %}
+                <form class="logout" method="POST" action="{% url 'account_logout' %}">
+                {% else %}
                 <form class="logout" method="POST" action="{% url 'account_logout' %}?next={{ request.path }}">
+                {% endif %}
                     {% csrf_token %}
                     {% if redirect_field_value %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
