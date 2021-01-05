@@ -32,30 +32,6 @@
                 <label for="image" class="form-label">이미지</label>
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
                 <div id="imageHelp" class="form-text">(선택사항) 이미지 크기는 반드시 1800 x 900이어야 합니다.</div>
-                <script>
-                    var _URL = window.URL || window.webkitURL;
-                    $("#image").change(function(e) {
-                        var file, img;
-                        if ((file = this.files[0])) {
-                            img = new Image();
-                            img.onerror = function() {
-                                alert("이미지 파일을 업로드하세요." + "\n\n( 현재 파일: " + file.name + " )");
-                            };
-                            img.src = _URL.createObjectURL(file);
-                            img.onload = function() {
-                                var width = img.naturalWidth,
-                                    height = img.naturalHeight;
-                                _URL.revokeObjectURL( img.src );
-                                if( width == 1800 && height == 900 ) {
-                                }
-                                else {
-                                    alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n( 현재 이미지 크기: " + width + " x " + height + " )");
-                                    //fail
-                                }
-                            };
-                        }
-                    });
-                </script>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
@@ -115,15 +91,16 @@
             var _URL = window.URL || window.webkitURL;
             $("form").submit( function( e ) {
                 var form = this;
-                e.preventDefault(); //Stop the submit for now
-                                            //Replace with your selector to find the file input in your form
+                e.preventDefault(); // Stop the submit for now
+                // Replace with your selector to find the file input in your form
                 var fileInput = $(this).find("input[type=file]")[0],
                     file = fileInput.files && fileInput.files[0];
                 if( file ) {
                     var img = new Image();
                     img.onerror = function() {
-                                alert( "이미지 파일을 업로드하세요." + "\n\n( 현재 파일: " + file.name + " )");
-                            };
+                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 첨부하세요.");
+                        document.querySelector("#image").value = '';
+                    };
                     img.src = _URL.createObjectURL( file );
                     img.onload = function() {
                         var width = img.naturalWidth,
@@ -133,12 +110,11 @@
                             form.submit();
                         }
                         else {
-                            alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n( 현재 이미지 크기: " + width + " x " + height + " )");
-                            //fail
+                            alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " → 조건에 맞지 않습니다." + "\n▶ 필수 크기: 1800 x 900")
                         }
                     };
                 }
-                else { //No file was input or browser doesn't support client side reading
+                else { // 필드에 아무것도 입력되지 않더라도 등록 처리
                     form.submit();
                 }
             });

@@ -107,7 +107,7 @@
                 if( file ) {
                     var img = new Image();
                     img.onerror = function() {
-                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 업로드하세요.");
+                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 첨부하세요.");
                         document.querySelector("#image").value = '';
                     };
                     img.src = _URL.createObjectURL( file );
@@ -120,7 +120,7 @@
                         }
                         else {
                             ratio = width/height
-                            if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1)" + "  → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속 하시겠어요?") ) {
+                            if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속 하시겠어요?") ) {
                                 form.submit();
                             }
                             else {
