@@ -9,11 +9,11 @@ class Notice(models.Model):
         ('posongvi', '뽀송비 학생')
     }
 
-    title = models.CharField(max_length = 50, null = False)
-    writer = models.ForeignKey(User, on_delete=models.CASCADE, null = True)
-    category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES, null = False)
-    content = models.TextField(null = False)
-    image = models.ImageField(upload_to='images/', null = True)
+    title = models.CharField(max_length = 50, null = False, blank = False)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES, null = False, blank = False)
+    content = models.TextField(null = False, blank = False)
+    image = models.ImageField(upload_to='images/', null = True, blank = True)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
     favorite_user_set = models.ManyToManyField(User, blank=True, related_name="favorite_user_set", through="Favorite")

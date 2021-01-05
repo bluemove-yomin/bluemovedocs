@@ -1,8 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponse
-import datetime
 from .models import *
 
 
@@ -33,6 +30,21 @@ def read(request, id):
     box = Box.objects.get(pk=id)
     all_boxes = Box.objects.all().order_by('deadline')
     return render(request, 'box/read.html', {'box': box, 'all_boxes': all_boxes})
+
+
+@login_required
+def box_favorite(request, id):
+    box = get_object_or_404(Box, pk=id)
+    
+    if request.user in box.box_favorite_user_set.all():
+        box.box_favorite_user_set.remove(request.user)
+    else:
+        box.box_favorite_user_set.add(request.user)
+
+    if 'next' in request.GET:
+        return redirect(request.GET['next'])
+    else:
+        return redirect('notice:main')
 
 
 @permission_required('auth.add_permission', raise_exception=True)
