@@ -31,19 +31,22 @@
             <small class="d-md-none ms-2">Account</small>
         </a>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{% url 'users:myaccount' user.id %}">내 계정</a></li>
+            <li><a class="dropdown-item" href="{% url 'users:myaccount' user.id %}">💙 내 계정</a></li>
+            {% if perms.auth %}
+            <li><a class="dropdown-item" href="/admin" target="_blank">🔨 사이트 관리</a></li>
+            {% endif %}
             <li>
                 <form class="logout" method="POST" action="{% url 'account_logout' %}?next={{ request.path }}">
                     {% csrf_token %}
                     {% if redirect_field_value %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
                     {% endif %}
-                    <button class="dropdown-item" type="submit">로그아웃</button>
+                    <button class="dropdown-item" type="submit">💨 로그아웃</button>
                 </form>
             </li>
             <li><hr class="dropdown-divider"></li>
             <li class="text-center">
-                {% if perms.notice %}
+                {% if perms.auth %}
                 <img height="24" src="/static/images/favicons/favicon-32x32.png">
                 {% endif %}
                 {% for account in user.socialaccount_set.all %}

@@ -60,9 +60,9 @@
     </div>
     {% endif %}
     {% if box.image %}
-    <a href="{% url 'box:read' box.id %}"><img src="{{ box.image.url }}" class="card-img-top" alt="문서함 이미지"></a>
+    <div class="ratio" style="--aspect-ratio: 50%;"><a href="{% url 'box:read' box.id %}"><img src="{{ box.image.url }}" class="card-img-top" alt="문서함 이미지" style="height: 100%; object-fit: cover; object-position: 50% 50%;"></a></div>
     {% else %}
-    <a href="{% url 'box:read' box.id %}"><img src="/static/images/1800x800-default.png" class="card-img-top" alt="문서함 이미지"></a>
+    <a href="{% url 'box:read' box.id %}"><img src="/static/images/1800x900-default.png" class="card-img-top" alt="문서함 이미지"></a>
     {% endif %}
     <div class="card-body mb-1">
         <p class="card-text mb-1" style="font-weight: 600;">
