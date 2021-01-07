@@ -43,11 +43,13 @@
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한</label>
-                <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
+                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
                 <div class="invalid-feedback">기한을 입력하세요.</div>
                 <div id="deadlineHelp" class="form-text">기한을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
                 <script>
-                    var today = new Date().toISOString().split('T')[0];
+                    var timezoneOffset = new Date().getTimezoneOffset() * 60000;
+                    var timezoneDate = new Date(Date.now() - timezoneOffset);
+                    var today = timezoneDate.toISOString().split('T')[0];
                     document.getElementsByName("deadline")[0].setAttribute('min', today);
                 </script>
             </div>
@@ -159,10 +161,12 @@
                 // Replace with your selector to find the file input in your form
                 var fileInput = $(this).find("input[type=file]")[0],
                     file = fileInput.files && fileInput.files[0];
+                // 유저가 이미지를 첨부했을 경우
                 if( file ) {
                     var img = new Image();
+                    // 알고 보니 유저가 첨부한 파일이 이미지가 아닐 경우
                     img.onerror = function() {
-                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 첨부하세요.");
+                        alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n▶ 필수: .png, .jpg 등 이미지 파일" + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
                         document.querySelector("#image").value = '';
                     };
                     img.src = _URL.createObjectURL( file );
@@ -170,29 +174,41 @@
                         var width = img.naturalWidth,
                             height = img.naturalHeight;
                         _URL.revokeObjectURL( img.src );
+                        ratio = width/height;
+                        // 유저가 첨부한 이미지가 1800 x 900일 경우
                         if( width == 1800 && height == 900 ) {
                             form.submit();
                         }
+                        // 유저가 첨부한 이미지가 1800 x 900이 아닐 경우
                         else {
-                            ratio = width/height
-                            if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속 하시겠어요?") ) {
-                                form.submit();
+                            // 유저가 첨부한 이미지 가로세로비가 2:1이 아닐 경우
+                            if ( ratio !== 2 ) {
+                                if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속하시겠어요?") ) {
+                                    form.submit();
+                                }
+                                else {
+                                    document.querySelector("#image").value = '';
+                                }
                             }
+                            // 유저가 첨부한 이미지 가로세로비가 2:1일 경우
                             else {
-
+                                form.submit();
                             }
                         }
                     };
                 }
+                // 유저가 이미지를 첨부하지 않았을 경우
                 else { // No file was input or browser doesn't support client side reading
-                    // 이미지 변경 작업에서 필드에 아무것도 입력되지 않을 경우 삭제 안내 메시지 출력
+                    // 이게 지금 '이미지 변경' 작업일 경우
                     if ( document.querySelector("body > main > div > form > div.form-group.mb-5 > div.mb-4.d-flex.justify-content-center > img") ) {
-                        if ( confirm("이미지를 삭제하시겠어요?") ) {
+                        if ( confirm("이미지 삭제를 선택하셨습니다.\n\n▶ 이미지 변경: 새로운 이미지 첨부 후 등록\n▶ 이미지 삭제: 미첨부 상태로 등록 → 선택된 옵션입니다.\n\n계속하시겠어요?") ) {
                             form.submit();
                         }
-                        else {}
+                        else {
+                            return false;
+                        }
                     }
-                    // 이미지 추가 작업에서 필드에 아무것도 입력되지 않을 경우 Forms Validation 실행
+                    // 이게 지금 '이미지 추가' 작업일 경우
                     else {}
                 }
             });

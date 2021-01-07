@@ -35,8 +35,9 @@
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한</label>
-                <input type="date" class="form-control" name="deadline" id="deadline" value="{{ box.deadline|date:'Y-m-d' }}" required>
+                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
                 <div class="invalid-feedback">기한을 입력하세요. 최소 오늘에서 최대 2022-01-31까지 입력할 수 있습니다.</div>
+                <div id="deadlineHelp" class="form-text">기한을 변경하려면 현재 작업 취소 후 '기한 변경하기'를 누르세요.</div>
                 <script>
                     var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);

@@ -12,13 +12,13 @@ class Box(models.Model):
         ('posongvi', '뽀송비 학생')
     }
 
-    title = models.CharField(max_length = 50, null = False, blank = False)
+    title = models.CharField(max_length = 50)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES, null = False, blank = False)
-    content = models.TextField(null = False, blank = False)
+    category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
+    content = models.TextField()
     content_update_flag = models.BooleanField(default = False)
-    image = models.ImageField(upload_to='images/', null = True, blank = True)
-    deadline = models.DateField(null = False, blank = False)
+    image = models.ImageField(upload_to='images/')
+    deadline = models.DateField()
     deadline_update_flag = models.BooleanField(default = False)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
@@ -26,7 +26,7 @@ class Box(models.Model):
 
     @property
     def favorite_count(self):
-        return self.favorite_user_set.count()
+        return self.box_favorite_user_set.count()
 
     @property
     def deadline_is_yet_to_come(self):
@@ -47,6 +47,14 @@ class Box(models.Model):
     @property
     def days_left_until_deadline(self):
         return self.deadline - datetime.date.today()
+
+
+@receiver(pre_save, sender=Box)
+def pre_save_box(sender, instance, **kwargs): 
+    if not instance._state.adding:
+        print ('this is an update 이건 업데이트입니다.')
+    else:
+        print ('this is an insert 이건 새로운 추가입니다.')
 
 
 @receiver(pre_save, sender=Box)

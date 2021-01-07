@@ -53,7 +53,7 @@ def update(request, id):
     if request.method == "POST":
         box.category = request.POST['category']
         box.title = request.POST['title']
-        box.deadline = request.POST['deadline']
+        box.deadline = request.POST.get('deadline')
         box.content = request.POST['content']
         box.save()
         return redirect('box:read', box.id)
@@ -64,14 +64,23 @@ def update(request, id):
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
     if request.method == "POST":
-        box.category = request.POST.get('category')
-        box.title = request.POST.get('title')
-        box.deadline = request.POST.get('deadline')
-        box.content = request.POST.get('content')
         box.image = request.FILES.get('image')
         box.save(update_fields=['image'])
         return redirect('box:read', box.id)
     return render(request, 'box/updateimage.html', {'box': box})
+
+
+@permission_required('auth.add_permission', raise_exception=True)
+def updatedeadline(request, id):
+    box = get_object_or_404(Box, pk=id)
+    if request.method == "POST":
+        box.category = request.POST['category']
+        box.title = request.POST['title']
+        box.deadline = request.POST.get('deadline')
+        box.content = request.POST['content']
+        box.save(update_fields=['deadline'])
+        return redirect('box:read', box.id)
+    return render(request, 'box/updatedeadline.html', {'box': box})
 
 
 @permission_required('auth.add_permission', raise_exception=True)

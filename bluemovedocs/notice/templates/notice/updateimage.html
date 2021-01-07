@@ -48,7 +48,7 @@
                 <div id="contentHelp" class="form-text">내용을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요. 입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
             </div>
             <div class="form-group mb-5">
-                <label for="image" class="form-label">이미지</label>
+                <label for="image" class="form-label">이미지<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 {% if notice.image %}
                 <div class="mb-4 d-flex justify-content-center">
                     <img src="{{ notice.image.url }}" class="img-fluid text-center" alt="이미지를 불러올 수 없습니다.">
@@ -57,7 +57,7 @@
                 {% if notice.image %}
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
                 <div id="imageHelp" class="form-text">
-                    (선택사항) 이미지 크기는 반드시 1800 x 900이어야 합니다.<br><br>
+                    이미지 크기는 반드시 1800 x 900이어야 합니다.<br><br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 변경</span>: 새로운 이미지를 첨부한 뒤 '이미지 변경 등록하기'를 누르세요.<br>
                     <i class="fas fa-info-circle"></i><span style="color: rgb(210, 30, 30); font-weight: 600;"> 이미지 삭제</span>: 아무것도 첨부하지 않은 채 '이미지 변경 등록하기'를 누르세요.
                 </div>
@@ -147,16 +147,14 @@
                 var form = this;
                 e.preventDefault(); // Stop the submit for now
                 // Replace with your selector to find the file input in your form
-                if (typeof (jsvariable) == 'undefined') {
-                    window.onerror = function(){
-                    return true;
-                }
                 var fileInput = $(this).find("input[type=file]")[0],
                     file = fileInput.files && fileInput.files[0];
+                // 유저가 이미지를 첨부했을 경우
                 if( file ) {
                     var img = new Image();
+                    // 알고 보니 유저가 첨부한 파일이 이미지가 아닐 경우
                     img.onerror = function() {
-                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 첨부하세요.");
+                        alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n▶ 필수: .png, .jpg 등 이미지 파일" + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
                         document.querySelector("#image").value = '';
                     };
                     img.src = _URL.createObjectURL( file );
@@ -164,23 +162,28 @@
                         var width = img.naturalWidth,
                             height = img.naturalHeight;
                         _URL.revokeObjectURL( img.src );
+                        // 유저가 첨부한 이미지가 1800 x 900일 경우
                         if( width == 1800 && height == 900 ) {
                             form.submit();
                         }
+                        // 유저가 첨부한 이미지가 1800 x 900이 아닐 경우
                         else {
                             alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " → 조건에 맞지 않습니다." + "\n▶ 필수 크기: 1800 x 900")
                         }
                     };
                 }
+                // 유저가 이미지를 첨부하지 않았을 경우
                 else { // No file was input or browser doesn't support client side reading
-                    // 이미지 변경 작업에서 필드에 아무것도 입력되지 않을 경우 삭제 안내 메시지 출력
+                    // 이게 지금 '이미지 변경' 작업일 경우
                     if ( document.querySelector("body > main > div > form > div.form-group.mb-5 > div.mb-4.d-flex.justify-content-center > img") ) {
-                        if ( confirm("이미지를 삭제하시겠어요?") ) {
+                        if ( confirm("이미지 삭제를 선택하셨습니다.\n\n▶ 이미지 변경: 새로운 이미지 첨부 후 등록\n▶ 이미지 삭제: 미첨부 상태로 등록 → 선택된 옵션입니다.\n\n계속하시겠어요?") ) {
                             form.submit();
                         }
-                        else {}
+                        else {
+                            return false;
+                        }
                     }
-                    // 이미지 추가 작업에서 필드에 아무것도 입력되지 않을 경우 Forms Validation 실행
+                    // 이게 지금 '이미지 추가' 작업일 경우
                     else {}
                 }
             });

@@ -8,7 +8,7 @@
         <form action="{% url 'notice:create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="form-group mb-3">
-                <label for="category" class="form-label">대상</label>
+                <label for="category" class="form-label">대상<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." required>
                     <option value="" selected disabled>대상을 선택하세요.</option>
                     <option value="bluemover">블루무버</option>
@@ -18,12 +18,12 @@
                 <div class="invalid-feedback">대상을 선택하세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="title" class="form-label">제목</label>
+                <label for="title" class="form-label">제목<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." required>
                 <div class="invalid-feedback">제목을 입력하세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="content" class="form-label">내용</label>
+                <label for="content" class="form-label">내용<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required></textarea>
                 <div class="invalid-feedback">내용을 입력하세요.</div>
                 <div id="contentHelp" class="form-text">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
@@ -31,7 +31,7 @@
             <div class="form-group mb-5">
                 <label for="image" class="form-label">이미지</label>
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
-                <div id="imageHelp" class="form-text">(선택사항) 이미지 크기는 반드시 1800 x 900이어야 합니다.</div>
+                <div id="imageHelp" class="form-text">이미지 크기는 반드시 1800 x 900이어야 합니다.</div>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
@@ -100,10 +100,29 @@
                 // Replace with your selector to find the file input in your form
                 var fileInput = $(this).find("input[type=file]")[0],
                     file = fileInput.files && fileInput.files[0];
+                (function formCheck() {
+                    'use strict';
+                    window.addEventListener('load', function() {
+                    // Get the forms we want to add validation styles to
+                    var forms = document.getElementsByClassName('needs-validation');
+                    // Loop over them and prevent submission
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                        }, false);
+                    });
+                    }, false);
+                });
+                // 유저가 이미지를 첨부했을 경우
                 if( file ) {
                     var img = new Image();
+                    // 알고 보니 유저가 첨부한 파일이 이미지가 아닐 경우
                     img.onerror = function() {
-                        alert( file.name + "은 이미지 파일이 아닙니다.\n이미지 파일을 첨부하세요.");
+                        alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n▶ 필수: .png, .jpg 등 이미지 파일" + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
                         document.querySelector("#image").value = '';
                     };
                     img.src = _URL.createObjectURL( file );
@@ -111,16 +130,58 @@
                         var width = img.naturalWidth,
                             height = img.naturalHeight;
                         _URL.revokeObjectURL( img.src );
+                        // 유저가 첨부한 이미지 크기가 1800 x 900일 경우
                         if( width == 1800 && height == 900 ) {
-                            form.submit();
+                            if ( !document.querySelector("#category").value ) {
+                                return formCheck();
+                            }
+                            else if ( !document.querySelector("#title").value ) {
+                                return formCheck();
+                            }
+                            else if ( !document.querySelector("#content").value ) {
+                                return formCheck();
+                            }
+                            else {
+                                form.submit();
+                            }
                         }
+                        // 유저가 첨부한 이미지 크기가 1800 x 900이 아닐 경우
                         else {
-                            alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " → 조건에 맞지 않습니다." + "\n▶ 필수 크기: 1800 x 900")
+                            if ( !document.querySelector("#category").value ) {
+                                return formCheck();
+                            }
+                            else if ( !document.querySelector("#title").value ) {
+                                return formCheck();
+                            }
+                            else if ( !document.querySelector("#content").value ) {
+                                return formCheck();
+                            }
+                            else {
+                                alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " → 조건에 맞지 않습니다." + "\n▶ 필수 크기: 1800 x 900\n\n" + "첨부된 " + file.name + "을(를) 삭제합니다.");
+                                document.querySelector("#image").value = '';
+                            }
                         }
                     };
                 }
-                else { // 필드에 아무것도 입력되지 않더라도 등록 처리
-                    form.submit();
+                // 유저가 이미지를 첨부하지 않았을 경우
+                else {
+                    if ( !document.querySelector("#category").value ) {
+                        return formCheck();
+                    }
+                    else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    else if ( !document.querySelector("#content").value ) {
+                        return formCheck();
+                    }
+                    else {
+                        if ( confirm("이미지가 없으면 홈페이지 배너에 노출되지 않습니다." + "\n\n▶ 현재: 이미지 없음 → 홈페이지 배너에서 이 공지사항을 찾아볼 수 없습니다." + "\n▶ 권장: 이미지 첨부" + "\n\n계속하시겠어요?") ) {
+                            form.submit();
+                        }
+                        else {
+                            return false;
+                        }
+                    }
                 }
             });
         </script>
