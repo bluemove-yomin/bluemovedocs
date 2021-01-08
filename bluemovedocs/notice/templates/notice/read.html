@@ -126,15 +126,15 @@
             <div class="list-group-item px-0 py-3">
                 <table style="border: none;">
                     <tr>
-                        <td rowspan="2">
+                        <td class="p-0" rowspan="2">
                             {% if comment.avatar_src == none %}
                             <img height="35" src="/static/images/favicons/favicon-96x96.png"/>
                             {% else %}
                             <img height="35" src="{{ comment.avatar_src|add:'-rg-br100' }}"/>
                             {% endif %}
                         </td>
-                        <td>
-                            <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 6px;">
+                        <td class="p-0">
+                            <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 8px;">
                                 {% if not comment.writer.first_name == '' %}
                                 {{ comment.writer.last_name }}{{ comment.writer.first_name }}
                                 {% else %}
@@ -144,8 +144,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <small class="card-subtitle mb-2" style="margin-left: 6px;">
+                        <td class="p-0">
+                            <small class="card-subtitle mb-2" style="margin-left: 8px;">
                                 {% if comment.created_at == comment.updated_at %}
                                 {{ comment.created_at }}
                                 {% else %}
@@ -155,7 +155,7 @@
                         </td>
                     </tr>
                 </table>
-                <p class="card-text mt-1" style="white-space:pre-wrap; margin-left: 44px;">{{ comment.content }}</p>
+                <p class="card-text mt-1" style="white-space:pre-wrap; margin-left: 43px;">{{ comment.content }}</p>
                 {% if user == comment.writer %}
                 <div class="d-grid justify-content-end">
                     <small>

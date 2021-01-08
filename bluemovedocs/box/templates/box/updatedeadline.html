@@ -36,7 +36,7 @@
                 <div id="titleHelp" class="form-text">제목을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="deadline" class="form-label">기한</label>
+                <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" required>
                 <div class="invalid-feedback">새로운 기한을 입력하세요. 최소 오늘에서 최대 2022-01-31까지 입력할 수 있으며 기존 기한은 제한됩니다.</div>
                 <script>
@@ -128,7 +128,7 @@
         })();
         </script>
 
-        <!-- Deadline is not changed -->
+        <!-- Deadline Validation -->
         <script>
             window.onerror = function(){
             return true;
@@ -136,14 +136,30 @@
             $("form").submit( function( e ) {
                 var form = this;
                 e.preventDefault();
+                // 유저가 새로운 기한을 입력하지 않았을 경우
                 if ( document.querySelector("#deadlineHelp > span").innerText == document.querySelector("#deadline").value ) {
                     document.querySelector("#deadline").value = '';
                 }
+                // 유저가 새로운 기한을 입력했을 경우
                 else {
-                    if ( document.querySelector("#deadline").value ) {
+                    // 유저가 기한을 아예 입력하지 않았을 경우
+                    if ( !document.querySelector("#deadline").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value < today ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 유저가 입력한 기한이 위 유효성 검사를 모두 통과했을 경우
+                    else {
                         form.submit();
                     }
-                    else {}
                 }
             });
         </script>

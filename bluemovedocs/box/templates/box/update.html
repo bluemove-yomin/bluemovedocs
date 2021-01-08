@@ -8,7 +8,7 @@
         <form action="{% url 'box:update' box.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="form-group mb-3">
-                <label for="category" class="form-label">대상</label>
+                <label for="category" class="form-label">대상<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." required>
                     <option value="{{ box.category }}" selected hidden>
                         {% if box.category == 'bluemover' %}
@@ -29,7 +29,7 @@
                 <div class="invalid-feedback">대상을 선택하세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="title" class="form-label">제목</label>
+                <label for="title" class="form-label">제목<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." value="{{ box.title }}" required>
                 <div class="invalid-feedback">제목을 입력하세요.</div>
             </div>
@@ -50,7 +50,7 @@
             {% else %}
             <div class="form-group mb-5">
             {% endif %}
-                <label for="content" class="form-label">내용</label>
+                <label for="content" class="form-label">내용<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required>{{ box.content }}</textarea>
                 <div class="invalid-feedback">내용을 입력하세요.</div>
                 <div id="contentHelp" class="form-text">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>

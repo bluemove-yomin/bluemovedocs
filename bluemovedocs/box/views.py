@@ -74,10 +74,7 @@ def updateimage(request, id):
 def updatedeadline(request, id):
     box = get_object_or_404(Box, pk=id)
     if request.method == "POST":
-        box.category = request.POST['category']
-        box.title = request.POST['title']
         box.deadline = request.POST.get('deadline')
-        box.content = request.POST['content']
         box.save(update_fields=['deadline'])
         return redirect('box:read', box.id)
     return render(request, 'box/updatedeadline.html', {'box': box})

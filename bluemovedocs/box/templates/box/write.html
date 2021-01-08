@@ -131,10 +131,10 @@
                 var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);
                     var today = timezoneDate.toISOString().split('T')[0];
-                // 유저가 이미지를 첨부했을 경우
+                // 유저가 파일을 첨부했을 경우
                 if( file ) {
                     var img = new Image();
-                    // 알고 보니 유저가 첨부한 파일이 이미지가 아닐 경우
+                    // 유저가 첨부한 파일이 이미지가 아닐 경우
                     img.onerror = function() {
                         alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n▶ 필수: .png, .jpg 등 이미지 파일" + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
                         document.querySelector("#image").value = '';
@@ -156,6 +156,14 @@
                             else if ( !document.querySelector("#deadline").value ) {
                                 return formCheck();
                             }
+                            else if ( document.querySelector("#deadline").value < today ) {
+                                document.querySelector("#deadline").value = '';
+                                return formCheck();
+                            }
+                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                                document.querySelector("#deadline").value = '';
+                                return formCheck();
+                            }
                             else if ( !document.querySelector("#content").value ) {
                                 return formCheck();
                             }
@@ -175,6 +183,10 @@
                                 return formCheck();
                             }
                             else if ( document.querySelector("#deadline").value < today ) {
+                                document.querySelector("#deadline").value = '';
+                                return formCheck();
+                            }
+                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                                 document.querySelector("#deadline").value = '';
                                 return formCheck();
                             }
@@ -212,6 +224,10 @@
                         return formCheck();
                     }
                     else if ( document.querySelector("#deadline").value < today ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }

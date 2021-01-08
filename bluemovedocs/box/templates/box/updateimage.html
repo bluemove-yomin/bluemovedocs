@@ -60,7 +60,7 @@
                 <div id="contentHelp" class="form-text">내용을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요. 입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
             </div>
             <div class="form-group mb-5">
-                <label for="image" class="form-label">이미지</label>
+                <label for="image" class="form-label">이미지<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 {% if box.image %}
                 <div class="mb-4 d-flex justify-content-center">
                     <img src="{{ box.image.url }}" class="img-fluid text-center" alt="이미지를 불러올 수 없습니다.">
@@ -69,7 +69,7 @@
                 {% if box.image %}
                 <input type="file" class="form-control" name="image" id="image" aria-describedby="imageHelp" accept="image/*">
                 <div id="imageHelp" class="form-text">
-                    (선택사항) 이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다. 권장 크기는 1800 x 900입니다.<br><br>
+                    이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다. 권장 크기는 1800 x 900입니다.<br><br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 이미지 변경</span>: 새로운 이미지를 첨부한 뒤 '이미지 변경 등록하기'를 누르세요.<br>
                     <i class="fas fa-info-circle"></i><span style="color: rgb(210, 30, 30); font-weight: 600;"> 이미지 삭제</span>: 아무것도 첨부하지 않은 채 '이미지 변경 등록하기'를 누르세요.
                 </div>
@@ -161,10 +161,10 @@
                 // Replace with your selector to find the file input in your form
                 var fileInput = $(this).find("input[type=file]")[0],
                     file = fileInput.files && fileInput.files[0];
-                // 유저가 이미지를 첨부했을 경우
+                // 유저가 파일을 첨부했을 경우
                 if( file ) {
                     var img = new Image();
-                    // 알고 보니 유저가 첨부한 파일이 이미지가 아닐 경우
+                    // 유저가 첨부한 파일이 이미지가 아닐 경우
                     img.onerror = function() {
                         alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n▶ 필수: .png, .jpg 등 이미지 파일" + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
                         document.querySelector("#image").value = '';
