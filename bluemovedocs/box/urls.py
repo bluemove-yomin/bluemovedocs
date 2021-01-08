@@ -10,6 +10,5 @@ urlpatterns = [
     path('<int:id>/box_favorite/', box_favorite, name="box_favorite"),
     path('<int:id>/update/', update, name='update'),
     path('<int:id>/updateimage/', updateimage, name='updateimage'),
-    path('<int:id>/updatedeadline/', updatedeadline, name='updatedeadline'),
     path('<int:id>/delete/', delete, name="delete"),
 ]

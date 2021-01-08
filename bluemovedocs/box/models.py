@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 import datetime
+from django.utils.dateparse import parse_date
 
 class Box(models.Model):
 
@@ -50,21 +51,15 @@ class Box(models.Model):
 
 
 @receiver(pre_save, sender=Box)
-def pre_save_box(sender, instance, **kwargs): 
-    if not instance._state.adding:
-        print ('this is an update 이건 업데이트입니다.')
-    else:
-        print ('this is an insert 이건 새로운 추가입니다.')
-
-
-@receiver(pre_save, sender=Box)
 def deadline_update_flag_on(sender, instance, **kwargs):
     try:
         obj = sender.objects.get(pk=instance.pk)
+        obj_date_raw = str(obj.deadline)
+        ins_date_raw = str(instance.deadline)
     except sender.DoesNotExist:
         pass # Object is new, so field hasn't technically changed, but you may want to do something else here.
     else:
-        if not obj.deadline == instance.deadline: # Field has changed
+        if not obj_date_raw == ins_date_raw:
             instance.deadline_update_flag = True
 
 

@@ -34,16 +34,18 @@
                 <div class="invalid-feedback">제목을 입력하세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="deadline" class="form-label">기한</label>
-                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
-                <div class="invalid-feedback">기한을 입력하세요. 최소 오늘에서 최대 2022-01-31까지 입력할 수 있습니다.</div>
-                <div id="deadlineHelp" class="form-text">기한을 변경하려면 현재 작업 취소 후 '기한 변경하기'를 누르세요.</div>
+                <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
+                <div class="invalid-feedback">새로운 기한을 입력하세요. 최소 오늘에서 최대 2022-01-31까지 입력할 수 있으며 기존 기한은 제한됩니다.</div>
                 <script>
                     var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);
                     var today = timezoneDate.toISOString().split('T')[0];
                     document.getElementsByName("deadline")[0].setAttribute('min', today);
                 </script>
+                <div id="deadlineHelp" class="form-text">
+                    <i class="fas fa-info-circle"></i> 기존 기한은 <span style="font-weight: 600;">{{ box.deadline|date:'Y-m-d' }}</span> 입니다.
+                </div>
             </div>
             {% if box.image %}
             <div class="form-group mb-3">
@@ -123,6 +125,55 @@
             }, false);
         })();
         </script>
+
+        <!-- Deadline Validation -->
+        <script>
+            window.onerror = function(){
+            return true;
+            }
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault();
+                // 유저가 새로운 기한을 입력하지 않았을 경우
+                if ( document.querySelector("#deadlineHelp > span").innerText == document.querySelector("#deadline").value ) {
+                    document.querySelector("#deadline").value = '';
+                }
+                // 유저가 새로운 기한을 입력했을 경우
+                else {
+                    // 유저가 기한을 아예 입력하지 않았을 경우
+                    if ( !document.querySelector("#deadline").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value < today ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 대상 input이 비어 있을 경우
+                    else if ( !document.querySelector("#category").value ) {
+                        return formCheck();
+                    }
+                    // 제목 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 내용 input이 비어 있을 경우
+                    else if ( !document.querySelector("#content").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
+                    else {
+                        form.submit();
+                    }
+                }
+            });
+        </script>
+
     </div>
 </main>
 {% endblock %}
