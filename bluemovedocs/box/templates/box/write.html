@@ -24,14 +24,18 @@
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" required>
-                <div class="invalid-feedback">기한을 입력하세요. 최소 오늘에서 최대 2022-01-31까지 입력할 수 있습니다.</div>
+                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" required>
+                <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
                 <script>
                     var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);
                     var today = timezoneDate.toISOString().split('T')[0];
                     document.getElementsByName("deadline")[0].setAttribute('min', today);
                 </script>
+                <div id="deadlineHelp" class="form-text">
+                    <p class="mb-2">기한이 초과되면 문서함이 자동으로 닫힙니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 오늘에서 최대 2022-01-31까지 입력할 수 있습니다.
+                </div>
             </div>
             <div class="form-group mb-3">
                 <label for="content" class="form-label">내용<span style="color: #007DC5; font-weight: 600;"> *</span></label>

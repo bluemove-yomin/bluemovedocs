@@ -36,7 +36,7 @@
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
-                <div class="invalid-feedback">새로운 기한을 입력하세요. 최소 오늘에서 최대 2022-01-31까지 입력할 수 있으며 기존 기한은 제한됩니다.</div>
+                <div class="invalid-feedback">유효 범위 내 새로운 기한을 입력하세요.</div>
                 <script>
                     var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);
@@ -44,7 +44,9 @@
                     document.getElementsByName("deadline")[0].setAttribute('min', today);
                 </script>
                 <div id="deadlineHelp" class="form-text">
-                    <i class="fas fa-info-circle"></i> 기존 기한은 <span style="font-weight: 600;">{{ box.deadline|date:'Y-m-d' }}</span> 입니다.
+                    <p class="mb-2">기한이 초과되면 문서함이 자동으로 닫힙니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 오늘에서 최대 2022-01-31까지 입력할 수 있습니다.<span id="old_deadline" style="display: none;">{{ box.deadline|date:'Y-m-d' }}</span><br>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.
                 </div>
             </div>
             {% if box.image %}
@@ -127,6 +129,7 @@
         </script>
 
         <!-- Deadline Validation -->
+        {% if box.deadline_update_flag %}
         <script>
             window.onerror = function(){
             return true;
@@ -135,11 +138,7 @@
                 var form = this;
                 e.preventDefault();
                 // 유저가 새로운 기한을 입력하지 않았을 경우
-                if ( document.querySelector("#deadlineHelp > span").innerText == document.querySelector("#deadline").value ) {
-                    document.querySelector("#deadline").value = '';
-                }
-                // 유저가 새로운 기한을 입력했을 경우
-                else {
+                if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     if ( !document.querySelector("#deadline").value ) {
                         return formCheck();
@@ -171,8 +170,128 @@
                         form.submit();
                     }
                 }
+                // 유저가 새로운 기한을 입력했을 경우
+                else {
+                    // 유저가 기한을 아예 입력하지 않았을 경우
+                    if ( !document.querySelector("#deadline").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value < today ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 대상 input이 비어 있을 경우
+                    else if ( !document.querySelector("#category").value ) {
+                        return formCheck();
+                    }
+                    // 제목 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 내용 input이 비어 있을 경우
+                    else if ( !document.querySelector("#content").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
+                    else {
+                        if ( confirm("이미 기한이 수정된 바 있습니다.\n\n▶ 수정 전: " + document.querySelector("#old_deadline").innerText + " (일정 변경)\n▶ 수정 후: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 또다시 수정하시겠어요?") ) {
+                            form.submit();
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                }
             });
         </script>
+        {% else %}
+        <script>
+            window.onerror = function(){
+            return true;
+            }
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault();
+                // 유저가 새로운 기한을 입력하지 않았을 경우
+                if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                    // 유저가 기한을 아예 입력하지 않았을 경우
+                    if ( !document.querySelector("#deadline").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value < today ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 대상 input이 비어 있을 경우
+                    else if ( !document.querySelector("#category").value ) {
+                        return formCheck();
+                    }
+                    // 제목 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 내용 input이 비어 있을 경우
+                    else if ( !document.querySelector("#content").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
+                    else {
+                        form.submit();
+                    }
+                }
+                // 유저가 새로운 기한을 입력했을 경우
+                else {
+                    // 유저가 기한을 아예 입력하지 않았을 경우
+                    if ( !document.querySelector("#deadline").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value < today ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        document.querySelector("#deadline").value = '';
+                        return formCheck();
+                    }
+                    // 대상 input이 비어 있을 경우
+                    else if ( !document.querySelector("#category").value ) {
+                        return formCheck();
+                    }
+                    // 제목 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 내용 input이 비어 있을 경우
+                    else if ( !document.querySelector("#content").value ) {
+                        return formCheck();
+                    }
+                    // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
+                    else {
+                        if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 수정 전: " + document.querySelector("#old_deadline").innerText + "\n▶ 수정 후: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                            form.submit();
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                }
+            });
+        </script>
+        {% endif %}
 
     </div>
 </main>
