@@ -25,6 +25,7 @@ class Notice(models.Model):
 
 class Comment(models.Model):
     content = models.TextField(null = False)
+    avatar_src = models.TextField(null = True)
     writer = models.ForeignKey(User, on_delete = models.CASCADE)
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE, related_name='comments')
     created_at = models.DateField(auto_now_add = True)

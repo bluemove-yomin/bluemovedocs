@@ -41,7 +41,7 @@
                     {% if notice.created_at == notice.updated_at %}
                     {{ notice.created_at }}
                     {% else %}
-                    {{ notice.created_at }}<small style="color: #6C757D;"> │ <i class="fas fa-sync"></i> {{ notice.updated_at }} 수정 </small>
+                    {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
                     {% endif %}
                 </td>
                 <td>
@@ -156,7 +156,7 @@
                 {% if notice.created_at == notice.updated_at %}
                 {{ notice.created_at }}
                 {% else %}
-                {{ notice.created_at }}<span style="color: #6C757D;"> │ <i class="fas fa-sync"></i> {{ notice.updated_at }} 수정 </span>
+                {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
                 {% endif %}
             </small>
         </div>

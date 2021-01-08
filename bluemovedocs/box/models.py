@@ -58,7 +58,7 @@ def pre_save_box(sender, instance, **kwargs):
 
 
 @receiver(pre_save, sender=Box)
-def deadline_flag_on(sender, instance, **kwargs):
+def deadline_update_flag_on(sender, instance, **kwargs):
     try:
         obj = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
@@ -69,7 +69,7 @@ def deadline_flag_on(sender, instance, **kwargs):
 
 
 @receiver(pre_save, sender=Box)
-def content_flag_on(sender, instance, **kwargs):
+def content_update_flag_on(sender, instance, **kwargs):
     try:
         obj = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:

@@ -124,21 +124,38 @@
         <div class="list-group list-group-flush mt-1">
             {% for comment in all_comments %}
             <div class="list-group-item px-0 py-3">
-                <h6 class="card-title m-0" style="font-weight: 600; color: #58595B;">
-                    {% if not comment.writer.first_name == '' %}
-                    {{ comment.writer.last_name }}{{ comment.writer.first_name }}
-                    {% else %}
-                    {{ comment.writer }}
-                    {% endif %}
-                </h6>
-                <small class="card-subtitle mb-2">
-                    {% if comment.created_at == comment.updated_at %}
-                    {{ comment.created_at }}
-                    {% else %}
-                    {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
-                    {% endif %}
-                </small>
-                <p class="card-text mt-1" style="white-space:pre-wrap;">{{ comment.content }}</p>
+                <table style="border: none;">
+                    <tr>
+                        <td rowspan="2">
+                            {% if comment.avatar_src == none %}
+                            <img height="35" src="/static/images/favicons/favicon-96x96.png"/>
+                            {% else %}
+                            <img height="35" src="{{ comment.avatar_src|add:'-rg-br100' }}"/>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 6px;">
+                                {% if not comment.writer.first_name == '' %}
+                                {{ comment.writer.last_name }}{{ comment.writer.first_name }}
+                                {% else %}
+                                {{ comment.writer }}
+                                {% endif %}
+                            </h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <small class="card-subtitle mb-2" style="margin-left: 6px;">
+                                {% if comment.created_at == comment.updated_at %}
+                                {{ comment.created_at }}
+                                {% else %}
+                                {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
+                                {% endif %}
+                            </small>
+                        </td>
+                    </tr>
+                </table>
+                <p class="card-text mt-1" style="white-space:pre-wrap; margin-left: 44px;">{{ comment.content }}</p>
                 {% if user == comment.writer %}
                 <div class="d-grid justify-content-end">
                     <small>

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
+from allauth.socialaccount.models import SocialAccount
 from .models import *
 
 
@@ -24,9 +25,10 @@ def create(request):
 def create_comment(request, id):
     if request.method == "POST":
         notice = get_object_or_404(Notice, pk=id)
+        comment_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
         comment_writer = request.user
         comment_content = request.POST.get('content')
-        Comment.objects.create(writer=comment_writer, content=comment_content, notice=notice)
+        Comment.objects.create(avatar_src=comment_avatar_src, writer=comment_writer, content=comment_content, notice=notice)
     return redirect('notice:read', notice.id)
 
 
