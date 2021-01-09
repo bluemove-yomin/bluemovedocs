@@ -1,7 +1,7 @@
 <!--  
 0~768px noticetable-list 출력
 769px~ noticetable-table 출력
- -->
+-->
 
 <!-- noticetable-table -->
 <div class="table-responsive" id="noticetable-table">
@@ -92,6 +92,63 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- 스태프 권한 유저일 경우 작성하기 버튼 노출 -->
+    {% if perms.auth %}
+    <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
+        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
+    </div>
+    {% endif %}
+
+    <!-- 페이지네이션 -->
+    {% if all_notices.has_other_pages %}
+    <div class="container-md mt-5 p-0">
+        <nav aria-label="notice_pagination" style="background-color: transparent;">
+            <ul class="pagination justify-content-center m-0">
+                {% if all_notices.has_previous %}
+                <li class="page-item">
+                    {% if not request.path == '/notice/' %}
+                    <a class="page-link" href="?page={{ all_notices.previous_page_number }}#noticeTablePosition">이전</a>
+                    {% else %}
+                    <a class="page-link" href="?page={{ all_notices.previous_page_number }}">이전</a>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">이전</span>
+                </li>
+                {% endif %}
+                {% for i in all_notices.paginator.page_range %}
+                    {% if all_notices.number == i %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ i }}</span>
+                    </li>
+                    {% else %}
+                        {% if not request.path == '/notice/' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}#noticeTablePosition">{{ i }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% if all_notices.has_next %}
+                <li class="page-item">
+                    {% if not request.path == '/notice/' %}
+                    <a class="page-link" href="?page={{ all_notices.next_page_number }}#noticeTablePosition">다음</a>
+                    {% else %}
+                    <a class="page-link" href="?page={{ all_notices.next_page_number }}">다음</a>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">다음</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
 </div>
 
 
@@ -166,4 +223,61 @@
         <div class="text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>공지사항이 없습니다.</p></div>
     </div>
     {% endfor %}
+
+    <!-- 스태프 권한 유저일 경우 작성하기 버튼 노출 -->
+    {% if perms.auth %}
+    <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
+        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
+    </div>
+    {% endif %}
+
+    <!-- 페이지네이션 -->
+    {% if all_notices.has_other_pages %}
+    <div class="container-md mt-5 p-0">
+        <nav aria-label="notice_pagination" style="background-color: transparent;">
+            <ul class="pagination justify-content-center m-0">
+                {% if all_notices.has_previous %}
+                <li class="page-item">
+                    {% if not request.path == '/notice/' %}
+                    <a class="page-link" href="?page={{ all_notices.previous_page_number }}#noticeTablePosition">이전</a>
+                    {% else %}
+                    <a class="page-link" href="?page={{ all_notices.previous_page_number }}">이전</a>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">이전</span>
+                </li>
+                {% endif %}
+                {% for i in all_notices.paginator.page_range %}
+                    {% if all_notices.number == i %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ i }}</span>
+                    </li>
+                    {% else %}
+                        {% if not request.path == '/notice/' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}#noticeTablePosition">{{ i }}</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {% if all_notices.has_next %}
+                <li class="page-item">
+                    {% if not request.path == '/notice/' %}
+                    <a class="page-link" href="?page={{ all_notices.next_page_number }}#noticeTablePosition">다음</a>
+                    {% else %}
+                    <a class="page-link" href="?page={{ all_notices.next_page_number }}">다음</a>
+                    {% endif %}
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">다음</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+
 </div>

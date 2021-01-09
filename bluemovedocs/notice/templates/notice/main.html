@@ -7,10 +7,5 @@
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📢 공지사항</h1>
         {% include 'shared/_noticetable.html' %}
     </div>
-    {% if perms.auth %}
-    <div class="container-md d-grid sm-flex justify-content-sm-end mt-5">
-        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
-    </div>
-    {% endif %}
 </main>
 {% endblock %}

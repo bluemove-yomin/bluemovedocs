@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from allauth.socialaccount.models import SocialAccount
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 
 
@@ -34,6 +35,14 @@ def create_comment(request, id):
 
 def main(request):
     all_notices = Notice.objects.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(all_notices, 10)
+    try:
+        all_notices = paginator.page(page)
+    except PageNotAnInteger:
+        all_notices = paginator.page(1)
+    except EmptyPage:
+        all_notices = paginator.page(paginator.num_pages)
     return render(request, 'notice/main.html', {'all_notices': all_notices})
 
 
@@ -41,6 +50,14 @@ def read(request, id):
     notice = Notice.objects.get(pk=id)
     all_notices = Notice.objects.all().order_by('-id')
     all_comments = notice.comments.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(all_notices, 10)
+    try:
+        all_notices = paginator.page(page)
+    except PageNotAnInteger:
+        all_notices = paginator.page(1)
+    except EmptyPage:
+        all_notices = paginator.page(paginator.num_pages)
     return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
