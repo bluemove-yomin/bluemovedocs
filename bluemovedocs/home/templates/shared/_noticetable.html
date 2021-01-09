@@ -12,7 +12,7 @@
                 <th scope="col">제목</th>
                 <th scope="col">담당</th>
                 <th scope="col">작성일</th>
-                <th class="text-center" scope="col"></th>
+                <th class="text-end" scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -47,7 +47,7 @@
                 <td>
                     {% if user.is_authenticated %}
                     <!-- Button trigger modal -->
-                    <div class="text-center">
+                    <div class="text-end">
                         <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}">
                             {% if user in notice.favorite_user_set.all %}
                             <i class="fas fa-bookmark"></i>
@@ -57,7 +57,7 @@
                         </a>
                     </div>
                     {% else %}
-                    <div class="text-center">
+                    <div class="text-end">
                         <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#tableloginModal">
                             <i class="far fa-bookmark"></i>
                         </a>

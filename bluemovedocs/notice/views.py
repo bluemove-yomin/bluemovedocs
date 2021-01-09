@@ -26,7 +26,12 @@ def create(request):
 def create_comment(request, id):
     if request.method == "POST":
         notice = get_object_or_404(Notice, pk=id)
-        comment_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
+        # 유저가 Google 계정으로 로그인했을 경우 (블루무버 또는 게스트인 경우)
+        if SocialAccount.objects.filter(user=request.user):
+            comment_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
+        # 유저가 Google 계정으로 로그인하지 않았을 경우 (사무국 또는 어드민일 경우)
+        else:
+            comment_avatar_src = ''
         comment_writer = request.user
         comment_content = request.POST.get('content')
         Comment.objects.create(avatar_src=comment_avatar_src, writer=comment_writer, content=comment_content, notice=notice)

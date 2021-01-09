@@ -35,7 +35,7 @@
             <img src="{{ notice.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
         </div>
         {% endif %}
-        <div style="white-space:pre-wrap;">{{ notice.content }}</div>
+        <div style="white-space: pre-wrap; word-break: break-word;">{{ notice.content }}</div>
     </div>
     {% if user == notice.writer %}
     <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">
@@ -127,7 +127,7 @@
                 <table style="border: none;">
                     <tr>
                         <td class="p-0" rowspan="2">
-                            {% if comment.avatar_src == none %}
+                            {% if comment.avatar_src == none or comment.avatar_src == '' %}
                             <img height="35" src="/static/images/favicons/favicon-96x96.png"/>
                             {% else %}
                             <img height="35" src="{{ comment.avatar_src|add:'-rg-br100' }}"/>
@@ -155,7 +155,7 @@
                         </td>
                     </tr>
                 </table>
-                <p class="card-text mt-1" style="white-space:pre-wrap; margin-left: 43px;">{{ comment.content }}</p>
+                <p class="card-text mt-1" style="white-space: pre-wrap; word-break: break-word; margin-left: 43px;">{{ comment.content }}</p>
                 {% if user == comment.writer %}
                 <div class="d-grid justify-content-end">
                     <small>
