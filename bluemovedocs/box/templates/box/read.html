@@ -4,18 +4,52 @@
 {% include 'shared/_navbar4box.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md my-5">
-        <p style="font-weight: 600;">
-            {% if box.category == 'bluemover' %}
-            블루무버 대상 문서함
+        <div class="d-flex align-items-sm-center justify-content-between">
+            <p style="font-weight: 600;">
+                {% if box.category == 'bluemover' %}
+                블루무버 대상 문서함
+                {% endif %}
+                {% if box.category == 'posongvi' %}
+                뽀송비 학생 대상 문서함
+                {% endif %}
+                {% if box.category == 'applicant' %}
+                블루무버 희망자 대상 문서함
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+            <!-- Button trigger modal -->
+            <a class="bookmark" href="{% url 'box:box_favorite' box.id %}?next={{ request.path }}">
+                {% if user in box.box_favorite_user_set.all %}
+                <p class="mb-0 ps-2"><i class="fas fa-bookmark"></i></p>
+                {% else %}
+                <p class="mb-0 ps-2"><i class="far fa-bookmark"></i></p>
+                {% endif %}
+            </a>
+            {% else %}
+            <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#listloginModal">
+                <p class="mb-1"><i class="far fa-bookmark"></i></p>
+            </a>
+            <!-- Modal -->
+            <div class="modal fade" id="listloginModal" tabindex="-1" aria-labelledby="listloginModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="listloginModalLabel" style="font-weight: 600;">🔑 로그인 필요</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
+                        </div>
+                        <div class="modal-footer">
+                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                            <a type="button" href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary">네, 로그인할게요!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
-            {% if box.category == 'posongvi' %}
-            뽀송비 학생 대상 문서함
-            {% endif %}
-            {% if box.category == 'applicant' %}
-            블루무버 희망자 대상 문서함
-            {% endif %}
-        </p>
-        <h2 style="font-weight: 600; color: #58595B;">{{ box.title }}</h2>
+        </div>
+        <h2 style="font-weight: 600; color: #58595B; word-break: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">{{ box.title }}</h2>
 
         <!-- boxBadge4Large -->
         <div class="d-flex justify-content-sm-between" id="boxBadge4Large">
@@ -40,13 +74,13 @@
             </small>
             <div class="d-flex align-items-stretch">
                 {% if box.deadline_is_yet_to_come %}
-                <span class="badge bg-primary">{{ box.days_left_until_deadline.days }}일 후 마감</span>
+                <span class="badge bg-primary">열림 │ {{ box.days_left_until_deadline.days }}일 후 마감</span>
                 {% elif box.deadline_is_tomorrow %}
-                <span class="badge bg-warning text-dark">내일 마감</span>
+                <span class="badge bg-warning text-dark">열림 │ 내일 마감</span>
                 {% elif box.deadline_is_today %}
-                <span class="badge bg-danger">오늘 마감</span>
+                <span class="badge bg-danger">열림 │ 오늘 마감</span>
                 {% elif box.deadline_is_over %}
-                <span class="badge bg-dark">{{ box.deadline|date:'Y-m-d' }} 마감</span>
+                <span class="badge bg-dark">닫힘 │ {{ box.deadline|date:'Y-m-d' }} 마감</span>
                 {% endif %}
             </div>
         </div>
@@ -74,13 +108,13 @@
             </small>
             <div class="sm-flex d-grid align-items-stretch mt-2">
                 {% if box.deadline_is_yet_to_come %}
-                <span class="badge bg-primary">{{ box.days_left_until_deadline.days }}일 후 마감</span>
+                <span class="badge bg-primary">열림 │ {{ box.days_left_until_deadline.days }}일 후 마감</span>
                 {% elif box.deadline_is_tomorrow %}
-                <span class="badge bg-warning text-dark">내일 마감</span>
+                <span class="badge bg-warning text-dark">열림 │ 내일 마감</span>
                 {% elif box.deadline_is_today %}
-                <span class="badge bg-danger">오늘 마감</span>
+                <span class="badge bg-danger">열림 │ 오늘 마감</span>
                 {% elif box.deadline_is_over %}
-                <span class="badge bg-dark">{{ box.deadline|date:'Y-m-d' }} 마감</span>
+                <span class="badge bg-dark">닫힘 │ {{ box.deadline|date:'Y-m-d' }} 마감</span>
                 {% endif %}
             </div>
         </div>
@@ -91,7 +125,7 @@
             <img src="{{ box.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
         </div>
         {% endif %}
-        <div style="white-space:pre-wrap;">{{ box.content }}</div>
+        <div style="white-space: pre-wrap; word-break: break-word;">{{ box.content }}</div>
     </div>
     {% if user == box.writer %}
     <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">
@@ -126,14 +160,12 @@
     </div>
     {% endif %}
 
+    <!-- #boxListPosition -->
+    <div id="boxListPosition"></div>
+
     <div class="container-md mt-5">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📁 문서함</h1>
         {% include 'shared/_boxcard.html' %}
     </div>
-    {% if perms.auth %}
-    <div class="container-md d-grid sm-flex justify-content-sm-end mt-5">
-        <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
-    </div>
-    {% endif %}
 </main>
 {% endblock %}

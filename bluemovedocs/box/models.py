@@ -18,12 +18,12 @@ class Box(models.Model):
     category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
     content = models.TextField()
     content_update_flag = models.BooleanField(default = False)
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='images/', null = True, blank = True)
     deadline = models.DateField()
     deadline_update_flag = models.BooleanField(default = False)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
-    box_favorite_user_set = models.ManyToManyField(User, blank=True, related_name="box_favorite_user_set", through="Favorite")
+    box_favorite_user_set = models.ManyToManyField(User, blank = True, related_name="box_favorite_user_set", through="Favorite")
 
     @property
     def favorite_count(self):

@@ -1,30 +1,21 @@
-<!-- TABS -->
+<!-- 탭 -->
 <div class="pt-2">
     <ul class="nav nav-pills mb-3 nav-justified gap-3" id="pills-tab" role="tablist">
+        <!-- 열린 문서함 탭 -->
         <li class="nav-item mb-2" id="forBoxCSS" role="presentation">
-            {% if not box.deadline_is_over %}
-            <a class="nav-link active" id="pills-openedBox-tab" data-bs-toggle="pill" href="#pills-openedBox" role="tab" aria-controls="pills-home" aria-selected="true">열린 문서함</a>
-            {% else %}
-            <a class="nav-link" id="pills-openedBox-tab" data-bs-toggle="pill" href="#pills-openedBox" role="tab" aria-controls="pills-home" aria-selected="true">열린 문서함</a>
-            {% endif %}
+            <a class="nav-link active" id="pills-opened-tab" data-bs-toggle="pill" href="#pills-opened" role="tab" aria-controls="pills-opened" aria-selected="true">열린 문서함</a>
         </li>
+        <!-- 닫힌 문서함 탭 -->
         <li class="nav-item mb-2" id="forBoxCSS" role="presentation">
-            {% if not box.deadline_is_over %}
-            <a class="nav-link" id="pills-closedBox-tab" data-bs-toggle="pill" href="#pills-closedBox" role="tab" aria-controls="pills-profile" aria-selected="false">닫힌 문서함</a>
-            {% else %}
-            <a class="nav-link active" id="pills-closedBox-tab" data-bs-toggle="pill" href="#pills-closedBox" role="tab" aria-controls="pills-profile" aria-selected="false">닫힌 문서함</a>
-            {% endif %}
+            <a class="nav-link" id="pills-closed-tab" data-bs-toggle="pill" href="#pills-closed" role="tab" aria-controls="pills-closed" aria-selected="false">닫힌 문서함</a>
         </li>
     </ul>
 </div>
+
+<!-- 탭 내부 -->
 <div class="tab-content" id="pills-tabContent">
-    <!-- OPENED_BOX_TAB -->
-    {% if not box.deadline_is_over %}
-    <div class="tab-pane fade show active" id="pills-openedBox" role="tabpanel" aria-labelledby="pills-openedBox-tab">
-    {% else %}
-    <div class="tab-pane fade" id="pills-openedBox" role="tabpanel" aria-labelledby="pills-openedBox-tab">
-    {% endif %}
-        <!-- OPENED_BOX_CARDS -->
+    <!-- 열린 문서함 탭 내부 -->
+    <div class="tab-pane fade show active" id="pills-opened" role="tabpanel" aria-labelledby="pills-opened-tab">
         <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-3">
             {% for box in all_boxes %}
             {% if box.deadline_is_over %}
@@ -40,13 +31,8 @@
             {% endfor %}
         </div>
     </div>
-    <!-- CLOSED_BOX_TAB -->
-    {% if not box.deadline_is_over %}
-    <div class="tab-pane fade" id="pills-closedBox" role="tabpanel" aria-labelledby="pills-closedBox-tab">
-    {% else %}
-    <div class="tab-pane fade show active" id="pills-closedBox" role="tabpanel" aria-labelledby="pills-closedBox-tab">
-    {% endif %}
-        <!-- CLOSED_BOX_CARDS -->
+    <!-- 닫힌 문서함 탭 내부 -->
+    <div class="tab-pane fade" id="pills-closed" role="tabpanel" aria-labelledby="pills-closed-tab">
         <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-3">
             {% for box in all_boxes %}
             {% if box.deadline_is_over %}
@@ -63,3 +49,72 @@
         </div>
     </div>
 </div>
+
+<!-- 생성하기 버튼 -->
+{% if perms.auth %}
+<div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
+    <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
+</div>
+{% endif %}
+
+<!-- 페이지네이션 -->
+{% if all_boxes.has_other_pages %}
+<div class="container-md mt-5 p-0">
+    <nav aria-label="notice_pagination" style="background-color: transparent;">
+        <ul class="pagination justify-content-center m-0">
+            {% if all_boxes.has_previous %}
+            <li class="page-item">
+                {% if not request.path == '/box/' %}
+                <a class="page-link" href="?page={{ all_boxes.previous_page_number }}#boxListPosition">이전</a>
+                {% else %}
+                <a class="page-link" href="?page={{ all_boxes.previous_page_number }}">이전</a>
+                {% endif %}
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">이전</span>
+            </li>
+            {% endif %}
+            {% for i in all_boxes.paginator.page_range %}
+                {% if all_boxes.number == i %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ i }}</span>
+                </li>
+                {% else %}
+                    {% if not request.path == '/box/' %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}#boxListPosition">{{ i }}</a></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if all_boxes.has_next %}
+            <li class="page-item">
+                {% if not request.path == '/box/' %}
+                <a class="page-link" href="?page={{ all_boxes.next_page_number }}#boxListPosition">다음</a>
+                {% else %}
+                <a class="page-link" href="?page={{ all_boxes.next_page_number }}">다음</a>
+                {% endif %}
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">다음</span>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+<!-- 현재 열려 있는 탭 active 유지 -->
+<script>
+    $(document).ready(function(){
+        $('a[data-bs-toggle="pill"]').on('show.bs.tab', function(e) {
+            localStorage.setItem('activeTab', $(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('activeTab');
+        if(activeTab){
+            $('#pills-tab a[href="' + activeTab + '"]').tab('show');
+        }
+    });
+</script>

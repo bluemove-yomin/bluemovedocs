@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 
 
@@ -22,13 +23,29 @@ def create(request):
 
 
 def main(request):
-    all_boxes = Box.objects.order_by('deadline')
+    all_boxes = Box.objects.all().order_by('deadline')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(all_boxes, 9)
+    try:
+        all_boxes = paginator.page(page)
+    except PageNotAnInteger:
+        all_boxes = paginator.page(1)
+    except EmptyPage:
+        all_boxes = paginator.page(paginator.num_pages)
     return render(request, 'box/main.html', {'all_boxes': all_boxes})
 
 
 def read(request, id):
     box = Box.objects.get(pk=id)
     all_boxes = Box.objects.all().order_by('deadline')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(all_boxes, 9)
+    try:
+        all_boxes = paginator.page(page)
+    except PageNotAnInteger:
+        all_boxes = paginator.page(1)
+    except EmptyPage:
+        all_boxes = paginator.page(paginator.num_pages)
     return render(request, 'box/read.html', {'box': box, 'all_boxes': all_boxes})
 
 
@@ -44,7 +61,7 @@ def box_favorite(request, id):
     if 'next' in request.GET:
         return redirect(request.GET['next'])
     else:
-        return redirect('notice:main')
+        return redirect('box:main')
 
 
 @permission_required('auth.add_permission', raise_exception=True)

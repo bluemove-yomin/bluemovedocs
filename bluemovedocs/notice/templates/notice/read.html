@@ -4,32 +4,18 @@
 {% include 'shared/_navbar4notice.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md my-5">
-        <p style="font-weight: 600;">
-            {% if notice.category == 'bluemover' %}
-            블루무버 대상 공지사항
-            {% endif %}
-            {% if notice.category == 'posongvi' %}
-            뽀송비 학생 대상 공지사항
-            {% endif %}
-            {% if notice.category == 'applicant' %}
-            블루무버 희망자 대상 공지사항
-            {% endif %}
-        </p>
-        <h2 style="font-weight: 600; color: #58595B;">{{ notice.title }}</h2>
         <div class="d-flex align-items-sm-center justify-content-between">
-            <small>
-                {% if not notice.writer.first_name == '' %}
-                {{ notice.writer.last_name }}{{ notice.writer.first_name }}
-                {% else %}
-                {{ notice.writer }}
+            <p style="font-weight: 600;">
+                {% if notice.category == 'bluemover' %}
+                블루무버 대상 공지사항
                 {% endif %}
-                │
-                {% if notice.created_at == notice.updated_at %}
-                {{ notice.created_at }}
-                {% else %}
-                {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
+                {% if notice.category == 'posongvi' %}
+                뽀송비 학생 대상 공지사항
                 {% endif %}
-            </small>
+                {% if notice.category == 'applicant' %}
+                블루무버 희망자 대상 공지사항
+                {% endif %}
+            </p>
             {% if user.is_authenticated %}
             <!-- Button trigger modal -->
             <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}">
@@ -63,6 +49,20 @@
             </div>
             {% endif %}
         </div>
+        <h2 style="font-weight: 600; color: #58595B; word-break: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">{{ notice.title }}</h2>
+        <small>
+            {% if not notice.writer.first_name == '' %}
+            {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+            {% else %}
+            {{ notice.writer }}
+            {% endif %}
+            │
+            {% if notice.created_at == notice.updated_at %}
+            {{ notice.created_at }}
+            {% else %}
+            {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
+            {% endif %}
+        </small>
         <hr class="text-black-50">
         {% if notice.image %}
         <div class="mb-4 d-flex justify-content-center">
