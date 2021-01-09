@@ -166,7 +166,7 @@
                     var img = new Image();
                     // 유저가 첨부한 파일이 이미지가 아닐 경우
                     img.onerror = function() {
-                        alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n▶ 필수: .png, .jpg 등 이미지 파일" + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
+                        alert( "이미지 파일만 첨부 가능합니다." + "\n\n▶ 필수: .png, .jpg 등의 확장자를 가진 이미지 파일" + "\n▶ 현재: " + file.name + " → 이미지 파일이 아닙니다." + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
                         document.querySelector("#image").value = '';
                     };
                     img.src = _URL.createObjectURL( file );
@@ -183,7 +183,7 @@
                         else {
                             // 유저가 첨부한 이미지 가로세로비가 2:1이 아닐 경우
                             if ( ratio !== 2 ) {
-                                if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." + "\n▶ 권장 크기: 1800 x 900 (2:1)\n\n계속하시겠어요?") ) {
+                                if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 권장 크기: 1800 x 900 (2:1)"  + "\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." +  "\n\n계속하시겠어요?") ) {
                                     form.submit();
                                 }
                                 else {

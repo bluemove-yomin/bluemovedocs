@@ -200,7 +200,7 @@
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                     else {
-                        if ( confirm("이미 기한이 수정된 바 있습니다.\n\n▶ 수정 전: " + document.querySelector("#old_deadline").innerText + " (일정 변경)\n▶ 수정 후: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 또다시 수정하시겠어요?") ) {
+                        if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + document.querySelector("#old_deadline").innerText + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                             form.submit();
                         }
                         else {
@@ -281,7 +281,7 @@
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                     else {
-                        if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 수정 전: " + document.querySelector("#old_deadline").innerText + "\n▶ 수정 후: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                        if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + document.querySelector("#old_deadline").innerText + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                             form.submit();
                         }
                         else {
