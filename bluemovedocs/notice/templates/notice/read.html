@@ -16,19 +16,53 @@
             {% endif %}
         </p>
         <h2 style="font-weight: 600; color: #58595B;">{{ notice.title }}</h2>
-        <small>
-            {% if not notice.writer.first_name == '' %}
-            {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+        <div class="d-flex align-items-sm-center justify-content-between">
+            <small>
+                {% if not notice.writer.first_name == '' %}
+                {{ notice.writer.last_name }}{{ notice.writer.first_name }}
+                {% else %}
+                {{ notice.writer }}
+                {% endif %}
+                │
+                {% if notice.created_at == notice.updated_at %}
+                {{ notice.created_at }}
+                {% else %}
+                {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
+                {% endif %}
+            </small>
+            {% if user.is_authenticated %}
+            <!-- Button trigger modal -->
+            <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}">
+                {% if user in notice.favorite_user_set.all %}
+                <p class="mb-0 ps-2"><i class="fas fa-bookmark"></i></p>
+                {% else %}
+                <p class="mb-0 ps-2"><i class="far fa-bookmark"></i></p>
+                {% endif %}
+            </a>
             {% else %}
-            {{ notice.writer }}
+            <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#listloginModal">
+                <p class="mb-1"><i class="far fa-bookmark"></i></p>
+            </a>
+            <!-- Modal -->
+            <div class="modal fade" id="listloginModal" tabindex="-1" aria-labelledby="listloginModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="listloginModalLabel" style="font-weight: 600;">🔑 로그인 필요</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
+                        </div>
+                        <div class="modal-footer">
+                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                            <a type="button" href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary">네, 로그인할게요!</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
-            │
-            {% if notice.created_at == notice.updated_at %}
-            {{ notice.created_at }}
-            {% else %}
-            {{ notice.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ notice.updated_at }} 수정</span>
-            {% endif %}
-        </small>
+        </div>
         <hr class="text-black-50">
         {% if notice.image %}
         <div class="mb-4 d-flex justify-content-center">
