@@ -16,7 +16,7 @@
 <div class="tab-content" id="pills-tabContent">
     <!-- 열린 문서함 탭 내부 -->
     <div class="tab-pane fade show active" id="pills-opened" role="tabpanel" aria-labelledby="pills-opened-tab">
-        <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-3">
+        <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-3" id="insideOpenedTab">
             {% for box in opened_boxes %}
             {% if box.deadline_is_over %}
             <div style="display: none;">
@@ -26,8 +26,8 @@
                 {% include 'shared/_boxcard_tabdata.html' %}
             </div>
             {% empty %}
-            <div class="col"></div>
-            <div class="col text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>문서함이 없습니다.</p></div>
+            <div class="col" id="openedEmptyFlag"></div>
+            <div class="col text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>열린 문서함이 없습니다.</p></div>
             {% endfor %}
         </div>
         <!-- 열린 문서함 탭 내부 생성하기 버튼 -->
@@ -88,7 +88,7 @@
     
     <!-- 닫힌 문서함 탭 내부 -->
     <div class="tab-pane fade" id="pills-closed" role="tabpanel" aria-labelledby="pills-closed-tab">
-        <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-3">
+        <div class="row row-cols-1 row-cols-lg-3 row-cols-md-2 g-3" id="insideClosedTab">
             {% for box in closed_boxes %}
             {% if box.deadline_is_over %}
             <div class="col">
@@ -98,8 +98,8 @@
                 {% include 'shared/_boxcard_tabdata.html' %}
             </div>
             {% empty %}
-            <div class="col"></div>
-            <div class="col text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>문서함이 없습니다.</p></div>
+            <div class="col" id="closedEmptyFlag"></div>
+            <div class="col text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>닫힌 문서함이 없습니다.</p></div>
             {% endfor %}
         </div>
         <!-- 닫힌 문서함 탭 내부 페이지네이션 -->
@@ -164,4 +164,25 @@
             $('#pills-tab a[href="' + activeTab + '"]').tab('show');
         }
     });
+</script>
+
+<!-- '비어 있어요!' 가운데 정렬 유지 -->
+<script>
+    var insideOpenedTab = document.querySelector("#insideOpenedTab");
+    var insideClosedTab = document.querySelector("#insideClosedTab");
+    var openedEmptyFlag = document.querySelector("#openedEmptyFlag");
+    var closedEmptyFlag = document.querySelector("#closedEmptyFlag");
+    if ( openedEmptyFlag ) {
+        if ( 767 < $(window).width() < 992 ) {
+            insideOpenedTab.classList.remove("row-cols-md-2");
+        }
+        else {}
+    }
+    else if ( closedEmptyFlag ) {
+        if ( 767 < $(window).width() < 992 ) {
+            insideClosedTab.classList.remove("row-cols-md-2");
+        }
+        else {}
+    }
+    else {}
 </script>
