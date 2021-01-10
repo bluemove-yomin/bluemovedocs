@@ -44,9 +44,9 @@
                     {% if opened_boxes.has_previous %}
                     <li class="page-item">
                         {% if not request.path == '/box/' %}
-                        <a class="page-link" href="?opened_page={{ opened_boxes.previous_page_number }}#boxListPosition">이전</a>
+                        <a class="page-link" href="?page={{ opened_boxes.previous_page_number }}#boxListPosition">이전</a>
                         {% else %}
-                        <a class="page-link" href="?opened_page={{ opened_boxes.previous_page_number }}">이전</a>
+                        <a class="page-link" href="?page={{ opened_boxes.previous_page_number }}">이전</a>
                         {% endif %}
                     </li>
                     {% else %}
@@ -61,18 +61,18 @@
                         </li>
                         {% else %}
                             {% if not request.path == '/box/' %}
-                            <li class="page-item"><a class="page-link" href="?opened_page={{ i }}#boxListPosition">{{ i }}</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}#boxListPosition">{{ i }}</a></li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="?opened_page={{ i }}">{{ i }}</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
                     {% if opened_boxes.has_next %}
                     <li class="page-item">
                         {% if not request.path == '/box/' %}
-                        <a class="page-link" href="?opened_page={{ opened_boxes.next_page_number }}#boxListPosition">다음</a>
+                        <a class="page-link" href="?page={{ opened_boxes.next_page_number }}#boxListPosition">다음</a>
                         {% else %}
-                        <a class="page-link" href="?opened_page={{ opened_boxes.next_page_number }}">다음</a>
+                        <a class="page-link" href="?page={{ opened_boxes.next_page_number }}">다음</a>
                         {% endif %}
                     </li>
                     {% else %}
@@ -102,12 +102,6 @@
             <div class="col text-center"><br><h2 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h2><p>문서함이 없습니다.</p></div>
             {% endfor %}
         </div>
-        <!-- 닫힌 문서함 탭 내부 생성하기 버튼 -->
-        {% if perms.auth %}
-        <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
-            <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
-        </div>
-        {% endif %}
         <!-- 닫힌 문서함 탭 내부 페이지네이션 -->
         {% if closed_boxes.has_other_pages %}
         <div class="container-md mt-5 p-0">
@@ -116,9 +110,9 @@
                     {% if closed_boxes.has_previous %}
                     <li class="page-item">
                         {% if not request.path == '/box/' %}
-                        <a class="page-link" href="?closed_page={{ closed_boxes.previous_page_number }}#boxListPosition">이전</a>
+                        <a class="page-link" href="?page={{ closed_boxes.previous_page_number }}#boxListPosition">이전</a>
                         {% else %}
-                        <a class="page-link" href="?closed_page={{ closed_boxes.previous_page_number }}">이전</a>
+                        <a class="page-link" href="?page={{ closed_boxes.previous_page_number }}">이전</a>
                         {% endif %}
                     </li>
                     {% else %}
@@ -133,18 +127,18 @@
                         </li>
                         {% else %}
                             {% if not request.path == '/box/' %}
-                            <li class="page-item"><a class="page-link" href="?closed_page={{ i }}#boxListPosition">{{ i }}</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}#boxListPosition">{{ i }}</a></li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="?closed_page={{ i }}">{{ i }}</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
                     {% if closed_boxes.has_next %}
                     <li class="page-item">
                         {% if not request.path == '/box/' %}
-                        <a class="page-link" href="?closed_page={{ closed_boxes.next_page_number }}#boxListPosition">다음</a>
+                        <a class="page-link" href="?page={{ closed_boxes.next_page_number }}#boxListPosition">다음</a>
                         {% else %}
-                        <a class="page-link" href="?closed_page={{ closed_boxes.next_page_number }}">다음</a>
+                        <a class="page-link" href="?page={{ closed_boxes.next_page_number }}">다음</a>
                         {% endif %}
                     </li>
                     {% else %}
