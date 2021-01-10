@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
+import datetime
 
 
 @permission_required('auth.add_permission', raise_exception=True)
@@ -23,30 +24,42 @@ def create(request):
 
 
 def main(request):
-    all_boxes = Box.objects.all().order_by('deadline')
-    page = request.GET.get('page', 1)
-    paginator = Paginator(all_boxes, 9)
+    opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
+    closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
+    opened_page = request.GET.get('opened_page', 1)
+    closed_page = request.GET.get('closed_page', 1)
+    opened_paginator = Paginator(opened_boxes, 9)
+    closed_paginator = Paginator(closed_boxes, 9)
     try:
-        all_boxes = paginator.page(page)
+        opened_boxes = opened_paginator.page(opened_page)
+        closed_boxes = closed_paginator.page(closed_page)
     except PageNotAnInteger:
-        all_boxes = paginator.page(1)
+        opened_boxes = opened_paginator.page(1)
+        closed_boxes = closed_paginator.page(1)
     except EmptyPage:
-        all_boxes = paginator.page(paginator.num_pages)
-    return render(request, 'box/main.html', {'all_boxes': all_boxes})
+        opened_boxes = opened_paginator.page(opened_paginator.num_pages)
+        closed_boxes = closed_paginator.page(closed_paginator.num_pages)
+    return render(request, 'box/main.html', {'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes})
 
 
 def read(request, id):
     box = Box.objects.get(pk=id)
-    all_boxes = Box.objects.all().order_by('deadline')
-    page = request.GET.get('page', 1)
-    paginator = Paginator(all_boxes, 9)
+    opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
+    closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
+    opened_page = request.GET.get('opened_page', 1)
+    closed_page = request.GET.get('closed_page', 1)
+    opened_paginator = Paginator(opened_boxes, 9)
+    closed_paginator = Paginator(closed_boxes, 9)
     try:
-        all_boxes = paginator.page(page)
+        opened_boxes = opened_paginator.page(opened_page)
+        closed_boxes = closed_paginator.page(closed_page)
     except PageNotAnInteger:
-        all_boxes = paginator.page(1)
+        opened_boxes = opened_paginator.page(1)
+        closed_boxes = closed_paginator.page(1)
     except EmptyPage:
-        all_boxes = paginator.page(paginator.num_pages)
-    return render(request, 'box/read.html', {'box': box, 'all_boxes': all_boxes})
+        opened_boxes = opened_paginator.page(opened_paginator.num_pages)
+        closed_boxes = closed_paginator.page(closed_paginator.num_pages)
+    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes})
 
 
 @login_required
