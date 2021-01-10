@@ -49,7 +49,7 @@
                     <!-- Button trigger modal -->
                     <div class="text-end">
                         {% if not request.path == '/notice/' %}
-                        <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}#noticeTablePosition">
+                        <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#noticeTablePosition">
                         {% else %}
                         <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}">
                         {% endif %}
