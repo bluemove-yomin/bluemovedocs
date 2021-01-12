@@ -36,10 +36,16 @@
                 <div id="categoryHelp" class="form-text">대상을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="title" class="form-label">제목</label>
-                <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." aria-describedby="titleHelp" value="{{ box.title }}" disabled>
-                <div class="invalid-feedback">제목을 입력하세요.</div>
-                <div id="titleHelp" class="form-text">제목을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <label for="title" class="form-label">문서명</label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="문서명을 입력하세요." aria-describedby="titleHelp" value="{{ box.title }}" disabled>
+                <div class="invalid-feedback">문서명을 입력하세요.</div>
+                <div id="titleHelp" class="form-text">문서명을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="document_id" class="form-label">문서 ID<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="document_id" id="document_id" placeholder="문서 ID를 입력하세요." value="{{ box.document_id }}" disabled>
+                <div class="invalid-feedback">문서 ID를 입력하세요.</div>
+                <div id="titleHelp" class="form-text">문서 ID를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한</label>

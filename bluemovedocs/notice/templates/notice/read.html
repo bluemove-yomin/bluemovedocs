@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %} 공지사항 | 블루무브 닥스 {% endblock %}
 {% block content %}
 {% include 'shared/_navbar4notice.html' %}
@@ -69,7 +70,7 @@
             <img src="{{ notice.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
         </div>
         {% endif %}
-        <div style="white-space: pre-wrap; word-break: break-word;">{{ notice.content }}</div>
+        <div>{{ notice.content|safe }}</div>
     </div>
     {% if user == notice.writer %}
     <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">

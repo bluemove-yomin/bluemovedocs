@@ -16,10 +16,11 @@ def create(request):
         box_category = request.POST.get('category')
         box_title = request.POST.get('title')
         box_writer = request.user
+        box_document_id = request.POST.get('document_id')
         box_deadline = request.POST.get('deadline')
         box_content = request.POST.get('content')
         box_image = request.FILES.get('image')
-        Box.objects.create(category=box_category, title=box_title, writer=box_writer, deadline=box_deadline, content=box_content, image=box_image)
+        Box.objects.create(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, content=box_content, image=box_image)
     return redirect('box:main')
 
 
@@ -89,6 +90,7 @@ def update(request, id):
     if request.method == "POST":
         box.category = request.POST['category']
         box.title = request.POST['title']
+        box.document_id = request.POST['document_id']
         box.deadline = request.POST['deadline']
         box.content = request.POST['content']
         box.save()

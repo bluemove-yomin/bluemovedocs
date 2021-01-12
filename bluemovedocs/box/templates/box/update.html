@@ -29,9 +29,14 @@
                 <div class="invalid-feedback">대상을 선택하세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="title" class="form-label">제목<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." value="{{ box.title }}" required>
-                <div class="invalid-feedback">제목을 입력하세요.</div>
+                <label for="title" class="form-label">문서명<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="문서명을 입력하세요." value="{{ box.title }}" required>
+                <div class="invalid-feedback">문서명을 입력하세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="document_id" class="form-label">문서 ID<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="document_id" id="document_id" placeholder="문서 ID를 입력하세요." value="{{ box.document_id }}" required>
+                <div class="invalid-feedback">문서 ID를 입력하세요.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -157,8 +162,12 @@
                     else if ( !document.querySelector("#category").value ) {
                         return formCheck();
                     }
-                    // 제목 input이 비어 있을 경우
+                    // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
                         return formCheck();
                     }
                     // 내용 input이 비어 있을 경우
@@ -190,8 +199,12 @@
                     else if ( !document.querySelector("#category").value ) {
                         return formCheck();
                     }
-                    // 제목 input이 비어 있을 경우
+                    // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
                         return formCheck();
                     }
                     // 내용 input이 비어 있을 경우
@@ -238,8 +251,12 @@
                     else if ( !document.querySelector("#category").value ) {
                         return formCheck();
                     }
-                    // 제목 input이 비어 있을 경우
+                    // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
                         return formCheck();
                     }
                     // 내용 input이 비어 있을 경우
@@ -271,8 +288,12 @@
                     else if ( !document.querySelector("#category").value ) {
                         return formCheck();
                     }
-                    // 제목 input이 비어 있을 경우
+                    // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
                         return formCheck();
                     }
                     // 내용 input이 비어 있을 경우

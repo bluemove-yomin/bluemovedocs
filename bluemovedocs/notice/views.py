@@ -3,23 +3,28 @@ from django.contrib.auth.decorators import login_required, permission_required
 from allauth.socialaccount.models import SocialAccount
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
+from .forms import NoticeContentForm
 
 
 @permission_required('auth.add_permission', raise_exception=True)
 def write(request):
-    return render(request, 'notice/write.html')
+    form = NoticeContentForm()
+    return render(request, 'notice/write.html', {'form': form})
 
 
 @permission_required('auth.add_permission', raise_exception=True)
 def create(request):
     if request.method == "POST":
-        notice_category = request.POST.get('category')
-        notice_title = request.POST.get('title')
-        notice_writer = request.user
-        notice_content = request.POST.get('content')
-        notice_image = request.FILES.get('image')
-        Notice.objects.create(category=notice_category, title=notice_title, writer=notice_writer, content=notice_content, image=notice_image)
-    return redirect('notice:main')
+        form = NoticeContentForm(request.POST, request.FILES)
+        if form.is_valid():
+            notice_category = request.POST.get('category')
+            notice_title = request.POST.get('title')
+            notice_writer = request.user
+            notice_image = request.FILES.get('image')
+            form.save(category=notice_category, title=notice_title, writer = notice_writer, image=notice_image)
+            return redirect('notice:main')
+    else:
+        return redirect('notice:main')
 
 
 @login_required

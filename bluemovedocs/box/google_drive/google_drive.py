@@ -5,7 +5,6 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
-import json
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -102,7 +101,7 @@ def main():
         bluemove_permission_owner = {
             'type': 'user',
             'role': 'owner',
-            'emailAddress': 'bwbluemove@gmail.com',
+            'emailAddress': 'bwbluemove@gmail.com', ### 블루무브 이메일 주소 ###
         }
         batch.add(drive_service.permissions().create(
                 fileId=file_id,

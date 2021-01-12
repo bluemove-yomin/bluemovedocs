@@ -16,6 +16,7 @@ class Box(models.Model):
     title = models.CharField(max_length = 50)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
+    document_id = models.CharField(max_length = 300)
     content = models.TextField()
     content_update_flag = models.BooleanField(default = False)
     image = models.ImageField(upload_to='images/', null = True, blank = True)

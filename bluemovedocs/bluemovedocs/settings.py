@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'users',
+    'ckeditor',
+    'django.forms',
 ]
 
 MIDDLEWARE = [
@@ -76,6 +78,10 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 WSGI_APPLICATION = 'bluemovedocs.wsgi.application'
 
@@ -130,8 +136,10 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'home', 'static')
+    os.path.join(BASE_DIR, 'home', 'static'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Media files
 
@@ -249,3 +257,21 @@ ACCOUNT_USERNAME_BLACKLIST = [
     'posongvi+team',
     'barrierfree+team',
 ]
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Format', 'FontSize'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'],
+            ['TextColor', 'BGColor'],
+            ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent'],
+            ['Link', 'Unlink'],
+            ['Smiley', 'SpecialChar'],
+            ['Find', 'Replace'],
+            ['Undo', 'Redo'],
+        ],
+        'width': 'auto',
+    },
+}

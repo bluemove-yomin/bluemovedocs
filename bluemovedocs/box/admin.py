@@ -7,6 +7,7 @@ class BoxAdmin(admin.ModelAdmin):
         'id',
         'category',
         'title',
+        'document_id',
         'content',
         'content_update_flag',
         'image',
