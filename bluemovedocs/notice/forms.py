@@ -1,9 +1,8 @@
-from django.forms import ModelForm
 from django import forms
 from .models import *
 from ckeditor.widgets import CKEditorWidget
 
-class NoticeContentForm(ModelForm):
+class NoticeContentForm(forms.ModelForm):
     content = forms.CharField(widget = CKEditorWidget(), label='', required=True)
     class Meta:
         model = Notice
