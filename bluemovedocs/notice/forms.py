@@ -19,3 +19,12 @@ class NoticeContentForm(forms.ModelForm):
         notice.image = kwargs.get('image', None)
         notice.save()
         return notice
+
+
+    def update(self, **kwargs):
+        notice = super().save(commit=False)
+        notice.writer = kwargs.get('writer', None)
+        notice.category = kwargs.get('category', None)
+        notice.title = kwargs.get('title', None)
+        notice.save()
+        return notice

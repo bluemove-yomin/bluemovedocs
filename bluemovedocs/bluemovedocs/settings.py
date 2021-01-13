@@ -272,6 +272,11 @@ CKEDITOR_CONFIGS = {
             ['Find', 'Replace'],
             ['Undo', 'Redo'],
         ],
+        'extraPlugins': ','.join([
+            'autolink',
+        ]),
+        'tabSpaces': 4,
         'width': 'auto',
+        'toolbarCanCollapse': True,
     },
 }

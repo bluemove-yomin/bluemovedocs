@@ -33,15 +33,15 @@
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력하세요." value="{{ notice.title }}" required>
                 <div class="invalid-feedback">제목을 입력하세요.</div>
             </div>
-            {% if notice.image %}
             <div class="form-group mb-3">
-            {% else %}
-            <div class="form-group mb-5">
-            {% endif %}
                 <label for="content" class="form-label">내용<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required>{{ notice.content }}</textarea>
-                <div class="invalid-feedback">내용을 입력하세요.</div>
-                <div id="contentHelp" class="form-text">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
+                <div id="editor">
+                {{ form.media }}
+                {{ form.as_table }}
+                </div>
+                <!-- <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required>{{ notice.content }}</textarea> -->
+                <div class="content-invalid-feedback m-0" style="width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;display:none;">내용을 입력하세요.</div>
+                <div id="contentHelp" class="form-text m-0">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
             </div>
             <div class="form-group mb-5">
                 <label for="image" class="form-label">이미지</label>
@@ -105,12 +105,94 @@
                     event.preventDefault();
                     event.stopPropagation();
                 }
+                var content_html = document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html")
+                var content_text = content_html.innerText
+                if (content_text == '\n') {
+                    document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                    document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                }
+                if (content_text == '\n\n\n\n') {
+                    document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                    document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                }
+                function validContent() {
+                    document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;");
+                    document.querySelector(".content-invalid-feedback").setAttribute("style", "display:none;");
+                }
+                content_html.addEventListener("click", validContent)
                 form.classList.add('was-validated');
                 }, false);
             });
             }, false);
         })();
         </script>
+
+        <!-- Image Validation -->
+        <script>
+            // 오류 뜨면 바로 통과 (글 작성 중 로그아웃 안 되는 문제 해결)
+            window.onerror = function(){
+            return true; // 이거를 다른 거로 바꿔도 되겠다.
+            }
+
+            var _URL = window.URL || window.webkitURL;
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault(); // Stop the submit for now
+                // Replace with your selector to find the file input in your form
+                var fileInput = $(this).find("input[type=file]")[0],
+                    file = fileInput.files && fileInput.files[0];
+                (function formCheck() {
+                    'use strict';
+                    window.addEventListener('load', function() {
+                    // Get the forms we want to add validation styles to
+                    var forms = document.getElementsByClassName('needs-validation');
+                    // Loop over them and prevent submission
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        var content_html = document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html")
+                        var content_text = content_html.innerText
+                        if (content_text == '\n') {
+                            document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                            document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                        }
+                        if (content_text == '\n\n\n\n') {
+                            document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                            document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                        }
+                        function validContent() {
+                            document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;");
+                            document.querySelector(".content-invalid-feedback").setAttribute("style", "display:none;");
+                        }
+                        content_html.addEventListener("click", validContent)
+                        form.classList.add('was-validated');
+                        }, false);
+                    });                    
+                    }, false);
+                });
+
+                if ( !document.querySelector("#category").value ) {
+                    return formCheck();
+                }
+                else if ( !document.querySelector("#title").value ) {
+                    return formCheck();
+                }
+                else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                    return formCheck();
+                }
+                else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                    return formCheck();
+                }
+                else {
+                    form.submit();
+                }
+
+            });
+        </script>
+
     </div>
 </main>
 {% endblock %}

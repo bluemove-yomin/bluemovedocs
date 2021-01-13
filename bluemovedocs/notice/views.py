@@ -22,9 +22,7 @@ def create(request):
             notice_writer = request.user
             notice_image = request.FILES.get('image')
             form.save(category=notice_category, title=notice_title, writer = notice_writer, image=notice_image)
-            return redirect('notice:main')
-    else:
-        return redirect('notice:main')
+    return redirect('notice:main') # POST와 GET 모두 notice:main으로 redirect
 
 
 @login_required
@@ -89,26 +87,27 @@ def notice_favorite(request, id):
 @permission_required('auth.add_permission', raise_exception=True)
 def update(request, id):
     notice = get_object_or_404(Notice, pk=id)
+    form = NoticeContentForm(instance=notice)
     if request.method == "POST":
-        notice.category = request.POST['category']
-        notice.title = request.POST['title']
-        notice.content = request.POST['content']
-        notice.save()
+        form = NoticeContentForm(request.POST, instance=notice)
+        if form.is_valid():
+            notice_category = request.POST.get('category')
+            notice_title = request.POST.get('title')
+            notice_writer = request.user
+            form.update(category=notice_category, title=notice_title, writer = notice_writer)
         return redirect('notice:read', notice.id)
-    return render(request, 'notice/update.html', {'notice': notice})
+    return render(request, 'notice/update.html', {'notice': notice, 'form': form})
 
 
 @permission_required('auth.add_permission', raise_exception=True)
 def updateimage(request, id):
     notice = get_object_or_404(Notice, pk=id)
+    form = NoticeContentForm(instance=notice)
     if request.method == "POST":
-        notice.category = request.POST.get('category')
-        notice.title = request.POST.get('title')
-        notice.content = request.POST.get('content')
         notice.image = request.FILES.get('image')
         notice.save(update_fields=['image', 'updated_at'])
         return redirect('notice:read', notice.id)
-    return render(request, 'notice/updateimage.html', {'notice': notice})
+    return render(request, 'notice/updateimage.html', {'notice': notice, 'form': form})
 
 
 @login_required
