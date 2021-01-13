@@ -30,10 +30,8 @@
                 {{ form.as_table }}
                 </div>
                 <!-- <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required></textarea> -->
-                <div class="invalid-feedback">내용을 입력하세요.</div>
+                <div class="content-invalid-feedback m-0" style="width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;display:none;">내용을 입력하세요.</div>
                 <div id="contentHelp" class="form-text m-0">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
-                <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
-                <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
             </div>
             <div class="form-group mb-5">
                 <label for="image" class="form-label">이미지</label>
@@ -71,6 +69,12 @@
             </div>
         </form>
 
+        <!-- <script>
+            $(document).on('#editor', function() {
+                document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").onclick = function() {alert("개씨발좆버러지새끼야");};
+            });
+        </script> -->
+
         <!-- Forms Validation -->
         <script>
         // Disable form submissions if there are invalid fields
@@ -86,6 +90,21 @@
                     event.preventDefault();
                     event.stopPropagation();
                 }
+                var content_html = document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html")
+                var content_text = content_html.innerText
+                if (content_text == '\n') {
+                    document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                    document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                }
+                if (content_text == '\n\n\n\n') {
+                    document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                    document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                }
+                function validContent() {
+                    document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;");
+                    document.querySelector(".content-invalid-feedback").setAttribute("style", "display:none;");
+                }
+                content_html.addEventListener("click", validContent)
                 form.classList.add('was-validated');
                 }, false);
             });
@@ -119,6 +138,21 @@
                             event.preventDefault();
                             event.stopPropagation();
                         }
+                        var content_html = document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html")
+                        var content_text = content_html.innerText
+                        if (content_text == '\n') {
+                            document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                            document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                        }
+                        if (content_text == '\n\n\n\n') {
+                            document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                            document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                        }
+                        function validContent() {
+                            document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;");
+                            document.querySelector(".content-invalid-feedback").setAttribute("style", "display:none;");
+                        }
+                        content_html.addEventListener("click", validContent)
                         form.classList.add('was-validated');
                         }, false);
                     });                    
@@ -146,10 +180,10 @@
                                 return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.");
+                                return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.");
+                                return formCheck();
                             }
                             else {
                                 form.submit();
@@ -164,10 +198,10 @@
                                 return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.");
+                                return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.");
+                                return formCheck();
                             }
                             else {
                                 alert("이미지 크기는 반드시 1800 x 900이어야 합니다." + "\n\n▶ 필수 크기: 1800 x 900" + "\n▶ 현재 크기: " + width + " x " + height + " → 조건에 맞지 않습니다." + "\n\n첨부된 " + file.name + "을(를) 삭제합니다.");
@@ -185,10 +219,10 @@
                         return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                        alert("내용을 입력하세요.");
+                        return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                        alert("내용을 입력하세요.");
+                        return formCheck();
                     }
                     else {
                         if ( confirm("이미지가 없으면 홈페이지 배너에 노출되지 않습니다." + "\n\n▶ 권장: 이미지 첨부" + "\n▶ 현재: 이미지 미첨부 → 홈페이지 배너에 표시되지 않습니다." + "\n\n계속하시겠어요?") ) {
