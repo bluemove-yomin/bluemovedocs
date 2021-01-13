@@ -29,7 +29,7 @@
                     블루무버 희망자
                     {% endif %}
                 </th>
-                <td><a href="{% url 'notice:read' notice.id %}" style="word-break: break-word; overflow: hidden; text-overflow: ellipsis; width: 500px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">{{ notice.title }}</a></td>
+                <td><a href="{% url 'notice:read' notice.id %}{{ request.get_full_path|cut:request.path }}" style="word-break: break-word; overflow: hidden; text-overflow: ellipsis; width: 500px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">{{ notice.title }}</a></td>
                 <td>
                     {% if not notice.writer.first_name == '' %}
                     {{ notice.writer.last_name }}{{ notice.writer.first_name }}
