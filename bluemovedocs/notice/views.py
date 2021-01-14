@@ -93,8 +93,7 @@ def update(request, id):
         if form.is_valid():
             notice_category = request.POST.get('category')
             notice_title = request.POST.get('title')
-            notice_writer = request.user
-            form.update(category=notice_category, title=notice_title, writer = notice_writer)
+            form.update(category=notice_category, title=notice_title)
         return redirect('notice:read', notice.id)
     return render(request, 'notice/update.html', {'notice': notice, 'form': form})
 

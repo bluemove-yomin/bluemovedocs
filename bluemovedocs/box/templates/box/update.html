@@ -35,8 +35,12 @@
             </div>
             <div class="form-group mb-3">
                 <label for="document_id" class="form-label">문서 ID<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="text" class="form-control" name="document_id" id="document_id" placeholder="문서 ID를 입력하세요." value="{{ box.document_id }}" required>
-                <div class="invalid-feedback">문서 ID를 입력하세요.</div>
+                <input type="text" class="form-control" name="document_id" id="document_id" maxlength="44" minlength="44" placeholder="문서 ID를 입력하세요." aria-describedby="document_idHelp" value="{{ box.document_id }}" required>
+                <div class="invalid-feedback">유효한 문서 ID를 입력하세요. 문서 ID는 영문자, 숫자, 밑줄 문자를 포함한 44자로 구성되어 있습니다.</div>
+                <div id="document_idHelp" class="form-text">
+                    <p class="mb-2">문서는 '링크가 있는 모든 사용자에게 공개'되어 있어야 합니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 문서 ID 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/<mark>1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58</mark></span>
+                </div>
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -60,9 +64,13 @@
             <div class="form-group mb-5">
             {% endif %}
                 <label for="content" class="form-label">내용<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required>{{ box.content }}</textarea>
-                <div class="invalid-feedback">내용을 입력하세요.</div>
-                <div id="contentHelp" class="form-text">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
+                <div id="editor">
+                {{ form.media }}
+                {{ form.as_table }}
+                </div>
+                <!-- <textarea class="form-control" name="content" id="content" placeholder="내용을 입력하세요." rows="7" aria-describedby="contentHelp" required>{{ box.content }}</textarea> -->
+                <div class="content-invalid-feedback m-0" style="width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;display:none;">내용을 입력하세요.</div>
+                <div id="contentHelp" class="form-text m-0">입력란 우측 하단을 누른 채 위 아래로 움직이면 높이를 조절할 수 있습니다.</div>
             </div>
             <div class="form-group mb-5">
                 <label for="image" class="form-label">이미지</label>
@@ -113,25 +121,40 @@
 
         <!-- Forms Validation -->
         <script>
-        // Disable form submissions if there are invalid fields
-        (function() {
-            'use strict';
-            window.addEventListener('load', function() {
-            // Get the forms we want to add validation styles to
-            var forms = document.getElementsByClassName('needs-validation');
-            // Loop over them and prevent submission
-            var validation = Array.prototype.filter.call(forms, function(form) {
-                form.addEventListener('submit', function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
+            // Disable form submissions if there are invalid fields
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                // Get the forms we want to add validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    var content_html = document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html")
+                    var content_text = content_html.innerText
+                    if (content_text == '\n') {
+                        document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                        document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                    }
+                    if (content_text == '\n\n\n\n') {
+                        document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;border-color: #dc3545;");
+                        document.querySelector(".content-invalid-feedback").setAttribute("style", "width:100%;margin-top:.25rem;font-size:.875em;color:#dc3545;");
+                    }
+                    function validContent() {
+                        document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content").setAttribute("style", "width: auto;");
+                        document.querySelector(".content-invalid-feedback").setAttribute("style", "display:none;");
+                    }
+                    content_html.addEventListener("click", validContent)
+                    form.classList.add('was-validated');
+                    }, false);
+                });
                 }, false);
-            });
-            }, false);
-        })();
-        </script>
+            })();
+            </script>
 
         <!-- Deadline Validation -->
         {% if box.deadline_update_flag %}
@@ -144,34 +167,49 @@
                 e.preventDefault();
                 // 유저가 새로운 기한을 입력하지 않았을 경우
                 if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                    // 대상 input이 비어 있을 경우
+                    if ( !document.querySelector("#category").value ) {
+                        alert("대상을 선택하세요.")
+                        return formCheck();
+                    }
+                    // 문서명 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        alert("문서명을 입력하세요.")
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
+                        alert("문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#document_id").value.length !== 44 ) {
+                        alert("유효한 문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
-                    if ( !document.querySelector("#deadline").value ) {
+                    else if ( !document.querySelector("#deadline").value ) {
+                        alert("기한을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
-                    // 대상 input이 비어 있을 경우
-                    else if ( !document.querySelector("#category").value ) {
-                        return formCheck();
-                    }
-                    // 문서명 input이 비어 있을 경우
-                    else if ( !document.querySelector("#title").value ) {
-                        return formCheck();
-                    }
-                    // 문서 ID input이 비어 있을 경우
-                    else if ( !document.querySelector("#document_id").value ) {
-                        return formCheck();
-                    }
                     // 내용 input이 비어 있을 경우
-                    else if ( !document.querySelector("#content").value ) {
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                        alert("내용을 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                        alert("내용을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
@@ -181,34 +219,49 @@
                 }
                 // 유저가 새로운 기한을 입력했을 경우
                 else {
+                    // 대상 input이 비어 있을 경우
+                    if ( !document.querySelector("#category").value ) {
+                        alert("대상을 선택하세요.")
+                        return formCheck();
+                    }
+                    // 문서명 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        alert("문서명을 입력하세요.")
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
+                        alert("문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#document_id").value.length !== 44 ) {
+                        alert("유효한 문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
-                    if ( !document.querySelector("#deadline").value ) {
+                    else if ( !document.querySelector("#deadline").value ) {
+                        alert("기한을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
-                    // 대상 input이 비어 있을 경우
-                    else if ( !document.querySelector("#category").value ) {
-                        return formCheck();
-                    }
-                    // 문서명 input이 비어 있을 경우
-                    else if ( !document.querySelector("#title").value ) {
-                        return formCheck();
-                    }
-                    // 문서 ID input이 비어 있을 경우
-                    else if ( !document.querySelector("#document_id").value ) {
-                        return formCheck();
-                    }
                     // 내용 input이 비어 있을 경우
-                    else if ( !document.querySelector("#content").value ) {
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                        alert("내용을 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                        alert("내용을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
@@ -233,34 +286,49 @@
                 e.preventDefault();
                 // 유저가 새로운 기한을 입력하지 않았을 경우
                 if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                    // 대상 input이 비어 있을 경우
+                    if ( !document.querySelector("#category").value ) {
+                        alert("대상을 선택하세요.")
+                        return formCheck();
+                    }
+                    // 문서명 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        alert("문서명을 입력하세요.")
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
+                        alert("문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#document_id").value.length !== 44 ) {
+                        alert("유효한 문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
-                    if ( !document.querySelector("#deadline").value ) {
+                    else if ( !document.querySelector("#deadline").value ) {
+                        alert("기한을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
-                    // 대상 input이 비어 있을 경우
-                    else if ( !document.querySelector("#category").value ) {
-                        return formCheck();
-                    }
-                    // 문서명 input이 비어 있을 경우
-                    else if ( !document.querySelector("#title").value ) {
-                        return formCheck();
-                    }
-                    // 문서 ID input이 비어 있을 경우
-                    else if ( !document.querySelector("#document_id").value ) {
-                        return formCheck();
-                    }
                     // 내용 input이 비어 있을 경우
-                    else if ( !document.querySelector("#content").value ) {
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                        alert("내용을 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                        alert("내용을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
@@ -270,34 +338,49 @@
                 }
                 // 유저가 새로운 기한을 입력했을 경우
                 else {
+                    // 대상 input이 비어 있을 경우
+                    if ( !document.querySelector("#category").value ) {
+                        alert("대상을 선택하세요.")
+                        return formCheck();
+                    }
+                    // 문서명 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        alert("문서명을 입력하세요.")
+                        return formCheck();
+                    }
+                    // 문서 ID input이 비어 있을 경우
+                    else if ( !document.querySelector("#document_id").value ) {
+                        alert("문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#document_id").value.length !== 44 ) {
+                        alert("유효한 문서 ID를 입력하세요.")
+                        return formCheck();
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
-                    if ( !document.querySelector("#deadline").value ) {
+                    else if ( !document.querySelector("#deadline").value ) {
+                        alert("기한을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
                         return formCheck();
                     }
-                    // 대상 input이 비어 있을 경우
-                    else if ( !document.querySelector("#category").value ) {
-                        return formCheck();
-                    }
-                    // 문서명 input이 비어 있을 경우
-                    else if ( !document.querySelector("#title").value ) {
-                        return formCheck();
-                    }
-                    // 문서 ID input이 비어 있을 경우
-                    else if ( !document.querySelector("#document_id").value ) {
-                        return formCheck();
-                    }
                     // 내용 input이 비어 있을 경우
-                    else if ( !document.querySelector("#content").value ) {
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                        alert("내용을 입력하세요.")
+                        return formCheck();
+                    }
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                        alert("내용을 입력하세요.")
                         return formCheck();
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우

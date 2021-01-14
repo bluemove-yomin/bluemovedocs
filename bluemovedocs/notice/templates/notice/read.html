@@ -200,6 +200,8 @@
                 </div>
                 {% endif %}
             </div>
+            {% empty %}
+            <div class="text-center"><br><p style="color: #CCCCCC;"><i class="far fa-comment-dots"></i> 댓글이 없습니다.</p></div>
             {% endfor %}
         </div>
 
@@ -210,7 +212,7 @@
             return true; // 이거를 다른 거로 바꿔도 되겠다.
             }
 
-            $("form").submit( function( e ) {
+            $("#commentForm").submit( function( e ) {
                 var form = this;
                 e.preventDefault();
                 if ( !document.querySelector("#content").value ) {
@@ -224,6 +226,7 @@
                 }
             });
         </script>
+
     </div>
     
     <!-- #noticeTablePosition은 _noticetable.html와 연결되어 있음 -->

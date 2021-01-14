@@ -23,7 +23,6 @@ class NoticeContentForm(forms.ModelForm):
 
     def update(self, **kwargs):
         notice = super().save(commit=False)
-        notice.writer = kwargs.get('writer', None)
         notice.category = kwargs.get('category', None)
         notice.title = kwargs.get('title', None)
         notice.save()

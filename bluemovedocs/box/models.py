@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.db.models.signals import pre_save
 import datetime
 from django.utils.dateparse import parse_date
+from ckeditor.fields import RichTextField
 
 class Box(models.Model):
 
@@ -17,7 +18,8 @@ class Box(models.Model):
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
     document_id = models.CharField(max_length = 300)
-    content = models.TextField()
+    content = RichTextField()
+    # content = models.TextField()
     content_update_flag = models.BooleanField(default = False)
     image = models.ImageField(upload_to='images/', null = True, blank = True)
     deadline = models.DateField()

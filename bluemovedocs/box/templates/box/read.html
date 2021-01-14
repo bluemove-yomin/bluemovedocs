@@ -120,12 +120,19 @@
         </div>
 
         <hr class="text-black-50">
+        {% if perms.auth %}
+        <div class="callout" style="word-break: break-word;">
+            <strong><i class="far fa-file-alt"></i> 문서 ID</strong><br>
+            <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
+            <small style="color: #6C757D;">이 콜아웃은 문서함 생성자에게만 표시됩니다.</small>
+        </div>
+        {% endif %}
         {% if box.image %}
-        <div class="mb-4 d-flex justify-content-center">
+        <div class="d-flex justify-content-center" style="margin-bottom: 2rem!important;">
             <img src="{{ box.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
         </div>
         {% endif %}
-        <div style="white-space: pre-wrap; word-break: break-word;">{{ box.content }}</div>
+        <div style="word-break: break-word;">{{ box.content|safe }}</div>
     </div>
     {% if user == box.writer %}
     <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">

@@ -3,25 +3,28 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 import datetime
+from .forms import BoxContentForm
 
 
 @permission_required('auth.add_permission', raise_exception=True)
 def write(request):
-    return render(request, 'box/write.html')
+    form = BoxContentForm()
+    return render(request, 'box/write.html', {'form': form})
 
 
 @permission_required('auth.add_permission', raise_exception=True)
 def create(request):
     if request.method == "POST":
-        box_category = request.POST.get('category')
-        box_title = request.POST.get('title')
-        box_writer = request.user
-        box_document_id = request.POST.get('document_id')
-        box_deadline = request.POST.get('deadline')
-        box_content = request.POST.get('content')
-        box_image = request.FILES.get('image')
-        Box.objects.create(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, content=box_content, image=box_image)
-    return redirect('box:main')
+        form = NoticeContentForm(request.POST, request.FILES)
+        if form.is_valid():
+            box_category = request.POST.get('category')
+            box_title = request.POST.get('title')
+            box_writer = request.user
+            box_document_id = request.POST.get('document_id')
+            box_deadline = request.POST.get('deadline')
+            box_image = request.FILES.get('image')
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, image=box_image)
+    return redirect('box:main') # POST와 GET 모두 notice:main으로 redirect
 
 
 def main(request):
@@ -87,25 +90,28 @@ def box_favorite(request, id):
 @permission_required('auth.add_permission', raise_exception=True)
 def update(request, id):
     box = get_object_or_404(Box, pk=id)
+    form = BoxContentForm(instance=box)
     if request.method == "POST":
-        box.category = request.POST['category']
-        box.title = request.POST['title']
-        box.document_id = request.POST['document_id']
-        box.deadline = request.POST['deadline']
-        box.content = request.POST['content']
-        box.save()
+        form = BoxContentForm(request.POST, instance=box)
+        if form.is_valid():
+            box_category = request.POST.get('category')
+            box_title = request.POST.get('title')
+            box_document_id = request.POST.get('document_id')
+            box_deadline = request.POST.get('deadline')
+            form.update(category=box_category, title=box_title, document_id=box_document_id, deadline=box_deadline)
         return redirect('box:read', box.id)
-    return render(request, 'box/update.html', {'box': box})
+    return render(request, 'box/update.html', {'box': box, 'form': form})
 
 
 @permission_required('auth.add_permission', raise_exception=True)
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
+    form = BoxContentForm(instance=box)
     if request.method == "POST":
         box.image = request.FILES.get('image')
         box.save(update_fields=['image'])
         return redirect('box:read', box.id)
-    return render(request, 'box/updateimage.html', {'box': box})
+    return render(request, 'box/updateimage.html', {'box': box, 'form': form})
 
 
 @permission_required('auth.add_permission', raise_exception=True)
