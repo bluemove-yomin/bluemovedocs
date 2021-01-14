@@ -134,13 +134,10 @@
             return true; // 이거를 다른 거로 바꿔도 되겠다.
             }
 
-            var _URL = window.URL || window.webkitURL;
             $("form").submit( function( e ) {
                 var form = this;
                 e.preventDefault(); // Stop the submit for now
                 // Replace with your selector to find the file input in your form
-                var fileInput = $(this).find("input[type=file]")[0],
-                    file = fileInput.files && fileInput.files[0];
                 (function formCheck() {
                     'use strict';
                     window.addEventListener('load', function() {
@@ -175,15 +172,19 @@
                 });
 
                 if ( !document.querySelector("#category").value ) {
+                    alert("대상을 선택하세요.")
                     return formCheck();
                 }
                 else if ( !document.querySelector("#title").value ) {
+                    alert("제목을 입력하세요.")
                     return formCheck();
                 }
                 else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                    alert("내용을 입력하세요.")
                     return formCheck();
                 }
                 else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                    alert("내용을 입력하세요.")
                     return formCheck();
                 }
                 else {

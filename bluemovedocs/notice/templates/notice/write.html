@@ -168,15 +168,19 @@
                         // 유저가 첨부한 이미지 크기가 1800 x 900일 경우
                         if( width == 1800 && height == 900 ) {
                             if ( !document.querySelector("#category").value ) {
+                                alert("대상을 선택하세요.")
                                 return formCheck();
                             }
                             else if ( !document.querySelector("#title").value ) {
+                                alert("제목을 입력하세요.")
                                 return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                                alert("내용을 입력하세요.")
                                 return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                                alert("내용을 입력하세요.")
                                 return formCheck();
                             }
                             else {
@@ -186,15 +190,19 @@
                         // 유저가 첨부한 이미지 크기가 1800 x 900이 아닐 경우
                         else {
                             if ( !document.querySelector("#category").value ) {
+                                alert("대상을 선택하세요.")
                                 return formCheck();
                             }
                             else if ( !document.querySelector("#title").value ) {
+                                alert("제목을 입력하세요.")
                                 return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                                alert("내용을 입력하세요.")
                                 return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                                alert("내용을 입력하세요.")
                                 return formCheck();
                             }
                             else {
@@ -207,15 +215,19 @@
                 // 유저가 이미지를 첨부하지 않았을 경우
                 else {
                     if ( !document.querySelector("#category").value ) {
+                        alert("대상을 선택하세요.")
                         return formCheck();
                     }
                     else if ( !document.querySelector("#title").value ) {
+                        alert("제목을 입력하세요.")
                         return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                        alert("내용을 입력하세요.")
                         return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                        alert("내용을 입력하세요.")
                         return formCheck();
                     }
                     else {

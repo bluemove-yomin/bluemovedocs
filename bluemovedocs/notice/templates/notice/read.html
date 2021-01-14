@@ -66,7 +66,7 @@
         </small>
         <hr class="text-black-50">
         {% if notice.image %}
-        <div class="mb-4 d-flex justify-content-center">
+        <div class="d-flex justify-content-center" style="margin-bottom: 2rem!important;">
             <img src="{{ notice.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
         </div>
         {% endif %}
@@ -169,7 +169,7 @@
                             {% endif %}
                         </td>
                         <td class="p-0">
-                            <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 8px;">
+                            <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 10px;">
                                 {% if not comment.writer.first_name == '' %}
                                 {{ comment.writer.last_name }}{{ comment.writer.first_name }}
                                 {% else %}
@@ -180,7 +180,7 @@
                     </tr>
                     <tr>
                         <td class="p-0">
-                            <small class="card-subtitle mb-2" style="margin-left: 8px;">
+                            <small class="card-subtitle mb-2" style="margin-left: 10px;">
                                 {% if comment.created_at == comment.updated_at %}
                                 {{ comment.created_at }}
                                 {% else %}
@@ -190,7 +190,7 @@
                         </td>
                     </tr>
                 </table>
-                <p class="card-text mt-1" style="white-space: pre-wrap; word-break: break-word; margin-left: 43px;">{{ comment.content }}</p>
+                <p class="card-text mt-1" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;">{{ comment.content }}</p>
                 {% if user == comment.writer %}
                 <div class="d-grid justify-content-end">
                     <small>
@@ -202,6 +202,28 @@
             </div>
             {% endfor %}
         </div>
+
+        <!-- Comment Validation -->
+        <script>
+            // 오류 뜨면 바로 통과 (글 작성 중 로그아웃 안 되는 문제 해결)
+            window.onerror = function(){
+            return true; // 이거를 다른 거로 바꿔도 되겠다.
+            }
+
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault();
+                if ( !document.querySelector("#content").value ) {
+                    alert("댓글을 입력하세요.")
+                }
+                else if ( document.querySelector("#content").value.length < 5 ) {
+                    alert("댓글을 최소 5자 이상 입력하세요.")
+                }
+                else {
+                    form.submit();
+                }
+            });
+        </script>
     </div>
     
     <!-- #noticeTablePosition은 _noticetable.html와 연결되어 있음 -->
