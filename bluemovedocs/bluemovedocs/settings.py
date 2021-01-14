@@ -167,12 +167,12 @@ SESSION_SAVE_EVERY_REQUEST = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
+            'https://www.googleapis.com/auth/drive',
             'profile',
             'email',
-            'openid',
         ],
         'AUTH_PARAMS': {
-            'access_type': 'offline',
+            'access_type': 'online',
         }
     }
 }

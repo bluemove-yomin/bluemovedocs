@@ -4,6 +4,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 import datetime
 from .forms import BoxContentForm
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from allauth.socialaccount.models import SocialToken, SocialApp
 
 
 @permission_required('auth.add_permission', raise_exception=True)
@@ -15,7 +18,7 @@ def write(request):
 @permission_required('auth.add_permission', raise_exception=True)
 def create(request):
     if request.method == "POST":
-        form = NoticeContentForm(request.POST, request.FILES)
+        form = BoxContentForm(request.POST, request.FILES)
         if form.is_valid():
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
@@ -24,7 +27,42 @@ def create(request):
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
             form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, image=box_image)
-    return redirect('box:main') # POST와 GET 모두 notice:main으로 redirect
+    return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
+
+
+@login_required
+def create_doc(request):
+    # 00. Google Drive API 호출하기
+    # scope: settings.py -> SOCIALACCOUNT_PROVIDERS
+    token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+    credentials = Credentials(
+        client_id='54744281802-ccr39h4ohfts06d55oat9m8u6asud66r.apps.googleusercontent.com',
+        client_secret='r4qzaZaNBq1u4X7ANuaf1vsf',
+        token_uri='https://oauth2.googleapis.com/token',
+        token=token.token,
+        refresh_token=token.token_secret,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+
+    # 01. 유저 My Drive에 블루무브 폴더 생성하기
+    file_metadata = {
+        'name': '블루무브',
+        'mimeType': 'application/vnd.google-apps.folder'
+    }
+    file = drive_service.files().create(body=file_metadata,
+                                        fields='id').execute()
+    folder_id = file.get('id')
+
+    application_id = '1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58' ### 지원서 File ID ###
+    body = {
+        'name': '4기 블루무버 지원서', # 나중에 제출일시 및 이름 추가하기
+        'parents': [folder_id],
+        'writersCanShare': True,
+    }
+    drive_response = drive_service.files().copy(
+        fileId=application_id, body=body).execute()
+    file_id = drive_response.get('id') ### File ID ###
+    return redirect('https://drive.google.com/')
 
 
 def main(request):

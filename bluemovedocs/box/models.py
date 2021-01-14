@@ -77,6 +77,14 @@ def content_update_flag_on(sender, instance, **kwargs):
             instance.content_update_flag = True
 
 
+class Doc(models.Model):
+    submittee = models.ForeignKey(User, on_delete = models.CASCADE)
+    src = models.TextField(null = True)
+    box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name='docs')
+    created_at = models.DateField(auto_now_add = True)
+    updated_at = models.DateField(auto_now = True)
+
+
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="box_favorite_user")
     box = models.ForeignKey(Box, on_delete=models.CASCADE)
