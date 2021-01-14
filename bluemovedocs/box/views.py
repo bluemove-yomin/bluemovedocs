@@ -6,7 +6,7 @@ import datetime
 from .forms import BoxContentForm
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
-from allauth.socialaccount.models import SocialToken, SocialApp
+from allauth.socialaccount.models import SocialToken, SocialApp, SocialAccount
 
 
 @permission_required('auth.add_permission', raise_exception=True)
@@ -31,7 +31,8 @@ def create(request):
 
 
 @login_required
-def create_doc(request):
+def create_doc(request, id):
+    box = get_object_or_404(Box, pk=id)
     # 00. Google Drive API 호출하기
     # scope: settings.py -> SOCIALACCOUNT_PROVIDERS
     token = SocialToken.objects.get(account__user=request.user, account__provider='google')
@@ -43,7 +44,6 @@ def create_doc(request):
         refresh_token=token.token_secret,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-
     # 01. 유저 My Drive에 블루무브 폴더 생성하기
     file_metadata = {
         'name': '블루무브',
@@ -52,17 +52,23 @@ def create_doc(request):
     file = drive_service.files().create(body=file_metadata,
                                         fields='id').execute()
     folder_id = file.get('id')
-
-    application_id = '1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58' ### 지원서 File ID ###
+    # 02. 블루무브 폴더에 템플릿 문서 복사하기
+    application_id = box.document_id ### 템플릿 문서 ID ###
     body = {
-        'name': '4기 블루무버 지원서', # 나중에 제출일시 및 이름 추가하기
+        'name': '4기 블루무버 지원서 - ' + SocialAccount.objects.filter(user=request.user)[0].extra_data['name'],
         'parents': [folder_id],
         'writersCanShare': True,
     }
     drive_response = drive_service.files().copy(
         fileId=application_id, body=body).execute()
-    file_id = drive_response.get('id') ### File ID ###
-    return redirect('https://drive.google.com/')
+    file_id = drive_response.get('id') ### 유저 문서 ID ###
+    name = drive_response.get('name')
+    # 03. 유저의 '문서 작성' 클릭 여부 저장하기
+    doc_user = request.user
+    doc_name = name
+    doc_file_id = file_id
+    Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, box=box)
+    return redirect('box:read', box.id)
 
 
 def main(request):
@@ -107,7 +113,11 @@ def read(request, id):
     except EmptyPage:
         opened_boxes = opened_paginator.page(opened_paginator.num_pages)
         closed_boxes = closed_paginator.page(closed_paginator.num_pages)
-    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes})
+    if request.user.is_authenticated:
+        all_docs = box.docs.filter(user=request.user)
+    else:
+        all_docs = None
+    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'all_docs': all_docs})
 
 
 @login_required

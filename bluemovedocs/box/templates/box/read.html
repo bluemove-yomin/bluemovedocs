@@ -122,7 +122,7 @@
         <hr class="text-black-50">
         {% if perms.auth %}
         <div class="callout" style="word-break: break-word;">
-            <strong><i class="far fa-file-alt"></i> 문서 ID</strong><br>
+            <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서 ID</span><br>
             <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
             <small style="color: #6C757D;">이 콜아웃은 문서함 생성자에게만 표시됩니다.</small>
         </div>
@@ -166,6 +166,80 @@
         <a href="{% url 'box:update' box.id %}" class="btn btn-outline-secondary">수정하기</a>
     </div>
     {% endif %}
+
+    {% if not user.is_authenticated %}
+        <div class="container-md">
+            <div class="container border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-upload"></i></span><br>
+                <span style="color: #58595B;">문서를 작성하려면 로그인하세요.</span>
+            </div>
+        </div>
+    {% elif perms.auth %}
+    <div class="container-md">
+        <div class="container border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+            <span style="color: #CCCCCC; font-size: 4rem;"><i class="far fa-laugh-squint"></i></span><br>
+            <span style="color: #58595B;">사무국 매니저는 문서를 작성할 수 없습니다.</span>
+        </div>
+    </div>
+    {% else %}
+        {% for doc in all_docs %}
+            {% if user == doc.user %}
+            <div class="container-md">
+                <form id="docForm" name="docForm" action="https://docs.google.com/document/d/{{ doc.file_id }}/edit" method="GET" target="_blank">
+                    <button class="container btn shadow-sm border rounded text-center" id="docButton" type="submit" onclick="button_click();" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                        <span style="color: #CCCCCC; font-size: 4rem;"><i class="fab fa-google-drive"></i></span><br>
+                        <span style="color: #58595B;">{{ doc.name }}</span>
+                    </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="container-md">
+                <div class="container border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                    <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-exclamation-triangle"></i></span><br>
+                    <span style="color: #58595B;">무언가 잘못되었습니다.</span>
+                </div>
+            </div>
+            {% endif %}
+        {% empty %}
+            <div class="container-md">
+                <form id="docForm" name="docForm" action="{% url 'box:create_doc' box.id %}" method="POST">
+                    {% csrf_token %}
+                    <button class="container btn shadow-sm border rounded text-center" id="docButton" type="submit" onclick="button_click();" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;" data-bs-toggle="modal" data-bs-target="#docModal">
+                        <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-upload"></i></span><br>
+                        <span style="color: #58595B;">문서를 작성하려면 누르세요.</span>
+                    </button>
+                    <!-- docModal -->
+                    <div class="modal fade" id="docModal" tabindex="-1" aria-labelledby="docModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="docModalLabel" style="font-weight: 600;">⏳ 작업 안내</h5>
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                                </div>
+                                <div class="modal-body">
+                                    Google 드라이브에 문서를 준비하고 있습니다.<br>작업이 종료될 때까지 이 창을 닫지 마세요.
+                                </div>
+                                <div class="modal-footer">
+                                    작업이 완료되면 페이지가 새로고침 됩니다.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $( "#docButton" ).hover(
+            function() {
+                $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+            },
+            function() {
+                $(this).removeClass('shadow-lg');
+            });
+        });
+    </script>
 
     <!-- #boxListPosition -->
     <div id="boxListPosition"></div>

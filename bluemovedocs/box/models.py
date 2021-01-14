@@ -78,11 +78,13 @@ def content_update_flag_on(sender, instance, **kwargs):
 
 
 class Doc(models.Model):
-    submittee = models.ForeignKey(User, on_delete = models.CASCADE)
-    src = models.TextField(null = True)
-    box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name='docs')
-    created_at = models.DateField(auto_now_add = True)
-    updated_at = models.DateField(auto_now = True)
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name="docs")
+    name = models.CharField(max_length = 300)
+    file_id = models.CharField(max_length = 300)
+    submit_flag = models.BooleanField(default = False)
+    created_at = models.DateTimeField(auto_now_add = True)
+    updated_at = models.DateTimeField(auto_now = True)
 
 
 class Favorite(models.Model):

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Box
+from .models import Box, Doc
 
 @admin.register(Box)
 class BoxAdmin(admin.ModelAdmin):
@@ -20,4 +20,17 @@ class BoxAdmin(admin.ModelAdmin):
         'category',
         'title',
         'content',
+    )
+
+
+@admin.register(Doc)
+class DocAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'name',
+        'file_id',
+        'created_at',
+        'submit_flag',
+        'updated_at',
     )

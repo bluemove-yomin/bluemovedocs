@@ -8,12 +8,17 @@
 {% include 'shared/_navbar4home.html' %}
 <main class="px-2 px-md-5">
 <div class="container-md mt-5">
-  <h1 class="mb-4" style="font-weight: 600; color: #58595B;">로그인</h1>
+  <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">로그인</h1>
 
   {% get_providers as socialaccount_providers %}
   {% providers_media_js %}
 
-  <div class="card-group pt-2">
+  <div class="callout callout-warning" style="word-break: break-word;">
+    <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-lock"></i> 처음 로그인하시나요?</span><br>
+    <small style="color: #6C757D;">첫 로그인 시 자동으로 회원가입이 진행되며 이메일 주소, 이름, 프로필 사진이 블루무브 닥스에 저장됩니다. 또한 Google 드라이브에 대한 권한 제공 요청이 발생할 수 있습니다. <a href="#">자세히 보기</a></small>
+  </div>
+
+  <div class="card-group mt-3">
     <div class="card">
       <div class="card-header">
         <h5 class="card-title text-center m-0" style="color: #58595B; font-weight: 600;">블루무버 / 게스트</h5>
@@ -48,47 +53,19 @@
           <script type="text/javascript">
             $(document).ready(function() {
             // executes when HTML-Document is loaded and DOM is ready
-            console.log("document is ready");
-            
-        
-            $( "#login" ).hover(
-            function() {
-                $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
-            }, function() {
-                $(this).removeClass('shadow-lg');
-            }
-            );
-            
-            // document ready  
+              $( "#login" ).hover(
+              function() {
+                  $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+              }, function() {
+                  $(this).removeClass('shadow-lg');
+              });
+              // document ready  
             });
           </script>
         </form>
       </div>
     </div>
   </div>
-
-  <div class="alert alert-warning alert-dismissible fade show shadow-sm mt-3" id="account_data_alert" role="alert">
-    <strong>처음 로그인하시나요?</strong><br><small>첫 로그인 시 자동으로 회원가입이 진행되며 이메일 주소, 이름, 프로필 사진이 블루무브 닥스에 저장됩니다. 게스트 계정의 경우 개인정보 보호를 위해 주기적으로 삭제하고 있으니 참고하시기 바랍니다. 자세한 사항은 이용방법을 참고해주세요.</small>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  <script type="text/javascript">
-    $(document).ready(function() {
-    // executes when HTML-Document is loaded and DOM is ready
-    console.log("document is ready");
-    
-
-    $( "#account_data_alert" ).hover(
-    function() {
-        $(this).addClass('shadow-lg'); 
-    }, function() {
-        $(this).removeClass('shadow-lg');
-    }
-    );
-    
-    // document ready  
-    });
-  </script>
-
 </div>
 </main>
 {% endblock %}
