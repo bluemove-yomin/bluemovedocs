@@ -57,29 +57,29 @@ def main():
     print('02. 블루무브 폴더에 지원서 템플릿을 복사했습니다.')
 
     # 테스트. 지원서 찾기
-    drive_response = drive_service.files().get(
-        fileId=file_id).execute()
-    if drive_response.get('id') == file_id:
-        print('테스트. 유저 Google Drive에 지원서 파일이 존재합니다.')
-    else:
-        print('테스트. 유저 Google Drive에 지원서 파일이 존재하지 않습니다.')
+    # drive_response = drive_service.files().get(
+    #     fileId=file_id).execute()
+    # if drive_response.get('id') == file_id:
+    #     print('테스트. 유저 Google Drive에 지원서 파일이 존재합니다.')
+    # else:
+    #     print('테스트. 유저 Google Drive에 지원서 파일이 존재하지 않습니다.')
 
-    # # 02. 블루무브 폴더에 지원서 템플릿 업로드하기 ### 비활성하기 ###
-    # # file_metadata = {
-    # #     'name': '4기 블루무버 지원서', # 나중에 제출일시 및 이름 추가하기
-    # #     'mimeType': 'application/vnd.google-apps.document',
-    # #     'parents': [folder_id],
-    # #     'writersCanShare': True,
-    # # }
-    # # media = MediaFileUpload('application.html',
-    # #                         mimetype='text/html',
-    # #                         resumable=True)
-    # # file = drive_service.files().create(body=file_metadata,
-    # #                                     media_body=media,
-    # #                                     fields='id').execute()
-    # # file_id = file.get('id') ### File ID ###
-    # # print('File ID: %s' % file_id)
-    # # print('블루무브 폴더에 지원서 템플릿을 업로드했습니다.')
+    # 02. 블루무브 폴더에 지원서 템플릿 업로드하기 ### 비활성하기 ###
+    # file_metadata = {
+    #     'name': '4기 블루무버 지원서', # 나중에 제출일시 및 이름 추가하기
+    #     'mimeType': 'application/vnd.google-apps.document',
+    #     'parents': [folder_id],
+    #     'writersCanShare': True,
+    # }
+    # media = MediaFileUpload('application.html',
+    #                         mimetype='text/html',
+    #                         resumable=True)
+    # file = drive_service.files().create(body=file_metadata,
+    #                                     media_body=media,
+    #                                     fields='id').execute()
+    # file_id = file.get('id') ### File ID ###
+    # print('File ID: %s' % file_id)
+    # print('블루무브 폴더에 지원서 템플릿을 업로드했습니다.')
 
     # # 03. 유저 Permission ID 불러오기
     # def callback_for_permissions_list(request_id, response, exception):

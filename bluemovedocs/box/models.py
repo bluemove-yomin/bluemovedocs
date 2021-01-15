@@ -82,6 +82,8 @@ class Doc(models.Model):
     box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name="docs")
     name = models.CharField(max_length = 300)
     file_id = models.CharField(max_length = 300)
+    user_permission_id = models.CharField(max_length = 300, null=True)
+    box_permission_id = models.CharField(max_length = 300, null=True)
     submit_flag = models.BooleanField(default = False)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)

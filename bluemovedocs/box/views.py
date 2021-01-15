@@ -33,7 +33,7 @@ def create(request):
 @login_required
 def create_doc(request, id):
     box = get_object_or_404(Box, pk=id)
-    # 00. Google Drive API 호출하기
+    # Google Drive API 호출하기
     # scope: settings.py -> SOCIALACCOUNT_PROVIDERS
     token = SocialToken.objects.get(account__user=request.user, account__provider='google')
     credentials = Credentials(
@@ -44,7 +44,7 @@ def create_doc(request, id):
         refresh_token=token.token_secret,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    # 01. 유저 My Drive에 블루무브 폴더 생성하기
+    # 유저 My Drive에 블루무브 폴더 생성하기
     file_metadata = {
         'name': '블루무브',
         'mimeType': 'application/vnd.google-apps.folder'
@@ -52,7 +52,7 @@ def create_doc(request, id):
     file = drive_service.files().create(body=file_metadata,
                                         fields='id').execute()
     folder_id = file.get('id')
-    # 02. 블루무브 폴더에 템플릿 문서 복사하기
+    # 블루무브 폴더에 템플릿 문서 복사하기
     application_id = box.document_id ### 템플릿 문서 ID ###
     body = {
         'name': '4기 블루무버 지원서 - ' + SocialAccount.objects.filter(user=request.user)[0].extra_data['name'],
@@ -63,13 +63,13 @@ def create_doc(request, id):
         fileId=application_id, body=body).execute()
     file_id = drive_response.get('id') ### 유저 문서 ID ###
     name = drive_response.get('name')
-    # 03. 유저의 '문서 작성' 클릭 여부 저장하기
+    # 유저의 문서 정보 저장하기
     doc_user = request.user
     doc_name = name
     doc_file_id = file_id
     Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, box=box)
     if 'next' in request.GET:
-        return redirect(request.GET['next'])
+        return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
     else:
         return redirect('box:read', box.id)
 
@@ -77,14 +77,10 @@ def create_doc(request, id):
 def main(request):
     opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
     closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
-    # opened_page = request.GET.get('opened_page', 1)
-    # closed_page = request.GET.get('closed_page', 1)
     page = request.GET.get('page', 1)
     opened_paginator = Paginator(opened_boxes, 9)
     closed_paginator = Paginator(closed_boxes, 9)
     try:
-        # opened_boxes = opened_paginator.page(opened_page)
-        # closed_boxes = closed_paginator.page(closed_page)
         opened_boxes = opened_paginator.page(page)
         closed_boxes = closed_paginator.page(page)
     except PageNotAnInteger:
@@ -100,14 +96,10 @@ def read(request, id):
     box = Box.objects.get(pk=id)
     opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
     closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
-    # opened_page = request.GET.get('opened_page', 1)
-    # closed_page = request.GET.get('closed_page', 1)
     page = request.GET.get('page', 1)
     opened_paginator = Paginator(opened_boxes, 9)
     closed_paginator = Paginator(closed_boxes, 9)
     try:
-        # opened_boxes = opened_paginator.page(opened_page)
-        # closed_boxes = closed_paginator.page(closed_page)
         opened_boxes = opened_paginator.page(page)
         closed_boxes = closed_paginator.page(page)
     except PageNotAnInteger:
@@ -170,3 +162,83 @@ def delete(request, id):
     box = get_object_or_404(Box, pk=id)
     box.delete()
     return redirect('box:main')
+
+
+@login_required
+def delete_doc(request, doc_id):
+    doc = get_object_or_404(Doc, pk=doc_id)
+    doc.delete()
+    return redirect('box:read', id=doc.box.id)
+
+
+@login_required
+def submit_doc(request, doc_id):
+    doc = get_object_or_404(Doc, pk=doc_id)
+    file_id = doc.file_id
+    # Google Drive API 호출하기
+    # scope: settings.py -> SOCIALACCOUNT_PROVIDERS
+    token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+    credentials = Credentials(
+        client_id='54744281802-ccr39h4ohfts06d55oat9m8u6asud66r.apps.googleusercontent.com',
+        client_secret='r4qzaZaNBq1u4X7ANuaf1vsf',
+        token_uri='https://oauth2.googleapis.com/token',
+        token=token.token,
+        refresh_token=token.token_secret,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+    # 유저 Permission ID 불러오기
+    def callback_for_permissions_list(request_id, response, exception):
+        if exception:
+            return redirect('box:read', id=doc.box.id)
+        else:
+            permissions_list = response.get('permissions') ### 유저 Permissions List ###
+            for permissions_data in permissions_list:
+                user_permission_id = permissions_data['id'] ### 유저 Permission ID ###
+        # 지원서 소유권 블루무브로 이전하기
+        def callback_for_bluemove_ownership(request_id, response, exception):
+            if exception:
+                return redirect('box:read', id=doc.box.id)
+            else:
+                bluemove_permission_id = response.get('id') ### 블루무브 Permission ID ###
+                doc.box_permission_id = bluemove_permission_id
+                doc.save(update_fields=['box_permission_id'])
+        batch = drive_service.new_batch_http_request(callback=callback_for_bluemove_ownership)
+        bluemove_permission_owner = {
+            'type': 'user',
+            'role': 'owner',
+            'emailAddress': 'bwbluemove@gmail.com', ### 블루무브 이메일 주소 ###
+        }
+        batch.add(drive_service.permissions().create(
+                fileId=file_id,
+                body=bluemove_permission_owner,
+                transferOwnership=True,
+                moveToNewOwnersRoot=True,
+                fields='id',
+        ))
+        batch.execute()
+        # 유저 권한을 뷰어로 변경하기
+        def callback_for_update_permission(request_id, response, exception):
+            if exception:
+                return redirect('box:read', id=doc.box.id)
+            else:
+                updated_user_permission_id = response.get('id') ### 업데이트된 유저 Permission ID ###
+            doc.user_permission_id = updated_user_permission_id
+            doc.submit_flag = True
+            doc.save()
+            # return redirect('box:read', id=doc.box.id)
+        batch = drive_service.new_batch_http_request(callback=callback_for_update_permission)
+        user_permission_reader = {
+            'role': 'reader',
+        }
+        batch.add(drive_service.permissions().update(
+                fileId=file_id,
+                permissionId=user_permission_id,
+                body=user_permission_reader,
+        ))
+        batch.execute()
+    batch = drive_service.new_batch_http_request(callback=callback_for_permissions_list)
+    batch.add(drive_service.permissions().list(
+            fileId=file_id,
+    ))
+    batch.execute()
+    return redirect('box:read', id=doc.box.id)
