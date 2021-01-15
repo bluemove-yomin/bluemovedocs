@@ -167,65 +167,116 @@
     </div>
     {% endif %}
 
+    <!-- #docPosition -->
+    <div id="docPosition"></div>
+
     {% if not user.is_authenticated %}
-        <div class="container-md">
-            <div class="container border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
-                <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-upload"></i></span><br>
+    <div class="container-md">
+        <div class="container-md border rounded px-sm-4 px-3 py-4">
+            <div class="d-flex justify-content-between">
+                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+            </div>
+            <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
                 <span style="color: #58595B;">문서를 작성하려면 로그인하세요.</span>
             </div>
         </div>
+    </div>
     {% elif perms.auth %}
     <div class="container-md">
-        <div class="container border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
-            <span style="color: #CCCCCC; font-size: 4rem;"><i class="far fa-laugh-squint"></i></span><br>
-            <span style="color: #58595B;">사무국 매니저는 문서를 작성할 수 없습니다.</span>
+        <div class="container-md border rounded px-sm-4 px-3 py-4">
+            <div class="d-flex justify-content-between">
+                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+            </div>
+            <div class="container border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                <span style="color: #CCCCCC; font-size: 4rem;"><i class="far fa-laugh-squint"></i></span><br>
+                <span style="color: #58595B;">사무국 매니저는 문서를 작성할 수 없습니다.</span>
+            </div>
         </div>
     </div>
     {% else %}
         {% for doc in all_docs %}
             {% if user == doc.user %}
             <div class="container-md">
-                <form id="docForm" name="docForm" action="https://docs.google.com/document/d/{{ doc.file_id }}/edit" method="GET" target="_blank">
-                    <button class="container btn shadow-sm border rounded text-center" id="docButton" type="submit" onclick="button_click();" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
-                        <span style="color: #CCCCCC; font-size: 4rem;"><i class="fab fa-google-drive"></i></span><br>
-                        <span style="color: #58595B;">{{ doc.name }}</span>
-                    </button>
-                </form>
+                <div class="container-md border rounded px-sm-4 px-3 py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+                        <p class="mb-2 text-muted">생성됨</p>
+                    </div>
+                    <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
+                        <div class="d-flex justify-content-between">
+                            <div></div>
+                            <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                                <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
+                                <small class="text-muted">{{ doc.created_at }} 생성</small>
+                            </a>
+                            <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                        </div>
+                    </div>
+                    <!-- docDeleteModal -->
+                    <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    삭제된 문서는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
+                                </div>
+                                <div class="modal-footer">
+                                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                <a type="button" href="#" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             {% else %}
             <div class="container-md">
-                <div class="container border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
-                    <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-exclamation-triangle"></i></span><br>
-                    <span style="color: #58595B;">무언가 잘못되었습니다.</span>
+                <div class="container-md border rounded px-sm-4 px-3 py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+                        <p class="mb-2 text-muted">에러 발생</p>
+                    </div>
+                    <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                        <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-exclamation-triangle"></i></span><br>
+                        <span style="color: #58595B;">무언가 잘못되었습니다.</span>
+                    </div>
                 </div>
             </div>
             {% endif %}
         {% empty %}
             <div class="container-md">
-                <form id="docForm" name="docForm" action="{% url 'box:create_doc' box.id %}" method="POST">
-                    {% csrf_token %}
-                    <button class="container btn shadow-sm border rounded text-center" id="docButton" type="submit" onclick="button_click();" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;" data-bs-toggle="modal" data-bs-target="#docModal">
-                        <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-upload"></i></span><br>
-                        <span style="color: #58595B;">문서를 작성하려면 누르세요.</span>
-                    </button>
-                    <!-- docModal -->
-                    <div class="modal fade" id="docModal" tabindex="-1" aria-labelledby="docModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 class="modal-title" id="docModalLabel" style="font-weight: 600;">⏳ 작업 안내</h5>
-                                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
-                                </div>
-                                <div class="modal-body">
-                                    Google 드라이브에 문서를 준비하고 있습니다.<br>작업이 종료될 때까지 이 창을 닫지 마세요.
-                                </div>
-                                <div class="modal-footer">
-                                    작업이 완료되면 페이지가 새로고침 됩니다.
+                <div class="container-md border rounded px-sm-4 px-3 py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+                        <p class="mb-2 text-muted">비어 있음</p>
+                    </div>
+                    <form id="docForm" name="docForm" action="{% url 'box:create_doc' box.id %}#docPosition" method="POST">
+                        {% csrf_token %}
+                        <button class="container btn shadow-sm border rounded text-center" id="docButton" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
+                            <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
+                            <span style="color: #58595B;">문서를 작성하려면 누르세요.</span>
+                        </button>
+                        <!-- docCreateModal -->
+                        <div class="modal fade" id="docCreateModal" tabindex="-1" aria-labelledby="docCreateModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="doCreateModalLabel" style="font-weight: 600;">⏳ 작업 중</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        Google 드라이브에 문서를 준비하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">에러 발생 시</span>: 작업이 1분 이내에 완료되지 않으면 사무국에 연락해주세요.</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         {% endfor %}
     {% endif %}

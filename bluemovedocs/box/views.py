@@ -68,7 +68,10 @@ def create_doc(request, id):
     doc_name = name
     doc_file_id = file_id
     Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, box=box)
-    return redirect('box:read', box.id)
+    if 'next' in request.GET:
+        return redirect(request.GET['next'])
+    else:
+        return redirect('box:read', box.id)
 
 
 def main(request):
