@@ -160,6 +160,8 @@ LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/'
 
+SESSION_COOKIE_AGE = 3600
+
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SESSION_SAVE_EVERY_REQUEST = True
@@ -173,13 +175,14 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
+            'approval_prompt': 'auto',
         }
     }
 }
 
 SOCIALACCOUNT_EMAIL_REQUIRED = True
 
-SOCIALACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+SOCIALACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 ACCOUNT_USERNAME_BLACKLIST = [
     'bluewavebluemove',

@@ -13,13 +13,19 @@
   {% get_providers as socialaccount_providers %}
   {% providers_media_js %}
 
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 로그인 취소</span><br>
+    <small>로그인이 취소되었습니다. 다시 시도해주세요.</small>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
   <div class="callout callout-info" style="word-break: break-word;">
     <span style="font-weight: 600; color: #58595B;"><i class="fab fa-google"></i> Google 계정 액세스 안내</span><br>
     <small style="color: #6C757D;">블루무브 닥스를 이용하려면 Google 계정 액세스를 허용하세요. <a href="#">자세히 보기</a></small>
   </div>
 
   <div class="card-group mt-3">
-    <div class="card mb-sm-0">
+    <div class="card">
       <div class="card-header">
         <h5 class="card-title text-center m-0" style="color: #58595B; font-weight: 600;">블루무버 / 게스트</h5>
       </div>
@@ -34,7 +40,7 @@
         </div>
       </div>
     </div>
-    <div class="card mb-0">
+    <div class="card">
       <div class="card-header">
         <h5 class="card-title text-center m-0" style="color: #58595B; font-weight: 600;">사무국</h5>
       </div>
