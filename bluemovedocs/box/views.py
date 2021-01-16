@@ -63,7 +63,7 @@ def create_doc(request, id):
         # 블루무브 폴더에 템플릿 문서 복사하기
         application_id = box.document_id ### 템플릿 문서 ID ###
         body = {
-            'name': '4기 블루무버 지원서 - ' + SocialAccount.objects.filter(user=request.user)[0].extra_data['name'],
+            'name': '4기 블루무버 지원서 - ' + request.user.last_name + request.user.first_name,
             'parents': [folder_id],
             'writersCanShare': True,
         }

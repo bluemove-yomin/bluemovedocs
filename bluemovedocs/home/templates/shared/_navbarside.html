@@ -1,19 +1,19 @@
 <ul class="navbar-nav flex-row flex-wrap ms-md-auto mb-2">
     <li class="nav-item col-6 col-md-auto">
         <a class="nav-link p-2" href="http://drive.bluemove.or.kr" target="_blank" rel="noopener">
-            <img src="/static/images/googledrivelogo.png" alt="구글 드라이브로 이동" title="구글 드라이브" height="20" class="d-inline-block">
+            <img src="/static/images/googledrivelogo.png" alt="구글 드라이브" title="구글 드라이브" height="20" class="d-inline-block">
             <small class="d-md-none ms-2">Google Drive</small>
         </a>
     </li>
     <li class="nav-item col-6 col-md-auto">
         <a class="nav-link p-2" href="https://notion.so/bluemove" target="_blank" rel="noopener">
-            <img src="/static/images/notionlogo.png" alt="노션으로 이동" title="노션" height="20" class="d-inline-block">
+            <img src="/static/images/notionlogo.png" alt="노션" title="노션" height="20" class="d-inline-block">
             <small class="d-md-none ms-2">Notion</small>
         </a>
     </li>
     <li class="nav-item col-6 col-md-auto">
         <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
-            <img src="/static/images/slacklogo.png" alt="슬랙으로 이동" title="슬랙" height="20" class="d-inline-block">
+            <img src="/static/images/slacklogo.png" alt="슬랙" title="슬랙" height="20" class="d-inline-block">
             <small class="d-md-none ms-2">Slack</small>
         </a>
     </li>
@@ -58,13 +58,13 @@
                 {% endfor %}
                 <small>
                     {% if perms.auth %}
-                    {{ user.first_name }} 매니저님
+                    {{ user.last_name }}{{ user.first_name }} 매니저님
                     {% endif %}
                     {% for account in user.socialaccount_set.all %}
                         {% if account.extra_data.hd == 'bluemove.or.kr' %}
-                        {{ account.extra_data.name }} 블루무버님
+                        {{ user.last_name }}{{ user.first_name }} 블루무버님
                         {% else %}
-                        {{ account.extra_data.name }} 게스트님
+                        {{ user.last_name }}{{ user.first_name }} 게스트님
                         {% endif %}
                     {% endfor %}
                 </small>

@@ -267,14 +267,14 @@
                                 <div class="modal-header">
                                     <h5 class="modal-title hide01" id="docSubmitModalLabel" style="font-weight: 600;">📤 제출 확인</h5>
                                     <h5 class="modal-title show01" id="doCreateModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <span class="hide02">제출 시 문서 소유권이 이전되며 수정할 수 없습니다.<br>정말 제출하시겠습니까?<br><br></span>
+                                    <span class="hide03">제출 시 문서 소유권이 이전되며 수정할 수 없습니다.<br>정말 제출하시겠습니까?<br><br></span>
                                     <span class="show02" style="display: none;">문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br></span>
                                     <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 조회할 수 있습니다.</small>
                                 </div>
-                                <div class="modal-footer hide03">
+                                <div class="modal-footer hide04">
                                     <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
                                     <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" id="goodbye_doc">네, 제출할게요!</a>
                                 </div>
@@ -370,7 +370,8 @@
             document.querySelector(".hide01").setAttribute("style", "display:none");
             document.querySelector(".hide02").setAttribute("style", "display:none");
             document.querySelector(".hide03").setAttribute("style", "display:none");
-            document.querySelector(".show01").setAttribute("style", "display:inline");
+            document.querySelector(".hide04").setAttribute("style", "display:none");
+            document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
             document.querySelector(".show02").setAttribute("style", "display:inline");
         });
     </script>

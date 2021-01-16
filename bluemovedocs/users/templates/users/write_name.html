@@ -2,17 +2,21 @@
 {% load static %}
 {% block title %} 로그인 | 블루무브 닥스 {% endblock %}
 {% block content %}
-{% include 'shared/_navbar4home.html' %}
+{% include 'shared/_navbar4writename.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md mt-5 table-responsive">
         <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">🔐 로그인</h1>
-        <div class="callout callout-dark" style="word-break: break-word;">
+        <div class="callout callout-dark hide01" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 실명 등록 안내</span><br>
             <small style="color: #6C757D;">블루무브 닥스를 이용하려면 실명을 등록하세요.</small>
         </div>
+        <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
+            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
+            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace 계정은 이용할 수 없습니다. {{ user.email }}에서 제공받은 모든 정보를 삭제합니다.</small>
+        </div>
         <form action="{% url 'users:write_name' user.id %}?next={{ request.META.HTTP_REFERER }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="row g-2 mb-5">
+            <div class="row g-2 mb-5 hide02">
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="last_name" id="last_name" placeholder="홍" value="{{ user.last_name }}" required>
@@ -29,9 +33,12 @@
                 </div>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
-                <input type="submit" value="등록하기" class="btn btn-outline-primary">
+                <input type="submit" value="등록하기" class="btn btn-outline-primary hide03">
+                <input type="submit" value="로그인 취소하기" class="btn btn-outline-secondary show02" style="display: none;">
             </div>
         </form>
+
+        <p id="user_email" style="display: none;">{{ user.email }}</p>
 
         <!-- Forms Validation -->
         <script>
@@ -54,6 +61,82 @@
             }, false);
         })();
         </script>
+
+        <script>
+            $(document).on("keyup", "input", function() {
+                $(this).val(
+                    $(this).val().replace(/[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"\\]/g,"")
+                );
+            });
+        </script>
+
+        <script>
+            // window.onerror = function(){
+            //     return true;
+            // }
+            var target = document.querySelector("#user_email").innerText;
+            if ( target.indexOf('bluemove.or.kr') !== -1 ) {
+            }
+            else if ( target.indexOf('.edu') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.ac.kr') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.hs.kr') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.ms.kr') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.go.kr') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.co.kr') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.or.kr') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else if ( target.indexOf('.org') !== -1 ) {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "display:block");
+                document.querySelector(".show02").setAttribute("style", "display:block");
+            }
+            else {
+            };
+        </script>
+
     </div>
 </main>
 {% endblock %}
