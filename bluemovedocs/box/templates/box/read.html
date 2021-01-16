@@ -206,16 +206,35 @@
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
                         <div class="d-flex justify-content-between">
                             <div></div>
-                            <a class="container" style="padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                            <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
                                 <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.updated_at }} 제출</small>
                             </a>
-                            <div></div>
+                            <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
                     <div class="container-md d-flex p-0 my-2">
                         <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출이 완료되었습니다.</button>
+                    </div>
+                    <!-- docDeleteModal -->
+                    <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    삭제된 문서는 복구할 수 없습니다.<br>또한 <span style="font-weight: 600; color: #dc3545;">지금 문서를 삭제하면 제출이 취소</span>됩니다.<br>정말 삭제하시겠습니까?<br><br>
+                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small>
+                                </div>
+                                <div class="modal-footer">
+                                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -238,23 +257,45 @@
                         </div>
                     </div>
                     <div class="container-md d-flex p-0 my-2">
-                        <a href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary">제출하기</a>
+                        <!-- <a href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary">제출하기</a> -->
+                        <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
+                    </div>
+                    <!-- docSubmitModal -->
+                    <div class="modal fade" id="docSubmitModal" tabindex="-1" aria-labelledby="docSubmitModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title hide01" id="docSubmitModalLabel" style="font-weight: 600;">📤 제출 확인</h5>
+                                    <h5 class="modal-title show01" id="doCreateModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <span class="hide02">제출 시 문서 소유권이 이전되며 수정할 수 없습니다.<br>정말 제출하시겠습니까?<br><br></span>
+                                    <span class="show02" style="display: none;">문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br></span>
+                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 조회할 수 있습니다.</small>
+                                </div>
+                                <div class="modal-footer hide03">
+                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                    <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" id="goodbye_doc">네, 제출할게요!</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     삭제된 문서는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?<br><br>
                                     <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small>
                                 </div>
                                 <div class="modal-footer">
-                                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 삭제할게요!</a>
                                 </div>
                             </div>
                         </div>
@@ -316,6 +357,21 @@
             function() {
                 $(this).removeClass('shadow-lg');
             });
+        });
+    </script>
+
+    <!-- GOODBYE DOC -->
+    <script>
+        window.onerror = function(){
+            return true;
+        }
+        var target = document.querySelector("#goodbye_doc");
+        target.addEventListener('click', function(){
+            document.querySelector(".hide01").setAttribute("style", "display:none");
+            document.querySelector(".hide02").setAttribute("style", "display:none");
+            document.querySelector(".hide03").setAttribute("style", "display:none");
+            document.querySelector(".show01").setAttribute("style", "display:inline");
+            document.querySelector(".show02").setAttribute("style", "display:inline");
         });
     </script>
 

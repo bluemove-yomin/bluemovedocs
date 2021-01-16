@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} 로그인 | 블루무브 닥스 {% endblock %}
+{% block content %}
+{% include 'shared/_navbar4home.html' %}
+<main class="px-2 px-md-5">
+    <div class="container-md mt-5 table-responsive">
+        <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">🔐 로그인</h1>
+        <div class="callout callout-dark" style="word-break: break-word;">
+            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 실명 등록 안내</span><br>
+            <small style="color: #6C757D;">블루무브 닥스를 이용하려면 실명을 등록하세요.</small>
+        </div>
+        <form action="{% url 'users:write_name' user.id %}?next={{ request.META.HTTP_REFERER }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="row g-2 mb-5">
+                <div class="col-md">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="last_name" id="last_name" placeholder="홍" value="{{ user.last_name }}" required>
+                        <label for="last_name">성</label>
+                        <div class="invalid-feedback">성을 입력하세요.</div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="first_name" id="first_name" placeholder="길동" value="{{ user.first_name }}" required>
+                        <label for="first_name">이름</label>
+                        <div class="invalid-feedback">이름을 입력하세요.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <input type="submit" value="등록하기" class="btn btn-outline-primary">
+            </div>
+        </form>
+
+        <!-- Forms Validation -->
+        <script>
+        // Disable form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+            // Get the forms we want to add validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+                }, false);
+            });
+            }, false);
+        })();
+        </script>
+    </div>
+</main>
+{% endblock %}

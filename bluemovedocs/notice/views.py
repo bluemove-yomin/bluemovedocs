@@ -4,6 +4,7 @@ from allauth.socialaccount.models import SocialAccount
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from .forms import NoticeContentForm
+from users.models import Profile
 
 
 @permission_required('auth.add_permission', raise_exception=True)
@@ -42,37 +43,76 @@ def create_comment(request, id):
 
 
 def main(request):
-    all_notices = Notice.objects.all().order_by('-id')
-    page = request.GET.get('page', 1)
-    paginator = Paginator(all_notices, 10)
-    try:
-        all_notices = paginator.page(page)
-    except PageNotAnInteger:
-        all_notices = paginator.page(1)
-    except EmptyPage:
-        all_notices = paginator.page(paginator.num_pages)
-    return render(request, 'notice/main.html', {'all_notices': all_notices})
+    # 회원가입 실명등록 시작
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        name_verified = profile.name_update_flag
+        if not name_verified == True:
+            return redirect('users:write_name', request.user.id)
+        else:
+            all_notices = Notice.objects.all().order_by('-id')
+            page = request.GET.get('page', 1)
+            paginator = Paginator(all_notices, 10)
+            try:
+                all_notices = paginator.page(page)
+            except PageNotAnInteger:
+                all_notices = paginator.page(1)
+            except EmptyPage:
+                all_notices = paginator.page(paginator.num_pages)
+            return render(request, 'notice/main.html', {'all_notices': all_notices})
+    else:
+    # 회원가입 실명등록 끝
+        all_notices = Notice.objects.all().order_by('-id')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(all_notices, 10)
+        try:
+            all_notices = paginator.page(page)
+        except PageNotAnInteger:
+            all_notices = paginator.page(1)
+        except EmptyPage:
+            all_notices = paginator.page(paginator.num_pages)
+        return render(request, 'notice/main.html', {'all_notices': all_notices})
 
 
 def read(request, id):
-    notice = Notice.objects.get(pk=id)
-    all_notices = Notice.objects.all().order_by('-id')
-    all_comments = notice.comments.all().order_by('-id')
-    page = request.GET.get('page', 1)
-    paginator = Paginator(all_notices, 10)
-    try:
-        all_notices = paginator.page(page)
-    except PageNotAnInteger:
-        all_notices = paginator.page(1)
-    except EmptyPage:
-        all_notices = paginator.page(paginator.num_pages)
-    return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
+    # 회원가입 실명등록 시작
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        name_verified = profile.name_update_flag
+        if not name_verified == True:
+            return redirect('users:write_name', request.user.id)
+        else:
+            notice = Notice.objects.get(pk=id)
+            all_notices = Notice.objects.all().order_by('-id')
+            all_comments = notice.comments.all().order_by('-id')
+            page = request.GET.get('page', 1)
+            paginator = Paginator(all_notices, 10)
+            try:
+                all_notices = paginator.page(page)
+            except PageNotAnInteger:
+                all_notices = paginator.page(1)
+            except EmptyPage:
+                all_notices = paginator.page(paginator.num_pages)
+            return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
+    else:
+    # 회원가입 실명등록 끝
+        notice = Notice.objects.get(pk=id)
+        all_notices = Notice.objects.all().order_by('-id')
+        all_comments = notice.comments.all().order_by('-id')
+        page = request.GET.get('page', 1)
+        paginator = Paginator(all_notices, 10)
+        try:
+            all_notices = paginator.page(page)
+        except PageNotAnInteger:
+            all_notices = paginator.page(1)
+        except EmptyPage:
+            all_notices = paginator.page(paginator.num_pages)
+        return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
 @login_required
 def notice_favorite(request, id):
     notice = get_object_or_404(Notice, pk=id)
-    
     if request.user in notice.favorite_user_set.all():
         notice.favorite_user_set.remove(request.user)
     else:
