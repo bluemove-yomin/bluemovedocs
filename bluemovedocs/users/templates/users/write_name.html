@@ -12,23 +12,23 @@
         </div>
         <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
-            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace 계정은 이용할 수 없습니다. {{ user.email }}에서 제공받은 모든 정보를 삭제합니다.</small>
+            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
         </div>
-        <form action="{% url 'users:write_name' user.id %}?next={{ request.META.HTTP_REFERER }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'users:write_name' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="row g-2 mb-5 hide02">
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="last_name" id="last_name" placeholder="홍" value="{{ user.last_name }}" required>
                         <label for="last_name">성</label>
-                        <div class="invalid-feedback">성을 입력하세요.</div>
+                        <div class="invalid-feedback">성을 입력하세요. 한글만 입력 가능합니다.</div>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="first_name" id="first_name" placeholder="길동" value="{{ user.first_name }}" required>
                         <label for="first_name">이름</label>
-                        <div class="invalid-feedback">이름을 입력하세요.</div>
+                        <div class="invalid-feedback">이름을 입력하세요. 한글만 입력 가능합니다.</div>
                     </div>
                 </div>
             </div>
@@ -62,6 +62,52 @@
         })();
         </script>
 
+        <!-- Image Validation -->
+        <script>
+            // 오류 뜨면 바로 통과 (글 작성 중 로그아웃 안 되는 문제 해결)
+            window.onerror = function(){
+            return true;
+            }
+            $("form").submit( function( e ) {
+                var form = this;
+                e.preventDefault(); // Stop the submit for now
+                var pattern_num = /[0-9]/;	// 숫자 
+                var pattern_eng = /[a-zA-Z]/;	// 문자 
+                var pattern_spc = /[~!@#$%^&*()_+|<>?:{}]/; // 특수문자
+                var pattern_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; // 한글체크
+                var target1 = document.querySelector("#last_name");
+                var target2 = document.querySelector("#first_name");
+                var email = document.querySelector("#user_email");
+                if (target1.value == '' || target2.value == '') {
+                }
+                else if ( !(pattern_num.test(target1.value)) && !(pattern_eng.test(target1.value)) && !(pattern_spc.test(target1.value)) && (pattern_kor.test(target1.value)) && !(pattern_num.test(target2.value)) && !(pattern_eng.test(target2.value)) && !(pattern_spc.test(target2.value)) && (pattern_kor.test(target2.value)) ){
+                    if ( confirm("블루무브 닥스에 등록될 회원정보입니다.\n\n" + "▶ 이메일 주소: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n\n모두 올바른 정보인가요?") ) {
+                        return form.submit();
+                    }
+                    else {}
+                }
+                else if ( !(pattern_kor.test(target1.value)) && !(pattern_kor.test(target2.value)) ){
+                    alert("한글만 입력 가능합니다.\n성과 이름을 다시 입력하세요.")
+                    target1.value = '';
+                    target2.value = '';
+                }
+                else if ( !(pattern_kor.test(target1.value)) ){
+                    alert("한글만 입력 가능합니다.\n성을 다시 입력하세요.")
+                    target1.value = '';
+                }
+                else if ( !(pattern_kor.test(target2.value)) ){
+                    alert("한글만 입력 가능합니다.\n이름을 다시 입력하세요.")
+                    target2.value = '';
+                }
+                else {
+                    alert("유효한 값을 입력하세요.")
+                    target1.value = '';
+                    target2.value = '';
+                }
+            });
+        </script>
+
+        <!-- 한글만 input될 수 있게 -->
         <script>
             $(document).on("keyup", "input", function() {
                 $(this).val(
@@ -70,6 +116,7 @@
             });
         </script>
 
+        <!-- 미허용 계정임에도 불구하고 login_cancelled.html을 안 거치고 왔을 경우 -->
         <script>
             // window.onerror = function(){
             //     return true;

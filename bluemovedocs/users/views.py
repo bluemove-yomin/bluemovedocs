@@ -26,53 +26,96 @@ def myaccount(request, id):
 def write_name(request, id):
     user = get_object_or_404(User, pk=id)
     profile = Profile.objects.get(user=user)
-    if request.method == "POST":
-        user.last_name = request.POST.get("last_name")
-        user.first_name = request.POST.get("first_name")
-        if 'bluemove.or.kr' in user.email:
-            profile.level = 'bluemover'
-        elif 'gmail.com' in user.email:
-            profile.level = 'guest'
-        elif 'naver.com' in user.email:
-            profile.level = 'guest'
-        elif 'kakao.com' in user.email:
-            profile.level = 'guest'
-        elif 'daum.net' in user.email:
-            profile.level = 'guest'
-        elif 'hanmail.net' in user.email:
-            profile.level = 'guest'
-        elif 'nate.com' in user.email:
-            profile.level = 'guest'
-        elif '.edu' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.ac.kr' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.hs.kr' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.ms.kr' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.go.kr' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.co.kr' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.or.kr' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        elif '.org' in user.email:
-            user.delete()
-            return redirect('users:login_cancelled')
-        else:
-            return redirect('users:login_cancelled')
-        profile.name_update_flag = True
-        user.save(update_fields=['last_name', 'first_name'])
-        profile.save(update_fields=['level', 'name_update_flag'])
-        return redirect('users:myaccount', user.id)
+    if 'bluemove.or.kr' in user.email:
+        profile.level = 'bluemover'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif 'gmail.com' in user.email:
+        profile.level = 'guest'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif 'naver.com' in user.email:
+        profile.level = 'guest'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif 'kakao.com' in user.email:
+        profile.level = 'guest'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif 'daum.net' in user.email:
+        profile.level = 'guest'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif 'hanmail.net' in user.email:
+        profile.level = 'guest'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif 'nate.com' in user.email:
+        profile.level = 'guest'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.name_update_flag = True
+            user.save(update_fields=['last_name', 'first_name'])
+            profile.save(update_fields=['level', 'name_update_flag'])
+            return redirect('users:myaccount', user.id)
+    elif '.edu' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.ac.kr' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.hs.kr' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.ms.kr' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.go.kr' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.co.kr' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.or.kr' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    elif '.org' in user.email:
+        user.delete()
+        return redirect('users:login_cancelled')
+    else:
+        user.delete()
+        return redirect('users:login_cancelled')
     return render(request, 'users/write_name.html')
 
 

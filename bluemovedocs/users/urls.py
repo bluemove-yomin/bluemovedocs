@@ -5,5 +5,5 @@ app_name="users"
 urlpatterns = [
     path('<int:id>/myaccount/', myaccount, name="myaccount"),
     path('<int:id>/write_name/', write_name, name="write_name"),
-    path('login_cancelled/', login_cancelled, name="login_cancelled"),
+    path('login/', login_cancelled, name="login_cancelled"),
 ]
