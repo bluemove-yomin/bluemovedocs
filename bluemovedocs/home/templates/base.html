@@ -66,6 +66,18 @@
                 }
             }
 
+            /* 문서함 접수된 문서 모바일 최적화 */
+            @media screen and (max-width: 650px) {
+                #boxSubmitted4Large {
+                    display: none!important;
+                }
+            }
+            @media screen and (min-width: 651px) {
+                #boxSubmitted4Small {
+                    display: none;
+                }
+            }
+
             /* 공지사항 모바일 최적화 */
             @media screen and (max-width: 991px) {
                 #noticetable-table {
@@ -216,6 +228,8 @@
                 border: 1px solid #58595B;
                 background-color: #58595B;
             }
+
+            /* 문서함 탭 CSS */
             #forBoxCSS > .nav-link {
                 color: #58595B;
             }

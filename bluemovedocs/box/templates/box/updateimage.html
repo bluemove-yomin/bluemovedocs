@@ -48,12 +48,6 @@
                 <div id="titleHelp" class="form-text">문서 ID를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="examiner_email" class="form-label">심사자 계정 주소</label>
-                <input type="email" class="form-control" name="examiner_email" id="examiner_email" placeholder="심사자 계정 주소를 입력하세요." value="{{ box.examiner_email }}" aria-describedby="examiner_emailHelp" disabled>
-                <div class="invalid-feedback">유효한 심사자 계정 주소를 입력하세요.</div>
-                <div id="examiner_emailHelp" class="form-text"><p class="mb-2">심사자 계정 주소를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</p></div>
-            </div>
-            <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한</label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
                 <div class="invalid-feedback">기한을 입력하세요.</div>

@@ -120,7 +120,7 @@
         </div>
 
         <hr class="text-black-50">
-        {% if perms.auth %}
+        {% if user == box.writer %}
         <div class="callout" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서 ID</span><br>
             <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
@@ -182,6 +182,101 @@
             </div>
         </div>
     </div>
+    {% elif user == box.writer %}
+    <div class="container-md">
+        <div class="container-md border rounded px-sm-4 px-3 pt-4 pb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">접수된 문서</h3>
+                <p class="mb-2 text-muted"><i class="fas fa-sync-alt"></i> <a href="javascript:location.reload();" style="font-weight: 300; color:#58595B;">{{ all_docs|length }}명 제출함</a></p>
+            </div>
+            <div class="list-group list-group-flush mt-1" id="refresh_submitted">
+                {% for doc in all_docs %}
+                <div class="list-group-item px-0 py-3">
+                    <!-- PC 환경 -->
+                    <div class="d-flex justify-content-between align-items-center" id="boxSubmitted4Large">
+                        <a class="container m-0 p-0" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                            <table style="border: none; margin-top: .25rem;">
+                                <tr>
+                                    <td class="p-0 m-0" rowspan="2">
+                                        <img src="{{ doc.avatar_src }}" height="35" class="rounded-circle" alt="{{ doc.user.last_name }}{{ doc.user.first_name }}">
+                                    </td>
+                                    <td class="p-0 m-0">
+                                        <span class="card-title my-0" style="margin-left: 10px; display: block; line-height: 1.2;">
+                                            {{ doc.name }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 m-0">
+                                        <small class="card-subtitle my-0" style="font-weight: 300; color: #6C757D; margin-left: 10px;">
+                                            {{ doc.updated_at }} 제출
+                                        </small>
+                                    </td>
+                                </tr>
+                            </table>
+                        </a>
+                        <table class="container m-0 p-0 d-flex justify-content-end" style="border: none;">
+                            <tr>
+                                <td class="px-2 py-0 m-0" rowspan="2">
+                                    <small>
+                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #dc3545;">삭제하기</a>
+                                    </small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-0 m-0">
+                                    <small>
+                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #58595B;">소유권 반납</a>
+                                    </small>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- 모바일 환경 -->
+                    <div class="w-100" id="boxSubmitted4Small">
+                        <table class="mb-1">
+                            <tr>
+                                <td class="p-0 m-0" rowspan="2">
+                                    <img src="{{ doc.avatar_src }}" height="35" class="rounded-circle" alt="{{ doc.user.last_name }}{{ doc.user.first_name }}">
+                                </td>
+                                <td class="p-0 m-0">
+                                    <h6 class="card-title my-0" style="color: #58595B; margin-left: 10px;">
+                                        <a href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">{{ doc.name }}</a>
+                                    </h6>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-0 m-0">
+                                    <small class="card-subtitle my-0" style="color: #6C757D; margin-left: 10px;">
+                                        {{ doc.updated_at }} 제출
+                                    </small>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="d-flex justify-content-end" style="border: none;">
+                            <tr>
+                                <td class="px-2 py-0 m-0" rowspan="2">
+                                    <small>
+                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #dc3545;">삭제하기</a>
+                                    </small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-0 m-0">
+                                    <small>
+                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #58595B;">소유권 반납</a>
+                                    </small>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center mt-2 pb-2"><p style="color: #CCCCCC;"><i class="far fa-copy"></i> 접수된 문서가 없습니다.</p></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
     {% elif perms.auth %}
     <div class="container-md">
         <div class="container-md border rounded px-sm-4 px-3 py-4">
@@ -222,16 +317,17 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 제출 취소 확인</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    삭제된 문서는 복구할 수 없습니다.<br>또한 <span style="font-weight: 600; color: #dc3545;">지금 문서를 삭제하면 제출이 취소</span>됩니다.<br>정말 삭제하시겠습니까?<br><br>
-                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small>
+                                    제출 취소 시 철회가 불가하며 <span style="font-weight: 600; color: #dc3545;">문서 소유권이 접수자에게 귀속</span>됩니다.<br>계속하시겠어요?
+                                    <!-- <br><br>
+                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small> -->
                                 </div>
                                 <div class="modal-footer">
                                 <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                                <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 취소할게요!</a>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +366,7 @@
                                     <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <span class="hide03">제출 시 문서 소유권이 이전되며 수정할 수 없습니다.<br>정말 제출하시겠습니까?<br><br></span>
+                                    <span class="hide03">제출 시 문서 소유권이 접수자에게 이전되며 수정이 불가합니다.<br><span style="font-weight: 600; color: #dc3545;">제출 취소 시 문서 소유권이 접수자에게 귀속</span>되는 점 유의하시기 바랍니다.<br>계속하시겠어요?<br><br></span>
                                     <span class="show02" style="display: none;">문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br></span>
                                     <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 조회할 수 있습니다.</small>
                                 </div>
@@ -286,16 +382,16 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                    <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">😱 첨부 취소 확인</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    삭제된 문서는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?<br><br>
+                                    첨부 취소된 문서는 재첨부가 불가합니다.<br>계속하시겠어요?<br><br>
                                     <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small>
                                 </div>
                                 <div class="modal-footer">
                                     <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 취소할게요!</a>
                                 </div>
                             </div>
                         </div>
@@ -307,7 +403,7 @@
                 <div class="container-md border rounded px-sm-4 px-3 py-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
-                        <p class="mb-2 text-muted">에러 발생</p>
+                        <p class="mb-2 text-muted">오류 발생</p>
                     </div>
                     <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                         <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-exclamation-triangle"></i></span><br>

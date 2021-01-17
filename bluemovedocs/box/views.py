@@ -25,10 +25,9 @@ def create(request):
             box_title = request.POST.get('title')
             box_writer = request.user
             box_document_id = request.POST.get('document_id')
-            box_examiner_email = request.POST.get('examiner_email')
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, examiner_email=box_examiner_email, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, image=box_image)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -76,7 +75,11 @@ def create_doc(request, id):
         doc_user = request.user
         doc_name = name
         doc_file_id = file_id
-        Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, box=box)
+        if SocialAccount.objects.filter(user=request.user):
+            doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
+        else:
+            doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
+        Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, avatar_src=doc_avatar_src, box=box)
         if 'next' in request.GET:
             return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
         else:
@@ -107,7 +110,7 @@ def main(request):
                 closed_boxes = closed_paginator.page(closed_paginator.num_pages)
             return render(request, 'box/main.html', {'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes})
     else:
-    # 회원가입 실명등록 끝
+    # 회원가입 실명등록 끝 (아래 수정했으면 위에도 똑같이 수정해야 반영됨!!!)
         opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
         closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
         page = request.GET.get('page', 1)
@@ -149,12 +152,15 @@ def read(request, id):
                 opened_boxes = opened_paginator.page(opened_paginator.num_pages)
                 closed_boxes = closed_paginator.page(closed_paginator.num_pages)
             if request.user.is_authenticated:
-                all_docs = box.docs.filter(user=request.user)
+                if request.user == box.writer:
+                    all_docs = box.docs.filter(submit_flag=True)
+                else:
+                    all_docs = box.docs.filter(user=request.user)
             else:
                 all_docs = None
             return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'all_docs': all_docs})
     else:
-    # 회원가입 실명등록 끝
+    # 회원가입 실명등록 끝 (아래 수정했으면 위에도 똑같이 수정해야 반영됨!!!)
         box = Box.objects.get(pk=id)
         opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
         closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
@@ -171,7 +177,10 @@ def read(request, id):
             opened_boxes = opened_paginator.page(opened_paginator.num_pages)
             closed_boxes = closed_paginator.page(closed_paginator.num_pages)
         if request.user.is_authenticated:
-            all_docs = box.docs.filter(user=request.user)
+            if request.user == box.writer:
+                all_docs = box.docs.filter(submit_flag=True)
+            else:
+                all_docs = box.docs.filter(user=request.user)
         else:
             all_docs = None
         return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'all_docs': all_docs})
@@ -180,7 +189,6 @@ def read(request, id):
 @login_required
 def box_favorite(request, id):
     box = get_object_or_404(Box, pk=id)
-    
     if request.user in box.box_favorite_user_set.all():
         box.box_favorite_user_set.remove(request.user)
     else:
@@ -202,9 +210,8 @@ def update(request, id):
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id')
-            box_examiner_email = request.POST.get('examiner_email')
             box_deadline = request.POST.get('deadline')
-            form.update(category=box_category, title=box_title, document_id=box_document_id, examiner_email=box_examiner_email, deadline=box_deadline)
+            form.update(category=box_category, title=box_title, document_id=box_document_id, deadline=box_deadline)
         return redirect('box:read', box.id)
     return render(request, 'box/update.html', {'box': box, 'form': form})
 
@@ -269,7 +276,7 @@ def submit_doc(request, doc_id):
         bluemove_permission_owner = {
             'type': 'user',
             'role': 'owner',
-            'emailAddress': doc.box.examiner_email, ### 블루무브 이메일 주소 ###
+            'emailAddress': doc.box.writer.email, ### 블루무브 이메일 주소 ###
         }
         batch.add(drive_service.permissions().create(
                 fileId=file_id,

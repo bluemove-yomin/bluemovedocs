@@ -81,7 +81,7 @@
                 if (target1.value == '' || target2.value == '') {
                 }
                 else if ( !(pattern_num.test(target1.value)) && !(pattern_eng.test(target1.value)) && !(pattern_spc.test(target1.value)) && (pattern_kor.test(target1.value)) && !(pattern_num.test(target2.value)) && !(pattern_eng.test(target2.value)) && !(pattern_spc.test(target2.value)) && (pattern_kor.test(target2.value)) ){
-                    if ( confirm("블루무브 닥스에 등록될 회원정보입니다.\n\n" + "▶ 이메일 주소: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n\n모두 올바른 정보인가요?") ) {
+                    if ( confirm("블루무브 닥스에 등록될 회원 정보입니다.\n\n" + "▶ 이메일 주소: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n\n모두 올바른 정보인가요?") ) {
                         return form.submit();
                     }
                     else {}

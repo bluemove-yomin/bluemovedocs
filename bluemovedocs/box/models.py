@@ -20,7 +20,6 @@ class Box(models.Model):
     document_id = models.CharField(max_length = 300)
     deadline = models.DateField()
     deadline_update_flag = models.BooleanField(default = False)
-    examiner_email = models.CharField(max_length = 100)
     content = RichTextField()
     # content = models.TextField()
     content_update_flag = models.BooleanField(default = False)
@@ -80,6 +79,7 @@ def content_update_flag_on(sender, instance, **kwargs):
 
 class Doc(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
+    avatar_src = models.CharField(max_length = 300)
     box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name="docs")
     name = models.CharField(max_length = 300)
     file_id = models.CharField(max_length = 300)
