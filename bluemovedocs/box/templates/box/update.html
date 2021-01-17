@@ -43,6 +43,16 @@
                 </div>
             </div>
             <div class="form-group mb-3">
+                <label for="examiner_email" class="form-label">심사자 계정 주소<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="email" class="form-control" name="examiner_email" id="examiner_email" placeholder="심사자 계정 주소를 입력하세요." value="{{ box.examiner_email }}" aria-describedby="examiner_emailHelp" disabled>
+                <div class="invalid-feedback">유효한 심사자 계정 주소를 입력하세요.</div>
+                <div id="examiner_emailHelp" class="form-text">
+                    <p class="mb-2">심사자 Google 드라이브로 문서가 접수됩니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 계정</span>: 심사자 계정은 개인 Google 계정이어야 합니다. 블루무버 계정을 포함한 모든 Google Workspace 계정은 허용되지 않습니다.<br>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600; color: rgb(210, 30, 30);"> 오탈자 유의</span>: 문서가 제3자에게 접수되는 일이 않도록 오탈자에 유의하세요.
+                </div>
+            </div>
+            <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
                 <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
@@ -186,6 +196,15 @@
                         alert("유효한 문서 ID를 입력하세요.")
                         return formCheck();
                     }
+                    // 심사자 계정
+                    else if ( !document.querySelector("#examiner_email").value ) {
+                        alert("심사자 계정을 입력하세요.")
+                    }
+                    else if ( document.querySelector("#examiner_email").value.indexOf('.edu') > -1 || document.querySelector("#examiner_email").value.indexOf('.ac.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.hs.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.ms.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.go.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.co.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.or.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.org') > -1 ) {
+                        alert("유효한 심사자 계정을 입력하세요.")
+                        document.querySelector("#examiner_email").value = '';
+                        return false
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
@@ -237,6 +256,15 @@
                     else if ( document.querySelector("#document_id").value.length !== 44 ) {
                         alert("유효한 문서 ID를 입력하세요.")
                         return formCheck();
+                    }
+                    // 심사자 계정
+                    else if ( !document.querySelector("#examiner_email").value ) {
+                        alert("심사자 계정을 입력하세요.")
+                    }
+                    else if ( document.querySelector("#examiner_email").value.indexOf('.edu') > -1 || document.querySelector("#examiner_email").value.indexOf('.ac.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.hs.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.ms.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.go.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.co.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.or.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.org') > -1 ) {
+                        alert("유효한 심사자 계정을 입력하세요.")
+                        document.querySelector("#examiner_email").value = '';
+                        return false
                     }
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
@@ -304,6 +332,15 @@
                     else if ( document.querySelector("#document_id").value.length !== 44 ) {
                         alert("유효한 문서 ID를 입력하세요.")
                         return formCheck();
+                    }
+                    // 심사자 계정
+                    else if ( !document.querySelector("#examiner_email").value ) {
+                        alert("심사자 계정을 입력하세요.")
+                    }
+                    else if ( document.querySelector("#examiner_email").value.indexOf('.edu') > -1 || document.querySelector("#examiner_email").value.indexOf('.ac.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.hs.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.ms.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.go.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.co.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.or.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.org') > -1 ) {
+                        alert("유효한 심사자 계정을 입력하세요.")
+                        document.querySelector("#examiner_email").value = '';
+                        return false
                     }
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {

@@ -8,6 +8,7 @@ class BoxAdmin(admin.ModelAdmin):
         'category',
         'title',
         'document_id',
+        'examiner_email',
         'content',
         'content_update_flag',
         'image',
@@ -19,7 +20,11 @@ class BoxAdmin(admin.ModelAdmin):
     search_fields = (
         'category',
         'title',
+        'document_id',
+        'examiner_email',
         'content',
+        'image',
+        'deadline',
     )
 
 

@@ -25,9 +25,10 @@ def create(request):
             box_title = request.POST.get('title')
             box_writer = request.user
             box_document_id = request.POST.get('document_id')
+            box_examiner_email = request.POST.get('examiner_email')
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, examiner_email=box_examiner_email, deadline=box_deadline, image=box_image)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -201,8 +202,9 @@ def update(request, id):
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id')
+            box_examiner_email = request.POST.get('examiner_email')
             box_deadline = request.POST.get('deadline')
-            form.update(category=box_category, title=box_title, document_id=box_document_id, deadline=box_deadline)
+            form.update(category=box_category, title=box_title, document_id=box_document_id, examiner_email=box_examiner_email, deadline=box_deadline)
         return redirect('box:read', box.id)
     return render(request, 'box/update.html', {'box': box, 'form': form})
 
@@ -267,7 +269,7 @@ def submit_doc(request, doc_id):
         bluemove_permission_owner = {
             'type': 'user',
             'role': 'owner',
-            'emailAddress': 'bwbluemove@gmail.com', ### 블루무브 이메일 주소 ###
+            'emailAddress': doc.box.examiner_email, ### 블루무브 이메일 주소 ###
         }
         batch.add(drive_service.permissions().create(
                 fileId=file_id,

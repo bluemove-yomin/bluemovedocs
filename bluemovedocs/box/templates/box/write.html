@@ -32,6 +32,16 @@
                 </div>
             </div>
             <div class="form-group mb-3">
+                <label for="examiner_email" class="form-label">심사자 계정 주소<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="email" class="form-control" name="examiner_email" id="examiner_email" placeholder="심사자 계정 주소를 입력하세요." value="bwbluemove@gmail.com" aria-describedby="examiner_emailHelp" disabled>
+                <div class="invalid-feedback">유효한 심사자 계정 주소를 입력하세요.</div>
+                <div id="examiner_emailHelp" class="form-text">
+                    <p class="mb-2">심사자 Google 드라이브로 문서가 접수됩니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 계정</span>: 심사자 계정은 개인 Google 계정이어야 합니다. 블루무버 계정을 포함한 모든 Google Workspace 계정은 허용되지 않습니다.<br>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600; color: rgb(210, 30, 30);"> 오탈자 유의</span>: 문서가 제3자에게 접수되는 일이 않도록 오탈자에 유의하세요.
+                </div>
+            </div>
+            <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" required>
                 <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
@@ -132,9 +142,9 @@
         <!-- Image Validation -->
         <script>
             // 오류 뜨면 바로 통과 (글 작성 중 로그아웃 안 되는 문제 해결)
-            window.onerror = function(){
-            return true; // 이거를 다른 거로 바꿔도 되겠다.
-            }
+            // window.onerror = function(){
+            // return true; // 이거를 다른 거로 바꿔도 되겠다.
+            // }
 
             var _URL = window.URL || window.webkitURL;
             $("form").submit( function( e ) {
@@ -196,41 +206,40 @@
                         if( width == 1800 && height == 900 ) {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
-                                return formCheck();
                             }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
-                                return formCheck();
                             }
                             else if ( !document.querySelector("#document_id").value ) {
                                 alert("문서 ID를 입력하세요.")
-                                return formCheck();
                             }
                             else if ( document.querySelector("#document_id").value.length !== 44 ) {
                                 alert("유효한 문서 ID를 입력하세요.")
-                                return formCheck();
+                            }
+                            else if ( !document.querySelector("#examiner_email").value ) {
+                                alert("심사자 계정을 입력하세요.")
+                            }
+                            else if ( document.querySelector("#examiner_email").value.indexOf('.edu') > -1 || document.querySelector("#examiner_email").value.indexOf('.ac.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.hs.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.ms.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.go.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.co.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.or.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.org') > -1 ) {
+                                alert("유효한 심사자 계정을 입력하세요.")
+                                document.querySelector("#examiner_email").value = '';
+                                return false
                             }
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
-                                return formCheck();
                             }
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
-                                return formCheck();
                             }
                             else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
-                                return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
-                                return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
-                                return formCheck();
                             }
                             else {
                                 form.submit();
@@ -240,41 +249,40 @@
                         else {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
-                                return formCheck();
                             }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
-                                return formCheck();
                             }
                             else if ( !document.querySelector("#document_id").value ) {
                                 alert("문서 ID를 입력하세요.")
-                                return formCheck();
                             }
                             else if ( document.querySelector("#document_id").value.length !== 44 ) {
                                 alert("유효한 문서 ID를 입력하세요.")
-                                return formCheck();
+                            }
+                            else if ( !document.querySelector("#examiner_email").value ) {
+                                alert("심사자 계정을 입력하세요.")
+                            }
+                            else if ( document.querySelector("#examiner_email").value.indexOf('.edu') > -1 || document.querySelector("#examiner_email").value.indexOf('.ac.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.hs.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.ms.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.go.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.co.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.or.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.org') > -1 ) {
+                                alert("유효한 심사자 계정을 입력하세요.")
+                                document.querySelector("#examiner_email").value = '';
+                                return false
                             }
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
-                                return formCheck();
                             }
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
-                                return formCheck();
                             }
                             else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
-                                return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
-                                return formCheck();
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
-                                return formCheck();
                             }
                             // 유저가 첨부한 이미지가 1800 x 900이 아닐 경우
                             else {
@@ -299,41 +307,45 @@
                 else {
                     if ( !document.querySelector("#category").value ) {
                         alert("대상을 선택하세요.")
-                        return formCheck();
+                        return false
                     }
                     else if ( !document.querySelector("#title").value ) {
                         alert("문서명을 입력하세요.")
-                        return formCheck();
+                        return false
                     }
                     else if ( !document.querySelector("#document_id").value ) {
                         alert("문서 ID를 입력하세요.")
-                        return formCheck();
+                        return false
                     }
                     else if ( document.querySelector("#document_id").value.length !== 44 ) {
                         alert("유효한 문서 ID를 입력하세요.")
-                        return formCheck();
+                        return false
+                    }
+                    else if ( !document.querySelector("#examiner_email").value ) {
+                        alert("심사자 계정을 입력하세요.")
+                        return false
+                    }
+                    else if ( document.querySelector("#examiner_email").value.indexOf('.edu') > -1 || document.querySelector("#examiner_email").value.indexOf('.ac.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.hs.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.ms.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.go.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.co.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.or.kr') > -1 || document.querySelector("#examiner_email").value.indexOf('.org') > -1 ) {
+                        alert("유효한 심사자 계정을 입력하세요.")
+                        document.querySelector("#examiner_email").value = '';
+                        return false
                     }
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( document.querySelector("#deadline").value < today ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     else {
                         if ( confirm("이미지가 없으면 목록에서 블루무브 로고만 표시됩니다.\n\n▶ 권장: 이미지 첨부\n▶ 현재: 이미지 없음 → 목록에서 눈에 잘 띄지 않습니다.\n\n계속하시겠어요?") ) {
