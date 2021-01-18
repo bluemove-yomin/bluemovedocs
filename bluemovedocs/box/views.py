@@ -82,6 +82,10 @@ def create_doc(request, id):
         ).execute()
         file_id = drive_response.get('id') ### 유저 문서 ID ###
         name = drive_response.get('name')
+        # 문서의 pageToken 시작하기
+        drive_response = drive_service.files().watch(
+            fileId = file_id
+        )
         # 문서에 이름, 휴대전화 번호, 이메일 주소 입력하기
         requests = [
             {
@@ -304,6 +308,18 @@ def submit_doc(request, doc_id):
         refresh_token=token.token_secret,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
+    # 문서 잠그기
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "true",
+                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                }
+            ]
+        }
+    ).execute()
     # 유저 Permission ID 불러오기
     drive_response = drive_service.permissions().list(
         fileId=file_id,
