@@ -31,10 +31,12 @@
             {% endfor %}
         </div>
         <!-- 열린 문서함 탭 내부 생성하기 버튼 -->
-        {% if perms.auth %}
+        {% if user.email == 'management@bluemove.or.kr' %}
+        {% elif perms.auth %}
         <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
             <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
         </div>
+        {% else %}
         {% endif %}
         <!-- 열린 문서함 탭 내부 페이지네이션 -->
         {% if opened_boxes.has_other_pages %}

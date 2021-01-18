@@ -68,13 +68,11 @@
         <div class="d-flex w-100 justify-content-between">
             <p class="card-text mb-1" style="font-weight: 600;">
                 {% if box.category == 'bluemover' %}
-                블루무버
-                {% endif %}
-                {% if box.category == 'posongvi' %}
-                뽀송비 학생
-                {% endif %}
-                {% if box.category == 'applicant' %}
-                블루무버 희망자
+                    블루무버
+                {% elif box.category == 'guest' %}
+                    게스트
+                {% else %}
+                    알 수 없음
                 {% endif %}
             </p>
             {% if user.is_authenticated %}

@@ -6,22 +6,16 @@
     <div class="container-md my-5">
         <p style="font-weight: 600;">
             {% if notice.category == 'bluemover' %}
-            블루무버 대상 공지사항
-            {% endif %}
-            {% if notice.category == 'posongvi' %}
-            뽀송비 학생 대상 공지사항
-            {% endif %}
-            {% if notice.category == 'applicant' %}
-            블루무버 희망자 대상 공지사항
+                블루무버
+            {% elif notice.category == 'guest' %}
+                게스트
+            {% else %}
+                알 수 없음
             {% endif %}
         </p>
         <h2 style="font-weight: 600; color: #58595B;">{{ notice.title }}</h2>
         <small>
-            {% if not notice.writer.first_name == '' %}
             {{ notice.writer.last_name }}{{ notice.writer.first_name }}
-            {% else %}
-            {{ notice.writer }}
-            {% endif %}
             │
             {% if notice.created_at == notice.updated_at %}
             {{ notice.created_at }}
@@ -48,13 +42,9 @@
                     <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" {% if not user.is_authenticated %}disabled{% endif %}>{{ comment.content }}</textarea>
                     <label for="content">
                         {% if user.is_authenticated %}
-                            {% if not user.first_name == '' %}
                             {{ user.last_name }}{{ user.first_name }}님의 댓글 작성
-                            {% else %}
-                            {{ user }}님의 댓글 작성
-                            {% endif %}
                         {% else %}
-                        댓글을 작성하려면 로그인하세요.
+                            댓글을 작성하려면 로그인하세요.
                         {% endif %}
                     </label>
                 </div>
@@ -110,11 +100,7 @@
                         </td>
                         <td class="p-0">
                             <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 10px;">
-                                {% if not comment.writer.first_name == '' %}
                                 {{ comment.writer.last_name }}{{ comment.writer.first_name }}
-                                {% else %}
-                                {{ comment.writer }}
-                                {% endif %}
                             </h6>
                         </td>
                     </tr>

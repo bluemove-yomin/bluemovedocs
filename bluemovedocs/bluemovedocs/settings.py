@@ -170,6 +170,7 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
             'https://www.googleapis.com/auth/drive',
+            'https://www.googleapis.com/auth/documents',
             'profile',
             'email',
         ],

@@ -50,22 +50,22 @@
             </li>
             <li><hr class="dropdown-divider"></li>
             <li class="text-center">
-                {% if perms.auth %}
-                <img height="24" src="/static/images/favicons/favicon-32x32.png">
-                {% endif %}
                 {% for account in user.socialaccount_set.all %}
-                <img height="24" src="{{ account.get_avatar_url|add:'-rg-br100' }}"/>
+                    <img height="24" class="rounded-circle" src="{{ account.get_avatar_url }}"/>
+                {% empty %}
+                    <img height="24" src="/static/images/favicons/favicon-32x32.png">
                 {% endfor %}
                 <small>
-                    {% if perms.auth %}
-                    {{ user.last_name }}{{ user.first_name }} 매니저님
-                    {% endif %}
                     {% for account in user.socialaccount_set.all %}
                         {% if account.extra_data.hd == 'bluemove.or.kr' %}
-                        {{ user.last_name }}{{ user.first_name }} 블루무버님
+                            {{ user.last_name }}{{ user.first_name }} 블루무버님
+                        {% elif perms.auth %}
+                            {{ user.last_name }}{{ user.first_name }} 매니저님
                         {% else %}
-                        {{ user.last_name }}{{ user.first_name }} 게스트님
+                            {{ user.last_name }}{{ user.first_name }} 게스트님
                         {% endif %}
+                    {% empty %}
+                        {{ user.last_name }}{{ user.first_name }} 매니저님
                     {% endfor %}
                 </small>
             </li>

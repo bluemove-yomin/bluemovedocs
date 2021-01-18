@@ -8,9 +8,9 @@ def home(request):
     # 회원가입 실명등록 시작
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
-        name_verified = profile.name_update_flag
+        name_verified = profile.info_update_flag
         if not name_verified == True:
-            return redirect('users:write_name', request.user.id)
+            return redirect('users:write_info', request.user.id)
         else:
             all_noticies = Notice.objects.all().order_by('-id')
             return render(request, 'home/home.html', {'all_noticies': all_noticies})

@@ -6,8 +6,7 @@ class Notice(models.Model):
 
     CATEGORY_CHOICES = {
         ('bluemover', '블루무버'),
-        ('applicant', '블루무버 희망자'),
-        ('posongvi', '뽀송비 학생')
+        ('guest', '게스트'),
     }
 
     title = models.CharField(max_length = 50)
@@ -15,7 +14,7 @@ class Notice(models.Model):
     category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
     content = RichTextField()
     # content = models.TextField()
-    image = models.ImageField(upload_to='images/')
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
     favorite_user_set = models.ManyToManyField(User, blank=True, related_name="favorite_user_set", through="Favorite")

@@ -10,8 +10,7 @@ class Box(models.Model):
 
     CATEGORY_CHOICES = {
         ('bluemover', '블루무버'),
-        ('applicant', '블루무버 희망자'),
-        ('posongvi', '뽀송비 학생')
+        ('guest', '게스트'),
     }
 
     title = models.CharField(max_length = 50)

@@ -4,18 +4,28 @@
 {% include 'shared/_navbar4home.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md mt-5">
+        {% if 'create_doc' in request.build_absolute_uri or 'submit_doc' in request.build_absolute_uri %}
+        <h1 class="mb-4 pb-2" id="errorPageLarge" style="font-weight: 600; color: #58595B;">👀 앗, 서버가 이상합니다!</h1>
+        <h2 class="mb-4 pb-2" id="errorPageSmall" style="font-weight: 600; color: #58595B;">👀 앗, 서버가 이상합니다!</h2>
+        <div class="callout callout-warning" style="word-break: break-word;">
+            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 문서함 관련 오류</span><br>
+            <small style="color: #6C757D;">Google 계정 토큰 갱신에 관한 문제가 발생했습니다. 재로그인 후 다시 시도해보세요.</small>
+        </div>
+        {% else %}
         <h1 class="mb-4" id="errorPageLarge" style="font-weight: 600; color: #58595B;">👀 앗, 서버가 이상합니다!</h1>
         <h2 class="mb-4" id="errorPageSmall" style="font-weight: 600; color: #58595B;">👀 앗, 서버가 이상합니다!</h2>
+        {% endif %}
         <p class="pt-1">
-            {% if perms.auth %}
-            {{ user.first_name }} 매니저님의
-            {% endif %}
             {% for account in user.socialaccount_set.all %}
                 {% if account.extra_data.hd == 'bluemove.or.kr' %}
-                {{ account.extra_data.name }} 블루무버님의
+                    {{ user.last_name }}{{ user.first_name }} 블루무버님의
+                {% elif perms.auth %}
+                    {{ user.last_name }}{{ user.first_name }} 매니저님의
                 {% else %}
-                {{ account.extra_data.name }} 게스트님의
+                    {{ user.last_name }}{{ user.first_name }} 게스트님의
                 {% endif %}
+            {% empty %}
+                {{ user.last_name }}{{ user.first_name }} 매니저님의
             {% endfor %}
             요청을 처리하려고 했으나 서버가 문제를 일으켰어요. 😥<br>
             오류가 반복된다면 사무국에 연락해주세요.
@@ -25,7 +35,7 @@
             <strong>HTTP_STATUS_CODE:</strong> 500 Internal Server Error<br>
             <strong>HTTP_METHOD:</strong> {{ request.META.REQUEST_METHOD }}<br>
             <strong>USER_AGENT:</strong> {{ request.META.HTTP_USER_AGENT }}<br>
-            <strong>USER_EMAIL:</strong> {% if request.user.is_authenticated %}{{ user.email }}{% else %}User is not authenticated{% endif %}{% for account in user.socialaccount_set.all %}{{ account.extra_data.email }}{% endfor %}<br>
+            <strong>USER_EMAIL:</strong> {% if request.user.is_authenticated %}{{ user.email }}{% else %}User is not authenticated{% endif %}<br>
             <strong>PREVIOUS_URI:</strong> {{ request.META.HTTP_REFERER }}<br>
             <strong>CURRENT_URI:</strong> {{ request.build_absolute_uri }}
         </small>

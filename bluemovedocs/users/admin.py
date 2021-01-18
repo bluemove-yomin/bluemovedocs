@@ -7,10 +7,12 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'user',
+        'phone',
         'level',
-        'name_update_flag',
+        'info_update_flag',
     )
     search_fields = (
         'user',
+        'phone',
         'level',
     )

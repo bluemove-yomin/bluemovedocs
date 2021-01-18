@@ -35,13 +35,13 @@ def create(request):
 def create_doc(request, id):
     # 회원가입 실명등록 시작
     profile = Profile.objects.get(user=request.user)
-    name_verified = profile.name_update_flag
+    name_verified = profile.info_update_flag
     if not name_verified == True:
-        return redirect('users:write_name', request.user.id)
+        return redirect('users:write_info', request.user.id)
     else:
     # 회원가입 실명등록 끝
         box = get_object_or_404(Box, pk=id)
-        # Google Drive API 호출하기
+        # Google Drive, Google Docs API 호출하기
         # scope: settings.py -> SOCIALACCOUNT_PROVIDERS
         token = SocialToken.objects.get(account__user=request.user, account__provider='google')
         credentials = Credentials(
@@ -52,6 +52,7 @@ def create_doc(request, id):
             refresh_token=token.token_secret,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        docs_service = build('docs', 'v1', credentials=credentials)
         # 유저 My Drive에 블루무브 폴더 생성하기
         file_metadata = {
             'name': '블루무브',
@@ -71,6 +72,28 @@ def create_doc(request, id):
             fileId=application_id, body=body).execute()
         file_id = drive_response.get('id') ### 유저 문서 ID ###
         name = drive_response.get('name')
+        # 문서에 이름, 이메일 주소 입력하기
+        requests = [
+            {
+                'replaceAllText': {
+                    'containsText': {
+                        'text': '{{user-name}}',
+                        'matchCase':  'true'
+                    },
+                    'replaceText': request.user.last_name + request.user.first_name,
+                }}, {
+                'replaceAllText': {
+                    'containsText': {
+                        'text': '{{user-email}}',
+                        'matchCase':  'true'
+                    },
+                    'replaceText': request.user.email,
+                }
+            }
+        ]
+
+        docs_service.documents().batchUpdate(
+            documentId=file_id, body={'requests': requests}).execute()
         # 유저의 문서 정보 저장하기
         doc_user = request.user
         doc_name = name
@@ -90,9 +113,9 @@ def main(request):
     # 회원가입 실명등록 시작
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
-        name_verified = profile.name_update_flag
+        name_verified = profile.info_update_flag
         if not name_verified == True:
-            return redirect('users:write_name', request.user.id)
+            return redirect('users:write_info', request.user.id)
         else:
             opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
             closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
@@ -132,9 +155,9 @@ def read(request, id):
     # 회원가입 실명등록 시작
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
-        name_verified = profile.name_update_flag
+        name_verified = profile.info_update_flag
         if not name_verified == True:
-            return redirect('users:write_name', request.user.id)
+            return redirect('users:write_info', request.user.id)
         else:
             box = Box.objects.get(pk=id)
             opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')

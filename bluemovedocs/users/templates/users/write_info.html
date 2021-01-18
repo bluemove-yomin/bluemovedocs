@@ -7,38 +7,41 @@
     <div class="container-md mt-5 table-responsive">
         <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">🔐 로그인</h1>
         <div class="callout callout-dark hide01" style="word-break: break-word;">
-            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 실명 등록 안내</span><br>
-            <small style="color: #6C757D;">블루무브 닥스를 이용하려면 실명을 등록하세요.</small>
+            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 회원 정보 등록</span><br>
+            <small style="color: #6C757D;"><span id="user_email">{{ user.email }}</span> 계정 정보가 블루무브 닥스에 저장되었습니다. 계속하려면 실명과 휴대전화 번호를 등록하세요.</small>
         </div>
         <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
             <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
         </div>
-        <form action="{% url 'users:write_name' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'users:write_info' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="row g-2 mb-5 hide02">
+            <div class="row g-2 mb-3 hide02">
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="last_name" id="last_name" placeholder="홍" value="{{ user.last_name }}" required>
                         <label for="last_name">성</label>
-                        <div class="invalid-feedback">성을 입력하세요. 한글만 입력 가능합니다.</div>
+                        <div class="invalid-feedback">성을 입력하세요. 한글만 입력할 수 있습니다.</div>
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="first_name" id="first_name" placeholder="길동" value="{{ user.first_name }}" required>
                         <label for="first_name">이름</label>
-                        <div class="invalid-feedback">이름을 입력하세요. 한글만 입력 가능합니다.</div>
+                        <div class="invalid-feedback">이름을 입력하세요. 한글만 입력할 수 있습니다.</div>
                     </div>
                 </div>
             </div>
+            <div class="form-floating mb-5 hide03">
+                <input type="tel" class="form-control" name="phone" id="phone" placeholder="010-1234-5678" minlength="12" maxlength="13" required>
+                <label for="phone">휴대전화 번호</label>
+                <div class="invalid-feedback">휴대전화 번호 10자리 또는 11자리를 입력하세요. 숫자만 입력할 수 있습니다.</div>
+              </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
-                <input type="submit" value="등록하기" class="btn btn-outline-primary hide03">
-                <input type="submit" value="로그인 취소하기" class="btn btn-outline-secondary show02" style="display: none;">
+                <a type="button" class="btn btn-outline-secondary" href="{% url 'users:login_cancelled_after_delete' user.id %}">로그인 취소하기</a>
+                <input type="submit" value="등록하기" class="btn btn-outline-primary hide04">
             </div>
         </form>
-
-        <p id="user_email" style="display: none;">{{ user.email }}</p>
 
         <!-- Forms Validation -->
         <script>
@@ -62,7 +65,30 @@
         })();
         </script>
 
-        <!-- Image Validation -->
+        <!-- 한글 또는 숫자만 input될 수 있게 -->
+        <script>
+            $(document).on("keyup", "#last_name", function() {
+                $(this).val(
+                    $(this).val().replace(/[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"\\]/g,"")
+                );
+            });
+        </script>
+        <script>
+            $(document).on("keyup", "#first_name", function() {
+                $(this).val(
+                    $(this).val().replace(/[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"\\]/g,"")
+                );
+            });
+        </script>
+        <script>
+            $(document).on("keyup", "#phone", function() {
+                $(this).val(
+                    $(this).val().replace(/[^0-9]/g, "").replace(/(^02|^0505|^1[0-9]{3}|^0[0-9]{2})([0-9]+)?([0-9]{4})$/,"$1-$2-$3").replace("--", "-")
+                );
+            });
+        </script>
+
+        <!-- Form Validation -->
         <script>
             // 오류 뜨면 바로 통과 (글 작성 중 로그아웃 안 되는 문제 해결)
             window.onerror = function(){
@@ -77,42 +103,68 @@
                 var pattern_kor = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/; // 한글체크
                 var target1 = document.querySelector("#last_name");
                 var target2 = document.querySelector("#first_name");
+                var target3 = document.querySelector("#phone");
                 var email = document.querySelector("#user_email");
-                if (target1.value == '' || target2.value == '') {
+                if (target1.value == '' || target2.value == '' || target3.value == '') {
                 }
-                else if ( !(pattern_num.test(target1.value)) && !(pattern_eng.test(target1.value)) && !(pattern_spc.test(target1.value)) && (pattern_kor.test(target1.value)) && !(pattern_num.test(target2.value)) && !(pattern_eng.test(target2.value)) && !(pattern_spc.test(target2.value)) && (pattern_kor.test(target2.value)) ){
-                    if ( confirm("블루무브 닥스에 등록될 회원 정보입니다.\n\n" + "▶ 이메일 주소: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n\n모두 올바른 정보인가요?") ) {
+                else if ( !(pattern_num.test(target1.value)) &&
+                          !(pattern_eng.test(target1.value)) &&
+                          !(pattern_spc.test(target1.value)) &&
+                          (pattern_kor.test(target1.value)) && // 성에 한글만 입력됐을 경우
+                          !(pattern_num.test(target2.value)) &&
+                          !(pattern_eng.test(target2.value)) &&
+                          !(pattern_spc.test(target2.value)) &&
+                          (pattern_kor.test(target2.value)) && // 이름에 한글만 입력됐을 경우
+                          (pattern_num.test(target3.value)) && // 휴대전화 번호에 숫자만 입력됐을 경우
+                          !(pattern_eng.test(target3.value)) &&
+                          !(pattern_spc.test(target3.value)) &&
+                          !(pattern_kor.test(target3.value)) &&
+                          (12 <= target3.value.length) && // 휴대전화 번호 10자리일 경우
+                          (target3.value.length <= 13) && // 휴대전화 번호 11자리일 경우
+                          (target3.value.indexOf('-') == 3) && // 휴대전화 번호에 자동 입력되는 dash가 네 번재 자리에 있을 경우
+                          (target3.value.match(/-/g).length == 2) && // 휴대전화 번호에 자동 입력되는 dash가 두 개일 경우
+                          (target3.value.indexOf('01') == 0) // 휴대전화 번호에 숫자 '01'이 맨 앞자리에 있을 경우
+                ) {
+                    if ( confirm("블루무브 닥스에 등록될 회원 정보입니다.\n\n" + "▶ Google 계정: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n▶ 휴대전화 번호: " + target3.value + "\n\n모두 올바른 정보인가요?") ) {
                         return form.submit();
                     }
                     else {}
                 }
                 else if ( !(pattern_kor.test(target1.value)) && !(pattern_kor.test(target2.value)) ){
-                    alert("한글만 입력 가능합니다.\n성과 이름을 다시 입력하세요.")
+                    alert("성과 이름은 한글만 허용됩니다.")
                     target1.value = '';
                     target2.value = '';
                 }
                 else if ( !(pattern_kor.test(target1.value)) ){
-                    alert("한글만 입력 가능합니다.\n성을 다시 입력하세요.")
+                    alert("성은 한글만 허용됩니다.")
                     target1.value = '';
                 }
                 else if ( !(pattern_kor.test(target2.value)) ){
-                    alert("한글만 입력 가능합니다.\n이름을 다시 입력하세요.")
+                    alert("이름은 한글만 허용됩니다.")
                     target2.value = '';
+                }
+                else if ( !(pattern_num.test(target3.value)) ){
+                    alert("휴대전화 번호는 숫자만 허용됩니다.")
+                    target3.value = '';
+                }
+                else if ( !(12 <= target3.value.length) || !(target3.value.length <= 13) ){
+                    alert("휴대전화 번호는 10자리 또는 11자리 숫자만 허용됩니다.")
+                    target3.value = '';
+                }
+                else if ( !(target3.value.indexOf('-') == 3) ){
+                    alert("유효한 휴대전화 번호를 입력하세요.")
+                    target3.value = '';
+                }
+                else if ( !(target3.value.match(/-/g).length == 2) || !(target3.value.indexOf('01') == 0) ){
+                    alert("유효한 휴대전화 번호를 입력하세요.")
+                    target3.value = '';
                 }
                 else {
                     alert("유효한 값을 입력하세요.")
                     target1.value = '';
                     target2.value = '';
+                    target3.value = '';
                 }
-            });
-        </script>
-
-        <!-- 한글만 input될 수 있게 -->
-        <script>
-            $(document).on("keyup", "input", function() {
-                $(this).val(
-                    $(this).val().replace(/[a-z0-9]|[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"\\]/g,"")
-                );
             });
         </script>
 
@@ -128,6 +180,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -135,6 +188,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -142,6 +196,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -149,6 +204,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -156,6 +212,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -163,6 +220,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -170,6 +228,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
@@ -177,6 +236,7 @@
                 document.querySelector(".hide01").setAttribute("style", "display:none");
                 document.querySelector(".hide02").setAttribute("style", "display:none");
                 document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "display:block");
                 document.querySelector(".show02").setAttribute("style", "display:block");
             }
