@@ -177,8 +177,8 @@
             </div>
         </div>
     </div>
-    <!-- 유저가 접수자(문서함 생성자) 또는 사무국일 경우 -->
-    {% elif user == box.writer or perm.auth %}
+    <!-- 유저가 접수자(문서함 생성자)일 경우 -->
+    {% elif user == box.writer %}
     <div class="container-md">
         <div class="container-md border rounded px-sm-4 px-3 pt-4 pb-2">
             <div class="d-flex justify-content-between align-items-center">
@@ -273,6 +273,7 @@
             </div>
         </div>
     </div>
+    <!-- 유저가 문서함 대상이 아닐 경우 -->
     {% elif not box.category == user.profile.level %}
     <div class="container-md">
         <div class="container-md border rounded px-sm-4 px-3 py-4">
@@ -280,13 +281,9 @@
                 <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
             </div>
             <div class="container border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
-                <span style="color: #CCCCCC; font-size: 4rem;"><i class="far fa-laugh-squint"></i></span><br>
+                <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-user-slash"></i></span><br>
                 <span style="color: #58595B;">
-                    {% if box.category == 'bluemover' %}
-                    블루무버 대상 문서함입니다.
-                    {% elif box.category == 'guest' %}
-                    게스트 대상 문서함입니다.
-                    {% endif %}
+                    {{ user.last_name }}{{ user.first_name }}님은 이 문서함의 대상이 아닙니다.
                 </span>
             </div>
         </div>

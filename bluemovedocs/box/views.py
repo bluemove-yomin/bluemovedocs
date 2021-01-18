@@ -56,10 +56,12 @@ def create_doc(request, id):
         # 유저 My Drive에 블루무브 폴더 생성하기
         file_metadata = {
             'name': '블루무브',
-            'mimeType': 'application/vnd.google-apps.folder'
+            'mimeType': 'application/vnd.google-apps.folder',
         }
-        file = drive_service.files().create(body=file_metadata,
-                                            fields='id').execute()
+        file = drive_service.files().create(
+            body=file_metadata,
+            fields='id'
+        ).execute()
         folder_id = file.get('id')
         # 블루무브 폴더에 템플릿 문서 복사하기
         application_id = box.document_id ### 템플릿 문서 ID ###
@@ -67,12 +69,20 @@ def create_doc(request, id):
             'name': '4기 블루무버 지원서 - ' + request.user.last_name + request.user.first_name,
             'parents': [folder_id],
             'writersCanShare': True,
+            # 'contentRestrictions': [
+            #     {
+            #         'readOnly': True,
+            #         'reason': '문서가 제출되었습니다. 접수자가 검토를 마칠 때까지 수정할 수 없습니다.',
+            #     }
+            # ],
         }
         drive_response = drive_service.files().copy(
-            fileId=application_id, body=body).execute()
+            fileId=application_id,
+            body=body
+        ).execute()
         file_id = drive_response.get('id') ### 유저 문서 ID ###
         name = drive_response.get('name')
-        # 문서에 이름, 이메일 주소 입력하기
+        # 문서에 이름, 휴대전화 번호, 이메일 주소 입력하기
         requests = [
             {
                 'replaceAllText': {
@@ -104,7 +114,11 @@ def create_doc(request, id):
         ]
 
         docs_service.documents().batchUpdate(
-            documentId=file_id, body={'requests': requests}).execute()
+            documentId=file_id,
+            body = {
+                'requests': requests
+            }
+        ).execute()
         # 유저의 문서 정보 저장하기
         doc_user = request.user
         doc_name = name
@@ -291,58 +305,38 @@ def submit_doc(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     # 유저 Permission ID 불러오기
-    def callback_for_permissions_list(request_id, response, exception):
-        if exception:
-            return redirect('box:read', id=doc.box.id)
-        else:
-            permissions_list = response.get('permissions') ### 유저 Permissions List ###
-            for permissions_data in permissions_list:
-                user_permission_id = permissions_data['id'] ### 유저 Permission ID ###
-        # 지원서 소유권 블루무브로 이전하기
-        def callback_for_bluemove_ownership(request_id, response, exception):
-            if exception:
-                return redirect('box:read', id=doc.box.id)
-            else:
-                bluemove_permission_id = response.get('id') ### 블루무브 Permission ID ###
-                doc.box_permission_id = bluemove_permission_id
-                doc.save(update_fields=['box_permission_id'])
-        batch = drive_service.new_batch_http_request(callback=callback_for_bluemove_ownership)
-        bluemove_permission_owner = {
-            'type': 'user',
-            'role': 'owner',
-            'emailAddress': doc.box.writer.email, ### 블루무브 이메일 주소 ###
-        }
-        batch.add(drive_service.permissions().create(
-                fileId=file_id,
-                body=bluemove_permission_owner,
-                transferOwnership=True,
-                moveToNewOwnersRoot=True,
-                fields='id',
-        ))
-        batch.execute()
-        # 유저 권한을 뷰어로 변경하기
-        def callback_for_update_permission(request_id, response, exception):
-            if exception:
-                return redirect('box:read', id=doc.box.id)
-            else:
-                updated_user_permission_id = response.get('id') ### 업데이트된 유저 Permission ID ###
-            doc.user_permission_id = updated_user_permission_id
-            doc.submit_flag = True
-            doc.save()
-            # return redirect('box:read', id=doc.box.id)
-        batch = drive_service.new_batch_http_request(callback=callback_for_update_permission)
-        user_permission_reader = {
-            'role': 'reader',
-        }
-        batch.add(drive_service.permissions().update(
-                fileId=file_id,
-                permissionId=user_permission_id,
-                body=user_permission_reader,
-        ))
-        batch.execute()
-    batch = drive_service.new_batch_http_request(callback=callback_for_permissions_list)
-    batch.add(drive_service.permissions().list(
-            fileId=file_id,
-    ))
-    batch.execute()
+    drive_response = drive_service.permissions().list(
+        fileId=file_id,
+    ).execute()
+    permissions_list = drive_response.get('permissions')
+    for permissions_data in permissions_list:
+        user_permission_id = permissions_data['id']
+    # 문서 소유권 접수자에게 이전하기
+    bluemove_permission_owner = {
+        'type': 'user',
+        'role': 'owner',
+        'emailAddress': doc.box.writer.email, ### 블루무브 이메일 주소 ###
+    }
+    drive_response = drive_service.permissions().create(
+        fileId=file_id,
+        body=bluemove_permission_owner,
+        transferOwnership=True,
+        moveToNewOwnersRoot=True,
+        fields='id',
+    ).execute()
+    bluemove_permission_id = drive_response.get('id')
+    # 유저 권한을 뷰어로 변경하기
+    user_permission_reader = {
+        'role': 'reader',
+    }
+    drive_response = drive_service.permissions().update(
+        fileId=file_id,
+        permissionId=user_permission_id,
+        body=user_permission_reader,
+    ).execute()
+    updated_user_permission_id = drive_response.get('id')
+    doc.box_permission_id = bluemove_permission_id
+    doc.user_permission_id = updated_user_permission_id
+    doc.submit_flag = True
+    doc.save()
     return redirect('box:read', id=doc.box.id)
