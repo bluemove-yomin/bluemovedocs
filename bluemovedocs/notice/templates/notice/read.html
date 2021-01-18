@@ -8,11 +8,11 @@
         <div class="d-flex align-items-sm-center justify-content-between">
             <p style="font-weight: 600;">
                 {% if notice.category == 'bluemover' %}
-                    블루무버
+                    📢 블루무버
                 {% elif notice.category == 'guest' %}
-                    게스트
+                    📢 게스트
                 {% else %}
-                    알 수 없음
+                    📢 알 수 없음
                 {% endif %}
             </p>
             {% if user.is_authenticated %}

@@ -16,7 +16,9 @@
                     {{ user.last_name }}{{ user.first_name }} 게스트님의
                 {% endif %}
             {% empty %}
-                {{ user.last_name }}{{ user.first_name }} 매니저님의
+                {% if user.is_authenticated %}
+                    {{ user.last_name }}{{ user.first_name }} 매니저님의
+                {% endif %}
             {% endfor %}
             요청을 처리하려고 했으나 서버가 접근을 거부했어요. 😥<br>
             오류가 반복된다면 사무국에 연락해주세요.
@@ -27,11 +29,12 @@
             <strong>HTTP_METHOD:</strong> {{ request.META.REQUEST_METHOD }}<br>
             <strong>USER_AGENT:</strong> {{ request.META.HTTP_USER_AGENT }}<br>
             <strong>USER_EMAIL:</strong> {% if request.user.is_authenticated %}{{ user.email }}{% else %}User is not authenticated{% endif %}<br>
-            <strong>PREVIOUS_URI:</strong> {{ request.META.HTTP_REFERER }}<br>
+            <strong>PREVIOUS_URI:</strong> {% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}Unknown{% endif %}<br>
             <strong>CURRENT_URI:</strong> {{ request.build_absolute_uri }}
         </small>
-        <div class="d-grid sm-flex justify-content-sm-end mt-5">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-5">
             <a type="button" class="btn btn-outline-secondary" onclick="goBack()">뒤로 가기</a>
+            <a type="button" class="btn btn-outline-primary" href="{% url 'home:home' %}">메인 페이지로 가기</a>
             <!-- goBack Script -->
             <script>
                 function goBack() {
