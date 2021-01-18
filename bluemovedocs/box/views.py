@@ -81,7 +81,18 @@ def create_doc(request, id):
                         'matchCase':  'true'
                     },
                     'replaceText': request.user.last_name + request.user.first_name,
-                }}, {
+                }
+            },
+            {
+                'replaceAllText': {
+                    'containsText': {
+                        'text': '{{user-phone}}',
+                        'matchCase':  'true'
+                    },
+                    'replaceText': request.user.profile.phone,
+                }
+            },
+            {
                 'replaceAllText': {
                     'containsText': {
                         'text': '{{user-email}}',
