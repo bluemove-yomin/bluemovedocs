@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from apiclient.http import MediaFileUpload
+from oauth2client.service_account import ServiceAccountCredentials
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -81,95 +82,86 @@ def main():
     # print('File ID: %s' % file_id)
     # print('블루무브 폴더에 지원서 템플릿을 업로드했습니다.')
 
-    # 03. 유저 Permission ID 불러오기
-    def callback_for_permissions_list(request_id, response, exception):
-        if exception:
-            print(exception)
-            print('03. ERROR 지원서 권한 정보 또는 유저 권한 ID를 불러오지 못했습니다.')
+    # 03. 문서 잠그기
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "true",
+                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                }
+            ]
+        }
+    ).execute()
+    print('03. 문서를 잠갔습니다.')
+
+    # 04. 유저 Permission ID 불러오기
+    drive_response = drive_service.permissions().list(
+        fileId=file_id,
+    ).execute()
+    permissions_list = drive_response.get('permissions')
+    for permissions_data in permissions_list:
+        user_permission_id = permissions_data['id']
+        if user_permission_id:
+            print('04. 유저의 Permission ID를 불러왔습니다.')
         else:
-            permissions_list = response.get('permissions') ### 유저 Permissions List ###
-            print("03. User Permissions: %s" % permissions_list)
-            print('03. 지원서 권한 정보를 불러왔습니다.')
-            for permissions_data in permissions_list:
-                user_permission_id = permissions_data['id'] ### 유저 Permission ID ###
-                print('03. User Permission ID: %s' % user_permission_id)
-                print('03. 유저 권한 ID를 불러왔습니다.')
+            print('04. 유저의 Permission ID를 불러오지 못했습니다.')
 
-        # 04. 지원서 소유권 블루무브로 이전하기
-        # file_id = '1_4BCiUc0kAaQz4syK_rVmocdabi5-AfcF-JBH_9W5zY' ### 나중에 02와 연결하기 ###
-        def callback_for_bluemove_ownership(request_id, response, exception):
-            if exception:
-                print(exception)
-                print('04. ERROR 지원서 소유권을 블루무브로 이전하지 못했습니다.')
-            else:
-                bluemove_permission_id = response.get('id') ### 블루무브 Permission ID ###
-                print("04. Bluemove Permission Id: %s" % bluemove_permission_id)
-                print('04. 지원서 소유권을 블루무브로 이전했습니다.')
-        batch = drive_service.new_batch_http_request(callback=callback_for_bluemove_ownership)
-        bluemove_permission_owner = {
-            'type': 'user',
-            'role': 'owner',
-            'emailAddress': 'bwbluemove@gmail.com', ### 블루무브 이메일 주소 ###
-        }
-        batch.add(drive_service.permissions().create(
-                fileId=file_id,
-                body=bluemove_permission_owner,
-                transferOwnership=True,
-                moveToNewOwnersRoot=True,
-                fields='id',
-        ))
-        batch.execute()
+    # 05. 문서 소유권 Service Account에게 이전하기
+    bluemove_permission_owner = {
+        'type': 'user',
+        'role': 'owner',
+        'emailAddress': 'bluemove-service@bluemove-docs.iam.gserviceaccount.com', ### 블루무브 이메일 주소 ###
+    }
+    drive_response = drive_service.permissions().create(
+        fileId=file_id,
+        body=bluemove_permission_owner,
+        transferOwnership=True,
+        # moveToNewOwnersRoot=True,
+        fields='id',
+    ).execute()
+    bluemove_permission_id = drive_response.get('id')
+    if bluemove_permission_id:
+        print('05. 문서 소유권을 블루무브에 이전했습니다.')
+    else:
+        print('05. 문서 소유권을 블루무브에 이전하지 못했습니다.')
 
-        # 05. 유저 권한을 뷰어로 변경하기
-        def callback_for_update_permission(request_id, response, exception):
-            if exception:
-                print(exception)
-                print('05. ERROR 유저 권한을 뷰어로 변경하지 못했습니다.')
-            else:
-                updated_user_permission_id = response.get('id') ### 업데이트된 유저 Permission ID ###
-                print("05. Updated User Permission ID: %s" % updated_user_permission_id)
-                print('05. 유저 권한을 뷰어로 변경했습니다.')
-                print('지원서 제출이 완료되었습니다.')
-        batch = drive_service.new_batch_http_request(callback=callback_for_update_permission)
-        user_permission_reader = {
-            'role': 'reader',
-        }
-        batch.add(drive_service.permissions().update(
-                fileId=file_id,
-                permissionId=user_permission_id,
-                body=user_permission_reader,
-        ))
-        batch.execute()
+    # 06. 유저 권한을 뷰어로 변경하기
+    user_permission_reader = {
+        'role': 'reader',
+    }
+    drive_response = drive_service.permissions().update(
+        fileId=file_id,
+        permissionId=user_permission_id,
+        body=user_permission_reader,
+    ).execute()
+    updated_user_permission_id = drive_response.get('id')
+    if updated_user_permission_id:
+        print('06. 유저 권한을 뷰어로 변경했습니다.')
+    else:
+        print('06. 유저 권한을 뷰어로 변경하지 못했습니다.')
 
-        # 06. 지원서 소유권 유저에게 이전하기
-        def callback_for_user_ownership(request_id, response, exception):
-            if exception:
-                print(exception)
-                print('06. ERROR 지원서 소유권을 유저에게 이전하지 못했습니다.')
-            else:
-                owner_user_permission_id = response.get('id') ### 블루무브 Permission ID ###
-                print("06. Owner User Permission Id: %s" % owner_user_permission_id)
-                print('06. 지원서 소유권을 유저에게 이전했습니다.')
-        batch = drive_service.new_batch_http_request(callback=callback_for_user_ownership)
-        user_permission_owner = {
-            'type': 'user',
-            'role': 'owner',
-            'emailAddress': 'ssongyo@gmail.com', ### 유저 이메일 주소 ###
-        }
-        batch.add(drive_service.permissions().create(
-                fileId=file_id,
-                body=user_permission_owner,
-                transferOwnership=True,
-                moveToNewOwnersRoot=True,
-                fields='id',
-        ))
-        batch.execute()
-
-    batch = drive_service.new_batch_http_request(callback=callback_for_permissions_list)
-    batch.add(drive_service.permissions().list(
-            fileId=file_id,
-    ))
-    batch.execute()
+    # 07. 서비스 계정으로 접수자 writer 퍼미션 추가
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
+    creds = ServiceAccountCredentials.from_json_keyfile_name(
+        'bluemove-docs-64c12e189ad5.json', SERVICE_ACCOUNT_SCOPES)
+    drive_service = build('drive', 'v3', credentials=creds)
+    create_role_writer_boxwriter = {
+        'type': 'user',
+        'role': 'writer',
+        'emailAddress': 'tejava@bluemove.or.kr', ### 블루무브 이메일 주소 ###
+    }
+    drive_response = drive_service.permissions().create(
+        fileId=file_id,
+        body=create_role_writer_boxwriter,
+        fields='id',
+    ).execute()
+    bluemove_permission_id = drive_response.get('id')
+    if bluemove_permission_id:
+        print('07. 접수자 writer 권한을 생성했습니다.')
+    else:
+        print('07. 접수자 writer 권한을 생성하지 못했습니다.')
 
 if __name__ == '__main__':
     main()
