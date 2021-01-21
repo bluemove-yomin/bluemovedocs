@@ -33,7 +33,11 @@ class DocAdmin(admin.ModelAdmin):
         'user',
         'name',
         'file_id',
+        'outside_permission_id',
+        'permission_id',
+        'inside_permission_id',
         'created_at',
         'submit_flag',
         'updated_at',
+        'return_flag',
     )

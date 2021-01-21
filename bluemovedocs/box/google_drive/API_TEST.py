@@ -2,24 +2,23 @@ from __future__ import print_function
 import pickle
 import os
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2 import service_account
-from apiclient.http import MediaFileUpload
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from google.auth.transport.requests import Request
+# from google.oauth2 import service_account
 from oauth2client.service_account import ServiceAccountCredentials
 
 def main():
     ##### 00. 서비스 계정 키 생성
-    credentials = service_account.Credentials.from_service_account_file(
-        filename = 'bluemove-docs-b1bf3a331b77.json',
-        scopes = ['https://www.googleapis.com/auth/cloud-platform'])
-    iam_service = build('iam', 'v1', credentials=credentials)
-    key = iam_service.projects().serviceAccounts().keys().create(
-        name = 'projects/-/serviceAccounts/' + 'bluemove-service@bluemove-docs.iam.gserviceaccount.com',
-        body = {}
-        ).execute()
-    name = key.get('name')
-    return print('Created key: ' + key['name'])
+    # credentials = service_account.Credentials.from_service_account_file(
+    #     filename = 'bluemove-docs-b1bf3a331b77.json',
+    #     scopes = ['https://www.googleapis.com/auth/cloud-platform'])
+    # iam_service = build('iam', 'v1', credentials=credentials)
+    # key = iam_service.projects().serviceAccounts().keys().create(
+    #     name = 'projects/-/serviceAccounts/' + 'bluemove-service@bluemove-docs.iam.gserviceaccount.com',
+    #     body = {}
+    #     ).execute()
+    # name = key.get('name')
+    # return print('Created key: ' + key['name'])
 
     ##### 00. OUTSIDE 클라이언트 Google Drive API 호출
     # SCOPES = ['https://www.googleapis.com/auth/drive']
@@ -59,7 +58,7 @@ def main():
     # 01. 서비스 계정 Google Drive, Google Docs API 호출
     SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
-        'bluemove-docs-b1bf3a331b77.json',
+        'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
@@ -74,10 +73,10 @@ def main():
         print('01-B. 서비스 계정 Google Docs API 호출에 실패했습니다!!!')
 
     ##### 00. 테스트 파일 또는 폴더 삭제
-    # drive_response = drive_service.files().delete(
-    #     fileId = '19UJqme6cNd-vtfy-Oxn-5PQ8dx4ammGE',
-    # ).execute()
-    # return print('00. 테스트 파일 또는 폴더 삭제에 성공했습니다.')
+    drive_response = drive_service.files().delete(
+        fileId = '1i41cvBjs1SFVFLXwfE9YpYGV3kVWHqIEiTsaT1rlaTY',
+    ).execute()
+    return print('00. 테스트 파일 또는 폴더 삭제에 성공했습니다.')
 
     # 02. 서비스 계정 My Drive 내 템플릿 문서 생성(복사)
     application_id = '1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58' ##### 템플릿 문서 ID INPUT #####
@@ -213,7 +212,7 @@ def main():
                            '성' + '이름' + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
                            '4기 블루무버 지원서' ##### 문서 이름 INPUT #####
-                           + '입니다.\n\n' + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           + '입니다.\n\n' +
                            '📧 생성일자: ' + '2021-01-20\n' + ##### 현재 일자 INPUT #####
                            '📨 제출일자: ' + '2021-01-20\n', ##### 08 일자 INPUT #####
         },

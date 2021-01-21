@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:id>/delete/', delete, name="delete"),
     path('delete_doc/<int:doc_id>/', delete_doc, name='delete_doc'),
     path('submit_doc/<int:doc_id>/', submit_doc, name='submit_doc'),
+    path('return_doc/<int:doc_id>/', return_doc, name='return_doc'),
 ]
