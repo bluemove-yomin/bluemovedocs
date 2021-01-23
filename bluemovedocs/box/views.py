@@ -322,14 +322,13 @@ def submit_doc(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     docs_service = build('docs', 'v1', credentials=credentials)
-    # 02. 문서 잠그기
+    # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
         body={
             "contentRestrictions": [
                 {
-                    "readOnly": "true",
-                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                    "readOnly": "false",
                 }
             ]
         }
@@ -372,6 +371,18 @@ def submit_doc(request, doc_id):
         },
     ).execute()
     inside_permission_id = drive_response.get('id') ##### INSIDE 클라이언트 권한 ID OUTPUT #####
+    # 06. 문서 잠금
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "true",
+                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                }
+            ]
+        }
+    ).execute()
     doc.name = name
     doc.submission_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.inside_permission_id = inside_permission_id
@@ -395,14 +406,13 @@ def reject_doc(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     docs_service = build('docs', 'v1', credentials=credentials)
-    # 02. 문서 잠그기
+    # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
         body={
             "contentRestrictions": [
                 {
-                    "readOnly": "true",
-                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                    "readOnly": "false",
                 }
             ]
         }
@@ -421,26 +431,38 @@ def reject_doc(request, doc_id):
         },
     ).execute()
     # 05. 문서 이름 및 설명 변경
-    # drive_response = drive_service.files().update(
-    #     fileId = file_id,
-    #     body = {
-    #         'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
-    #                 doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
-    #                 request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
-    #                 '_' + datetime.date.today().strftime('%y%m%d'),
-    #         'description': '블루무브 닥스에서 생성된 ' +
-    #                        request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
-    #                        '님의 ' +
-    #                        doc.box.title ##### 문서 이름 INPUT #####
-    #                        + '입니다.\n\n' +
-    #                        '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
-    #                        '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
-    #                        '📩 반려일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
-    #     },
-    #     fields = 'name'
-    # ).execute()
+    drive_response = drive_service.files().update(
+        fileId = file_id,
+        body = {
+            'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
+                    doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
+                    request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                    '_' + datetime.date.today().strftime('%y%m%d'),
+            'description': '블루무브 닥스에서 생성된 ' +
+                           request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           '님의 ' +
+                           doc.box.title ##### 문서 이름 INPUT #####
+                           + '입니다.\n\n' +
+                           '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
+                           '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
+                           '📩 반려일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
+        },
+        fields = 'name'
+    ).execute()
     name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
-    # doc.name = name
+    # 06. 문서 잠금
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "true",
+                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                }
+            ]
+        }
+    ).execute()
+    doc.name = name
     doc.submit_flag = False
     doc.reject_flag = True
     doc.reject_reason = request.POST.get('reject_reason')
@@ -464,12 +486,23 @@ def return_doc(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     docs_service = build('docs', 'v1', credentials=credentials)
-    # 02. INSIDE 클라이언트 권한 삭제 writer 2 none
+    # 02. 문서 잠금 해제
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "false",
+                }
+            ]
+        }
+    ).execute()
+    # 03. INSIDE 클라이언트 권한 삭제 writer 2 none
     drive_response = drive_service.permissions().delete(
         fileId = file_id,
         permissionId = inside_permission_id,
     ).execute()
-    # 03. OUTSIDE 클라이언트 권한 변경 reader 2 owner
+    # 04. OUTSIDE 클라이언트 권한 변경 reader 2 owner
     drive_response = drive_service.permissions().update(
         fileId = file_id,
         permissionId = outside_permission_id,
@@ -478,7 +511,7 @@ def return_doc(request, doc_id):
             'role': 'owner',
         },
     ).execute()
-    # 04. 문서 이름 및 설명 변경
+    # 05. 문서 이름 및 설명 변경
     drive_response = drive_service.files().update(
         fileId = file_id,
         body = {
@@ -498,12 +531,26 @@ def return_doc(request, doc_id):
         fields = 'name'
     ).execute()
     name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
-    # 05. 서비스 계정 권한 삭제 writer 2 none
+    # 06. 문서 잠금
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "true",
+                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                }
+            ]
+        }
+    ).execute()
+    # 07. 서비스 계정 권한 삭제 writer 2 none
     drive_response = drive_service.permissions().delete(
         fileId = file_id,
         permissionId = permission_id,
     ).execute()
     doc.return_flag = True
+    doc.outside_permission_id = None
+    doc.permission_id = None
+    doc.inside_permission_id = None
     doc.save()
-    doc.delete()
     return redirect('box:read', id=doc.box.id)
