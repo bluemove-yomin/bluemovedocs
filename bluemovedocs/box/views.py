@@ -208,7 +208,7 @@ def read(request, id):
                 closed_boxes = closed_paginator.page(closed_paginator.num_pages)
             if request.user.is_authenticated:
                 if request.user == box.writer:
-                    all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False))
+                    all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False)).order_by('-id')
                 else:
                     all_docs = box.docs.filter(user=request.user)
             else:
@@ -233,7 +233,7 @@ def read(request, id):
             closed_boxes = closed_paginator.page(closed_paginator.num_pages)
         if request.user.is_authenticated:
             if request.user == box.writer:
-                all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False))
+                all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False)).order_by('-id')
             else:
                 all_docs = box.docs.filter(user=request.user)
         else:
@@ -347,10 +347,10 @@ def submit_doc(request, doc_id):
         body = {
             'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
                     doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
-                    request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                    doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                     '_' + datetime.date.today().strftime('%y%m%d'),
             'description': '블루무브 닥스에서 생성된 ' +
-                           request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
                            doc.box.title ##### 문서 이름 INPUT #####
                            + '입니다.\n\n' +
@@ -436,10 +436,10 @@ def reject_doc(request, doc_id):
         body = {
             'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
                     doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
-                    request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                    doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                     '_' + datetime.date.today().strftime('%y%m%d'),
             'description': '블루무브 닥스에서 생성된 ' +
-                           request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
                            doc.box.title ##### 문서 이름 INPUT #####
                            + '입니다.\n\n' +
@@ -517,10 +517,10 @@ def return_doc(request, doc_id):
         body = {
             'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
                     doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
-                    request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                    doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                     '_' + datetime.date.today().strftime('%y%m%d'),
             'description': '블루무브 닥스에서 생성된 ' +
-                           request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
                            doc.box.title ##### 문서 이름 INPUT #####
                            + '입니다.\n\n' +
@@ -548,6 +548,7 @@ def return_doc(request, doc_id):
         fileId = file_id,
         permissionId = permission_id,
     ).execute()
+    doc.submit_flag = False
     doc.return_flag = True
     doc.outside_permission_id = None
     doc.permission_id = None

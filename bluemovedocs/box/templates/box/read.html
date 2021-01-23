@@ -285,7 +285,7 @@
                                                 <input type="text" class="form-control" name="reject_reason" id="reject_reason" placeholder="반려 사유를 입력하세요." required>
                                                 <div class="invalid-feedback">반려 사유를 입력하세요.</div>
                                             </div>
-                                            문서 반려 시<br>▶ {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>▶ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                            문서 반려 시<br>▶ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>▶ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유는 {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 표시됩니다.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
@@ -311,9 +311,12 @@
                                     <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <span class="hide0303">문서 반환 시<br>▶ {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>▶ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?</span>
+                                    <span class="hide0303">
+                                        문서 반환 시<br>▶ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>▶ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 반환하세요.</small>
+                                    </span>
                                     <span class="show0202" style="display: none;">
-                                        {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </span>
                                 </div>
@@ -457,7 +460,7 @@
                         </div>
                     </div>
                     <div class="container-md d-flex p-0 my-2">
-                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출이 완료되었습니다.</button>
+                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출 결과 대기 중</button>
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
@@ -616,24 +619,40 @@
 
     <!-- doNotClose -->
     <script>
-        // window.onerror = function(){
-        //     return true;
-        // }
+        window.onerror = function(){
+            return true;
+        }
+        var reason = document.querySelector("#reject_reason");
         function doNotClose() {
-            document.querySelector(".hide01").setAttribute("style", "display:none");
-            document.querySelector(".hide02").setAttribute("style", "display:none");
-            document.querySelector(".hide03").setAttribute("style", "display:none");
-            document.querySelector(".hide04").setAttribute("style", "display:none");
-            document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
-            document.querySelector(".show02").setAttribute("style", "display:inline");
+            if ( reason ) {
+                if ( reason.value ) {
+                    document.querySelector(".hide01").setAttribute("style", "display:none");
+                    document.querySelector(".hide02").setAttribute("style", "display:none");
+                    document.querySelector(".hide03").setAttribute("style", "display:none");
+                    document.querySelector(".hide04").setAttribute("style", "display:none");
+                    document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
+                    document.querySelector(".show02").setAttribute("style", "display:inline");
+                }
+                else {
+                    return alert('반려 사유를 입력하세요.')
+                }
+            }
+            else {
+                document.querySelector(".hide01").setAttribute("style", "display:none");
+                document.querySelector(".hide02").setAttribute("style", "display:none");
+                document.querySelector(".hide03").setAttribute("style", "display:none");
+                document.querySelector(".hide04").setAttribute("style", "display:none");
+                document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
+                document.querySelector(".show02").setAttribute("style", "display:inline");
+            }
         };
     </script>
 
     <!-- doNotClose2 -->
     <script>
-        // window.onerror = function(){
-        //     return true;
-        // }
+        window.onerror = function(){
+            return true;
+        }
         function doNotClose2() {
             document.querySelector(".hide0101").setAttribute("style", "display:none");
             document.querySelector(".hide0202").setAttribute("style", "display:none");
