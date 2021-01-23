@@ -164,7 +164,7 @@
     <!-- #docPosition -->
     <div id="docPosition"></div>
 
-    <!-- 유저가 로그인하지 않았을 경우 -->
+    <!-- 유저 미로그인 시 -->
     {% if not user.is_authenticated %}
     <div class="container-md">
         <div class="container-md border rounded px-sm-4 px-3 py-4">
@@ -177,7 +177,7 @@
             </div>
         </div>
     </div>
-    <!-- 유저가 접수자(문서함 생성자)일 경우 -->
+    <!-- 유저가 INSIDE일 경우 -->
     {% elif user == box.writer %}
     <div class="container-md">
         <div class="container-md border rounded px-sm-4 px-3 pt-4 pb-2">
@@ -186,6 +186,7 @@
                 <p class="mb-2 text-muted"><i class="fas fa-sync-alt"></i> <a href="javascript:location.reload();" style="font-weight: 300; color:#58595B;">{{ all_docs|length }}명 제출함</a></p>
             </div>
             <div class="list-group list-group-flush mt-1" id="refresh_submitted">
+                <!-- 접수된 문서 있을 경우 -->
                 {% for doc in all_docs %}
                 <div class="list-group-item px-0 py-3">
                     <!-- PC 환경 -->
@@ -205,7 +206,7 @@
                                 <tr>
                                     <td class="p-0 m-0">
                                         <small class="card-subtitle my-0" style="font-weight: 300; color: #6C757D; margin-left: 10px;">
-                                            {{ doc.updated_at }} 제출
+                                            {{ doc.user.last_name }}{{ doc.user.first_name }} │ {{ doc.submission_date }} 제출
                                         </small>
                                     </td>
                                 </tr>
@@ -213,16 +214,16 @@
                         </a>
                         <table class="container m-0 p-0 d-flex justify-content-end" style="border: none;">
                             <tr>
-                                <td class="px-2 py-0 m-0" rowspan="2">
+                                <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
                                     <small>
-                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #dc3545;">삭제하기</a>
+                                        <a href="#" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal">반려하기</a>
                                     </small>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="p-0 m-0">
+                                <td class="p-0 m-0" rowspan="1">
                                     <small>
-                                        <a href="{% url 'box:return_doc' doc.id %}#docPosition" style="color: #58595B;">소유권 반납</a>
+                                        <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal">반환하기</a>
                                     </small>
                                 </td>
                             </tr>
@@ -244,29 +245,87 @@
                             <tr>
                                 <td class="p-0 m-0">
                                     <small class="card-subtitle my-0" style="color: #6C757D; margin-left: 10px;">
-                                        {{ doc.updated_at }} 제출
+                                        {{ doc.user.last_name }}{{ doc.user.first_name }} │ {{ doc.submission_date }} 제출
                                     </small>
                                 </td>
                             </tr>
                         </table>
                         <table class="d-flex justify-content-end" style="border: none;">
                             <tr>
-                                <td class="px-2 py-0 m-0" rowspan="2">
+                                <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
                                     <small>
-                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #dc3545;">삭제하기</a>
+                                        <a href="#" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal">반려하기</a>
                                     </small>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="p-0 m-0">
                                     <small>
-                                        <a href="{% url 'box:delete_doc' doc.id %}#docPosition" style="color: #58595B;">소유권 반납</a>
+                                        <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal">반환하기</a>
                                     </small>
                                 </td>
                             </tr>
                         </table>
                     </div>
+                    <!-- docRejectModal -->
+                    <form action="{% url 'box:reject_doc' doc.id %}#docPosition" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="modal fade" id="docRejectModal" tabindex="-1" aria-labelledby="docRejectLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title hide01" id="docRejectModalLabel" style="font-weight: 600;">💥 반려 확인</h5>
+                                        <h5 class="modal-title show01" id="docRejectModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                        <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <span class="hide03">
+                                            {% csrf_token %}
+                                            <div class="form-group mb-3">
+                                                <label for="reject_reason" class="form-label">반려 사유<span style="color: #DC3545; font-weight: 600;"> *</span></label>
+                                                <input type="text" class="form-control" name="reject_reason" id="reject_reason" placeholder="반려 사유를 입력하세요." required>
+                                                <div class="invalid-feedback">반려 사유를 입력하세요.</div>
+                                            </div>
+                                            반려된 문서는 이 목록에서 사라지며 더 이상 조회할 수 없습니다.<br>정말 반려하시겠습니까?<br><br>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유는 제출자에게 표시됩니다.</small>
+                                        </span>
+                                        <span class="show02" style="display: none;">
+                                            문서를 반려하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                        </span>
+                                    </div>
+                                    <div class="modal-footer hide04">
+                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                        <input type="submit" value="네, 반려할게요!" class="btn btn-outline-danger" onclick="doNotClose();">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- docReturnModal -->
+                    <div class="modal fade" id="docReturnModal" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title hide0101" id="docReturnModalLabel" style="font-weight: 600;">💥 반환 확인</h5>
+                                    <h5 class="modal-title show0101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <span class="hide0303">반환된 문서는 이 목록에서 사라지며 더 이상 조회할 수 없습니다.<br>또한 블루무브 닥스에 저장된 모든 관련 정보가 삭제됩니다.<br>정말 반환하시겠습니까?</span>
+                                    <span class="show0202" style="display: none;">
+                                        문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                    </span>
+                                </div>
+                                <div class="modal-footer hide0404">
+                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                    <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose2();">네, 반환할게요!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <!-- 접수된 문서 없을 경우 -->
                 {% empty %}
                 <div class="text-center mt-2 pb-2"><p style="color: #CCCCCC;"><i class="far fa-copy"></i> 접수된 문서가 없습니다.</p></div>
                 {% endfor %}
@@ -288,9 +347,81 @@
             </div>
         </div>
     </div>
+    <!-- 유저가 OUTSIDE일 경우 -->
     {% else %}
         {% for doc in all_docs %}
-            {% if doc.submit_flag == True %}
+            <!-- 문서가 반려됐을 경우 -->
+            {% if doc.reject_flag == True and doc.submit_flag == False %}
+            <div class="container-md">
+                <div class="container-md border rounded px-sm-4 px-3 py-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+                        <p class="mb-2 text-muted"><i class="fas fa-times-circle"></i> 반려됨</p>
+                    </div>
+                    <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
+                        <div class="d-flex justify-content-between">
+                            <div></div>
+                            <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                <span style="color: #58595B; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                                <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
+                                <small class="text-muted" style="font-weight: 300;">{{ doc.rejection_date }} 반려<br>(사유: {{ doc.reject_reason }})</small>
+                            </a>
+                            <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                        </div>
+                    </div>
+                    <div class="container-md d-flex p-0 my-2">
+                        <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</a>
+                    </div>
+                    <!-- docSubmitModal -->
+                    <div class="modal fade" id="docSubmitModal" tabindex="-1" aria-labelledby="docSubmitModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title hide01" id="docSubmitModalLabel" style="font-weight: 600;">📤 제출 확인</h5>
+                                    <h5 class="modal-title show01" id="docSubmitModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <span class="hide03">제출된 문서는 더 이상 수정할 수 없습니다.<br><span style="color: #007DC5; font-weight: 600;">(문서 조회 및 삭제 권한은 유지됩니다.)</span><br>정말 제출하시겠습니까?</span>
+                                    <span class="show02" style="display: none;">
+                                        문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                    </span>
+                                </div>
+                                <div class="modal-footer hide04">
+                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                    <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose();">네, 제출할게요!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- docDeleteModal -->
+                    <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title hide0101" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                    <h5 class="modal-title show0101" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <span class="hide0303">삭제된 문서는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?</span>
+                                    <span class="show0202" style="display: none;">
+                                        문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                    </span>
+                                </div>
+                                <div class="modal-footer hide0404">
+                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger" onclick="doNotClose2();">네, 취소할게요!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 문서를 제출했을 경우 -->
+            {% elif doc.submit_flag == True %}
             <div class="container-md">
                 <div class="container-md border rounded px-sm-4 px-3 py-4">
                     <div class="d-flex justify-content-between align-items-center">
@@ -303,7 +434,7 @@
                             <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
                                 <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
-                                <small class="text-muted" style="font-weight: 300;">{{ doc.updated_at }} 제출</small>
+                                <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
                             </a>
                             <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
@@ -316,23 +447,27 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">💥 제출 취소 확인</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <h5 class="modal-title hide01" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                    <h5 class="modal-title show01" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    제출 취소 시 철회가 불가하며 <span style="font-weight: 600; color: #dc3545;">문서 소유권이 접수자에게 귀속</span>됩니다.<br>계속하시겠어요?
-                                    <!-- <br><br>
-                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small> -->
+                                    <span class="hide03">제출된 문서를 삭제하면 제출이 자동 취소됩니다.<br>삭제된 문서는 복구할 수 없습니다.<br><span style="color: #DC3545; font-weight: 600;">(다시 제출하고 싶다면 새 문서를 생성해야 합니다.)</span><br>정말 삭제하시겠습니까?</span>
+                                    <span class="show02" style="display: none;">
+                                        문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                    </span>
                                 </div>
-                                <div class="modal-footer">
-                                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 취소할게요!</a>
+                                <div class="modal-footer hide04">
+                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger" onclick="doNotClose();">네, 삭제할게요!</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- 문서를 생성했을 경우 -->
             {% elif user == doc.user %}
             <div class="container-md">
                 <div class="container-md border rounded px-sm-4 px-3 py-4">
@@ -346,13 +481,12 @@
                             <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
                                 <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
-                                <small class="text-muted" style="font-weight: 300;">{{ doc.created_at }} 생성</small>
+                                <small class="text-muted" style="font-weight: 300;">{{ doc.creation_date }} 생성</small>
                             </a>
                             <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
                     <div class="container-md d-flex p-0 my-2">
-                        <!-- <a href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary">제출하기</a> -->
                         <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
                     </div>
                     <!-- docSubmitModal -->
@@ -361,17 +495,19 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title hide01" id="docSubmitModalLabel" style="font-weight: 600;">📤 제출 확인</h5>
-                                    <h5 class="modal-title show01" id="doCreateModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <h5 class="modal-title show01" id="docSubmitModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
                                     <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <span class="hide03">제출 시 문서 소유권이 접수자에게 이전되며 수정이 불가합니다.<br><span style="font-weight: 600; color: #dc3545;">제출 취소 시 문서 소유권이 접수자에게 귀속</span>되는 점 유의하시기 바랍니다.<br>계속하시겠어요?<br><br></span>
-                                    <span class="show02" style="display: none;">문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br></span>
-                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 조회할 수 있습니다.</small>
+                                    <span class="hide03">제출된 문서는 더 이상 수정할 수 없습니다.<br><span style="color: #007DC5; font-weight: 600;">(문서 조회 및 삭제 권한은 유지됩니다.)</span><br>정말 제출하시겠습니까?</span>
+                                    <span class="show02" style="display: none;">
+                                        문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                    </span>
                                 </div>
                                 <div class="modal-footer hide04">
                                     <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" id="goodbye_doc">네, 제출할게요!</a>
+                                    <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose();">네, 제출할게요!</a>
                                 </div>
                             </div>
                         </div>
@@ -381,22 +517,27 @@
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="docDeleteModalLabel" style="font-weight: 600;">😱 첨부 취소 확인</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <h5 class="modal-title hide0101" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                    <h5 class="modal-title show0101" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    첨부 취소된 문서는 재첨부가 불가합니다.<br>계속하시겠어요?<br><br>
-                                    <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 문서는 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 Google 드라이브에서 계속 이용할 수 있습니다.</small>
+                                    <span class="hide0303">삭제된 문서는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?</span>
+                                    <span class="show0202" style="display: none;">
+                                        문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                    </span>
                                 </div>
-                                <div class="modal-footer">
+                                <div class="modal-footer hide0404">
                                     <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger">네, 취소할게요!</a>
+                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger" onclick="doNotClose2();">네, 삭제할게요!</a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- 그 무엇도 아닌 경우 -->
             {% else %}
             <div class="container-md">
                 <div class="container-md border rounded px-sm-4 px-3 py-4">
@@ -411,6 +552,7 @@
                 </div>
             </div>
             {% endif %}
+        <!-- 생성된 문서가 없을 경우 -->
         {% empty %}
             <div class="container-md">
                 <div class="container-md border rounded px-sm-4 px-3 py-4">
@@ -429,11 +571,11 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                    <h5 class="modal-title" id="doCreateModalLabel" style="font-weight: 600;">⏳ 작업 중</h5>
+                                    <h5 class="modal-title" id="docCreateModalLabel" style="font-weight: 600;">⏳ 작업 중</h5>
                                     </div>
                                     <div class="modal-body">
-                                        Google 드라이브에 문서를 생성하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 사무국에 연락해주세요.</small>
+                                        {{ user.last_name }}{{ user.first_name }}님의 문서를 생성하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </div>
                                 </div>
                             </div>
@@ -455,20 +597,56 @@
         });
     </script>
 
-    <!-- GOODBYE DOC -->
+    <!-- doNotClose -->
     <script>
-        window.onerror = function(){
-            return true;
-        }
-        var target = document.querySelector("#goodbye_doc");
-        target.addEventListener('click', function(){
+        // window.onerror = function(){
+        //     return true;
+        // }
+        function doNotClose() {
             document.querySelector(".hide01").setAttribute("style", "display:none");
             document.querySelector(".hide02").setAttribute("style", "display:none");
             document.querySelector(".hide03").setAttribute("style", "display:none");
             document.querySelector(".hide04").setAttribute("style", "display:none");
             document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
             document.querySelector(".show02").setAttribute("style", "display:inline");
-        });
+        };
+    </script>
+
+    <!-- doNotClose2 -->
+    <script>
+        // window.onerror = function(){
+        //     return true;
+        // }
+        function doNotClose2() {
+            document.querySelector(".hide0101").setAttribute("style", "display:none");
+            document.querySelector(".hide0202").setAttribute("style", "display:none");
+            document.querySelector(".hide0303").setAttribute("style", "display:none");
+            document.querySelector(".hide0404").setAttribute("style", "display:none");
+            document.querySelector(".show0101").setAttribute("style", "font-weight: 600; display:inline");
+            document.querySelector(".show0202").setAttribute("style", "display:inline");
+        };
+    </script>
+
+    <!-- Forms Validation -->
+    <script>
+        // Disable form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+            // Get the forms we want to add validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
     </script>
 
     <!-- #boxListPosition -->

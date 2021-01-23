@@ -37,7 +37,8 @@ class DocAdmin(admin.ModelAdmin):
         'permission_id',
         'inside_permission_id',
         'created_at',
-        'submit_flag',
         'updated_at',
+        'submit_flag',
+        'reject_flag',
         'return_flag',
     )

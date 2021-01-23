@@ -181,7 +181,7 @@
                     </tr>
                 </table>
                 <p class="card-text mt-1" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;">{{ comment.content }}</p>
-                {% if user == comment.writer %}
+                {% if user == comment.writer or perms.auth %}
                 <div class="d-grid justify-content-end">
                     <small>
                         <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" style="color: #dc3545;">삭제하기</a>

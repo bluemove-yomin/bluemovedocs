@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
+from django.db.models import Q
 import datetime
 from .forms import BoxContentForm
 from googleapiclient.discovery import build
@@ -69,7 +70,7 @@ def create_doc(request, id):
             fields = 'id, name'
         ).execute()
         file_id = drive_response.get('id') ##### 문서 ID OUTPUT #####
-        name = drive_response.get('name') ##### 문서 이름 + OUTSIDE 클라이언트 성명 OUTPUT #####
+        name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
         # 03. 문서 내 템플릿 태그 적용
         docs_response = docs_service.documents().batchUpdate(
             documentId = file_id,
@@ -115,6 +116,7 @@ def create_doc(request, id):
             # 05. OUTSIDE 클라이언트 권한 추가 writer
             drive_response = drive_service.permissions().create(
                 fileId = file_id,
+                sendNotificationEmail = False,
                 body = {
                     'type': 'user',
                     'role': 'writer',
@@ -127,12 +129,12 @@ def create_doc(request, id):
             doc_file_id = file_id
             doc_outside_permission_id = outside_permission_id
             doc_permission_id = permission_id
-            doc_creation_datetime = datetime.date.today().strftime('%Y-%m-%d')
+            doc_creation_date = datetime.date.today().strftime('%Y-%m-%d')
             if SocialAccount.objects.filter(user=request.user):
                 doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
             else:
                 doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
-            Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, permission_id=doc_permission_id, creation_datetime=doc_creation_datetime, avatar_src=doc_avatar_src, box=box)
+            Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, permission_id=doc_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
             if 'next' in request.GET:
                 return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
             else:
@@ -206,7 +208,7 @@ def read(request, id):
                 closed_boxes = closed_paginator.page(closed_paginator.num_pages)
             if request.user.is_authenticated:
                 if request.user == box.writer:
-                    all_docs = box.docs.filter(submit_flag=True)
+                    all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False))
                 else:
                     all_docs = box.docs.filter(user=request.user)
             else:
@@ -231,7 +233,7 @@ def read(request, id):
             closed_boxes = closed_paginator.page(closed_paginator.num_pages)
         if request.user.is_authenticated:
             if request.user == box.writer:
-                all_docs = box.docs.filter(submit_flag=True).filter(return_flag=False)
+                all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False))
             else:
                 all_docs = box.docs.filter(user=request.user)
         else:
@@ -290,6 +292,19 @@ def delete(request, id):
 @login_required
 def delete_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
+    file_id = doc.file_id
+    # 01. 서비스 계정 Google Drive, Google Docs API 호출
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+    credentials = ServiceAccountCredentials.from_json_keyfile_name (
+        'bluemove-docs-6a11a86cda0e.json',
+        SERVICE_ACCOUNT_SCOPES,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+    docs_service = build('docs', 'v1', credentials=credentials)
+    # 02. 문서 삭제
+    drive_response = drive_service.files().delete(
+        fileId = file_id,
+    ).execute()
     doc.delete()
     return redirect('box:read', id=doc.box.id)
 
@@ -307,7 +322,7 @@ def submit_doc(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     docs_service = build('docs', 'v1', credentials=credentials)
-    # 06. 문서 잠그기
+    # 02. 문서 잠그기
     drive_response = drive_service.files().update(
         fileId=file_id,
         body={
@@ -319,7 +334,7 @@ def submit_doc(request, doc_id):
             ]
         }
     ).execute()
-    # 07. OUTSIDE 클라이언트 권한 변경 writer 2 reader
+    # 03. OUTSIDE 클라이언트 권한 변경 writer 2 reader
     drive_response = drive_service.permissions().update(
         fileId = file_id,
         permissionId = outside_permission_id,
@@ -327,7 +342,7 @@ def submit_doc(request, doc_id):
             'role': 'reader',
         },
     ).execute()
-    # 08. 문서 이름 및 설명 변경
+    # 04. 문서 이름 및 설명 변경
     drive_response = drive_service.files().update(
         fileId = file_id,
         body = {
@@ -340,15 +355,16 @@ def submit_doc(request, doc_id):
                            '님의 ' +
                            doc.box.title ##### 문서 이름 INPUT #####
                            + '입니다.\n\n' +
-                           '📧 생성일자: ' + doc.creation_datetime + '\n' + ##### 문서 생성일자 INPUT #####
+                           '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
                            '📨 제출일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
         },
         fields = 'name'
     ).execute()
-    name = drive_response.get('name')
-    # 09. INSIDE 클라이언트 권한 추가 writer
+    name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
+    # 05. INSIDE 클라이언트 권한 추가 writer
     drive_response = drive_service.permissions().create(
         fileId = file_id,
+        sendNotificationEmail = False,
         body = {
             'type': 'user',
             'role': 'writer',
@@ -357,9 +373,78 @@ def submit_doc(request, doc_id):
     ).execute()
     inside_permission_id = drive_response.get('id') ##### INSIDE 클라이언트 권한 ID OUTPUT #####
     doc.name = name
-    doc.submission_datetime = datetime.date.today().strftime('%Y-%m-%d')
+    doc.submission_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.inside_permission_id = inside_permission_id
     doc.submit_flag = True
+    doc.reject_flag = False
+    doc.save()
+    return redirect('box:read', id=doc.box.id)
+
+
+@permission_required('auth.add_permission', raise_exception=True)
+def reject_doc(request, doc_id):
+    doc = get_object_or_404(Doc, pk=doc_id)
+    file_id = doc.file_id
+    inside_permission_id = doc.inside_permission_id
+    outside_permission_id = doc.outside_permission_id
+    # 01. 서비스 계정 Google Drive, Google Docs API 호출
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+    credentials = ServiceAccountCredentials.from_json_keyfile_name (
+        'bluemove-docs-6a11a86cda0e.json',
+        SERVICE_ACCOUNT_SCOPES,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+    docs_service = build('docs', 'v1', credentials=credentials)
+    # 02. 문서 잠그기
+    drive_response = drive_service.files().update(
+        fileId=file_id,
+        body={
+            "contentRestrictions": [
+                {
+                    "readOnly": "true",
+                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                }
+            ]
+        }
+    ).execute()
+    # 03. INSIDE 클라이언트 권한 삭제 writer 2 none
+    drive_response = drive_service.permissions().delete(
+        fileId = file_id,
+        permissionId = inside_permission_id,
+    ).execute()
+    # 04. OUTSIDE 클라이언트 권한 변경 reader 2 writer
+    drive_response = drive_service.permissions().update(
+        fileId = file_id,
+        permissionId = outside_permission_id,
+        body = {
+            'role': 'writer',
+        },
+    ).execute()
+    # 05. 문서 이름 및 설명 변경
+    # drive_response = drive_service.files().update(
+    #     fileId = file_id,
+    #     body = {
+    #         'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
+    #                 doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
+    #                 request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+    #                 '_' + datetime.date.today().strftime('%y%m%d'),
+    #         'description': '블루무브 닥스에서 생성된 ' +
+    #                        request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
+    #                        '님의 ' +
+    #                        doc.box.title ##### 문서 이름 INPUT #####
+    #                        + '입니다.\n\n' +
+    #                        '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
+    #                        '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
+    #                        '📩 반려일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
+    #     },
+    #     fields = 'name'
+    # ).execute()
+    name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
+    # doc.name = name
+    doc.submit_flag = False
+    doc.reject_flag = True
+    doc.reject_reason = request.POST.get('reject_reason')
+    doc.rejection_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.save()
     return redirect('box:read', id=doc.box.id)
 
@@ -379,12 +464,12 @@ def return_doc(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     docs_service = build('docs', 'v1', credentials=credentials)
-    # 10. INSIDE 클라이언트 권한 삭제 writer 2 none
+    # 02. INSIDE 클라이언트 권한 삭제 writer 2 none
     drive_response = drive_service.permissions().delete(
         fileId = file_id,
         permissionId = inside_permission_id,
     ).execute()
-    # 11. OUTSIDE 클라이언트 권한 변경 reader 2 owner
+    # 03. OUTSIDE 클라이언트 권한 변경 reader 2 owner
     drive_response = drive_service.permissions().update(
         fileId = file_id,
         permissionId = outside_permission_id,
@@ -393,7 +478,7 @@ def return_doc(request, doc_id):
             'role': 'owner',
         },
     ).execute()
-    # 12. 문서 이름 및 설명 변경
+    # 04. 문서 이름 및 설명 변경
     drive_response = drive_service.files().update(
         fileId = file_id,
         body = {
@@ -406,16 +491,19 @@ def return_doc(request, doc_id):
                            '님의 ' +
                            doc.box.title ##### 문서 이름 INPUT #####
                            + '입니다.\n\n' +
-                           '📧 생성일자: ' + doc.creation_datetime + '\n' + ##### 문서 생성일자 INPUT #####
-                           '📨 제출일자: ' + doc.submission_datetime + '\n' + ##### 문서 제출일자 INPUT #####
+                           '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
+                           '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
                            '📩 반환일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
         },
         fields = 'name'
     ).execute()
-    name = drive_response.get('name') ##### 문서 이름 + OUTSIDE 클라이언트 성명 OUTPUT #####
-    # 13. 서비스 계정 권한 삭제 writer 2 none
+    name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
+    # 05. 서비스 계정 권한 삭제 writer 2 none
     drive_response = drive_service.permissions().delete(
         fileId = file_id,
         permissionId = permission_id,
     ).execute()
+    doc.return_flag = True
+    doc.save()
+    doc.delete()
     return redirect('box:read', id=doc.box.id)
