@@ -31,8 +31,7 @@
             {% endfor %}
         </div>
         <!-- 열린 문서함 탭 내부 생성하기 버튼 -->
-        {% if user.email == 'management@bluemove.or.kr' %}
-        {% elif perms.auth %}
+        {% if user.profile.level == 'bluemover' %}
         <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
             <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
         </div>

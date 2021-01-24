@@ -4,21 +4,26 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from django.db.models import Q
 import datetime
+import base64
 from .forms import BoxContentForm
 from googleapiclient.discovery import build
 # from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
+from email.mime.text import MIMEText
 from allauth.socialaccount.models import SocialToken, SocialApp, SocialAccount
 from oauth2client.service_account import ServiceAccountCredentials
 from users.models import Profile
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def write(request):
     form = BoxContentForm()
     return render(request, 'box/write.html', {'form': form})
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def create(request):
     if request.method == "POST":
         form = BoxContentForm(request.POST, request.FILES)
@@ -57,13 +62,13 @@ def create_doc(request, id):
             fileId = application_id,
             body = {
                 'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
-                        box.title.replace(" ","") + ##### 문서 이름 INPUT #####
+                        box.title.replace(" ","") + ##### 문서명 INPUT #####
                         request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),
                 'description': '블루무브 닥스에서 생성된 ' +
                             request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                             '님의 ' +
-                            box.title ##### 문서 이름 INPUT #####
+                            box.title ##### 문서명 INPUT #####
                             + '입니다.\n\n' +
                             '📧 생성일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
             },
@@ -293,14 +298,13 @@ def delete(request, id):
 def delete_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
     file_id = doc.file_id
-    # 01. 서비스 계정 Google Drive, Google Docs API 호출
-    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+    # 01. 서비스 계정 Google Drive API 호출
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    docs_service = build('docs', 'v1', credentials=credentials)
     # 02. 문서 삭제
     drive_response = drive_service.files().delete(
         fileId = file_id,
@@ -314,14 +318,22 @@ def submit_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
     file_id = doc.file_id
     outside_permission_id = doc.outside_permission_id
-    # 01. 서비스 계정 Google Drive, Google Docs API 호출
-    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+    INSIDE_CLIENT = doc.box.writer.email
+    user_id = doc.box.writer.email
+    # 01. 서비스 계정 Google Drive, Gmail 호출
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    docs_service = build('docs', 'v1', credentials=credentials)
+    SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+    gmail_credentials = service_account.Credentials.from_service_account_file(
+        'bluemove-docs-6a11a86cda0e.json',
+        scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
+    )
+    credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
+    mail_service = build('gmail', 'v1', credentials = credentials_delegated)
     # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
@@ -341,18 +353,18 @@ def submit_doc(request, doc_id):
             'role': 'reader',
         },
     ).execute()
-    # 04. 문서 이름 및 설명 변경
+    # 04. 문서명 및 설명 변경
     drive_response = drive_service.files().update(
         fileId = file_id,
         body = {
             'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
-                    doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
+                    doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
                     doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                     '_' + datetime.date.today().strftime('%y%m%d'),
             'description': '블루무브 닥스에서 생성된 ' +
                            doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
-                           doc.box.title ##### 문서 이름 INPUT #####
+                           doc.box.title ##### 문서명 INPUT #####
                            + '입니다.\n\n' +
                            '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
                            '📨 제출일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
@@ -383,6 +395,24 @@ def submit_doc(request, doc_id):
             ]
         }
     ).execute()
+    # 07. 메일 생성
+    sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove <' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
+    to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+    subject = doc.box.title + '가 정상적으로 제출되었습니다.' ##### 문서명 INPUT #####
+    message_text = "<h1>블루무브 닥스</h1><p>테스트</p><strong>감사합니다</strong>" ##### 나중에 템플릿 만들어 넣기 #####
+    message = MIMEText(message_text, 'html')
+    message['from'] = sender
+    message['to'] = to
+    message['subject'] = subject
+    message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
+    # 08. 메일 발신
+    message = (
+        mail_service.users().messages().send(
+            userId = user_id,
+            body = message,
+        ).execute()
+    )
+    message_id = message['id']
     doc.name = name
     doc.submission_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.inside_permission_id = inside_permission_id
@@ -398,14 +428,13 @@ def reject_doc(request, doc_id):
     file_id = doc.file_id
     inside_permission_id = doc.inside_permission_id
     outside_permission_id = doc.outside_permission_id
-    # 01. 서비스 계정 Google Drive, Google Docs API 호출
-    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+    # 01. 서비스 계정 Google Drive API 호출
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    docs_service = build('docs', 'v1', credentials=credentials)
     # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
@@ -430,18 +459,18 @@ def reject_doc(request, doc_id):
             'role': 'writer',
         },
     ).execute()
-    # 05. 문서 이름 및 설명 변경
+    # 05. 문서명 및 설명 변경
     drive_response = drive_service.files().update(
         fileId = file_id,
         body = {
             'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
-                    doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
+                    doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
                     doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                     '_' + datetime.date.today().strftime('%y%m%d'),
             'description': '블루무브 닥스에서 생성된 ' +
                            doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
-                           doc.box.title ##### 문서 이름 INPUT #####
+                           doc.box.title ##### 문서명 INPUT #####
                            + '입니다.\n\n' +
                            '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
                            '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
@@ -478,14 +507,13 @@ def return_doc(request, doc_id):
     inside_permission_id = doc.inside_permission_id
     outside_permission_id = doc.outside_permission_id
     permission_id = doc.permission_id
-    # 01. 서비스 계정 Google Drive, Google Docs API 호출
-    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+    # 01. 서비스 계정 Google Drive 호출
+    SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    docs_service = build('docs', 'v1', credentials=credentials)
     # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
@@ -511,18 +539,18 @@ def return_doc(request, doc_id):
             'role': 'owner',
         },
     ).execute()
-    # 05. 문서 이름 및 설명 변경
+    # 05. 문서명 및 설명 변경
     drive_response = drive_service.files().update(
         fileId = file_id,
         body = {
             'name': '블루무브닥스_' + ##### 대분류는 나중에 확정하기(일단 블루무브닥스로 설정) #####
-                    doc.box.title.replace(" ","") + ##### 문서 이름 INPUT #####
+                    doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
                     doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                     '_' + datetime.date.today().strftime('%y%m%d'),
             'description': '블루무브 닥스에서 생성된 ' +
                            doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                            '님의 ' +
-                           doc.box.title ##### 문서 이름 INPUT #####
+                           doc.box.title ##### 문서명 INPUT #####
                            + '입니다.\n\n' +
                            '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
                            '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
@@ -550,6 +578,7 @@ def return_doc(request, doc_id):
     ).execute()
     doc.submit_flag = False
     doc.return_flag = True
+    doc.return_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.outside_permission_id = None
     doc.permission_id = None
     doc.inside_permission_id = None

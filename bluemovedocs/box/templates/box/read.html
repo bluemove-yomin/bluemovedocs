@@ -216,14 +216,14 @@
                             <tr>
                                 <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
                                     <small>
-                                        <a style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
+                                        <a href="#" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
                                     </small>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="p-0 m-0" rowspan="1">
                                     <small>
-                                        <a style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                        <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
                                     </small>
                                 </td>
                             </tr>
@@ -254,14 +254,14 @@
                             <tr>
                                 <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
                                     <small>
-                                        <a style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
+                                        <a href="#" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
                                     </small>
                                 </td>
                             </tr>
                             <tr>
                                 <td class="p-0 m-0">
                                     <small>
-                                        <a style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                        <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
                                     </small>
                                 </td>
                             </tr>
@@ -285,7 +285,7 @@
                                                 <input type="text" class="form-control" name="reject_reason" id="reject_reason" placeholder="반려 사유를 입력하세요." required>
                                                 <div class="invalid-feedback">반려 사유를 입력하세요.</div>
                                             </div>
-                                            문서 반려 시<br>▶ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>▶ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                            문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유는 {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 표시됩니다.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
@@ -312,7 +312,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <span class="hide0303">
-                                        문서 반환 시<br>▶ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>▶ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
+                                        문서 반환 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
                                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 반환하세요.</small>
                                     </span>
                                     <span class="show0202" style="display: none;">
@@ -359,11 +359,12 @@
                 <div class="container-md border rounded px-sm-4 px-3 py-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
-                        <p class="mb-2 text-muted"><i class="fas fa-hand-sparkles"></i> 반환됨</p>
+                        <p class="mb-2 text-muted"><i class="fas fa-share-square"></i> 반환됨</p>
                     </div>
                     <div class="container-md border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem; margin-bottom: .95rem;">
                         <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-asterisk"></i></span><br>
-                        <span style="color: #58595B;">{{ doc.user.last_name }}{{ doc.user.first_name }}님은 이 문서에 대한 반환 기록을 보유하고 있으므로 더 이상 새 문서를 생성할 수 없습니다.</span>
+                        <span style="color: #58595B;">{{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서가 반환되었으며 더 이상 블루무브 닥스에서 액세스할 수 없습니다.</span><br>
+                        <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 반환</small>
                     </div>
                     <div class="container-md d-flex p-0 my-2">
                         <a href="https://drive.google.com/drive/search?q={{ doc.box.title|cut:' ' }}{{ doc.user.last_name }}{{ doc.user.first_name }}" target="_blank" type="button" class="container btn btn-primary">Google 드라이브에서 찾아보기</a>
@@ -460,7 +461,7 @@
                         </div>
                     </div>
                     <div class="container-md d-flex p-0 my-2">
-                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출 결과 대기 중</button>
+                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출 완료</button>
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
@@ -472,7 +473,7 @@
                                     <button type="button" class="btn-close hide02" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <span class="hide03">제출된 문서 삭제 시 제출이 자동 취소되며 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
+                                    <span class="hide03">제출된 문서 삭제 시 제출 포기로 간주되며 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
                                     <span class="show02" style="display: none;">
                                         {{ doc.user.last_name }}{{ doc.user.first_name }}님의 제출 여부를 초기화하고 문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
