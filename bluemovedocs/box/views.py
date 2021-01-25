@@ -260,7 +260,8 @@ def box_favorite(request, id):
         return redirect('box:main')
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def update(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
@@ -276,7 +277,8 @@ def update(request, id):
     return render(request, 'box/update.html', {'box': box, 'form': form})
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
@@ -287,7 +289,8 @@ def updateimage(request, id):
     return render(request, 'box/updateimage.html', {'box': box, 'form': form})
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def delete(request, id):
     box = get_object_or_404(Box, pk=id)
     box.delete()
@@ -298,17 +301,386 @@ def delete(request, id):
 def delete_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
     file_id = doc.file_id
-    # 01. 서비스 계정 Google Drive API 호출
+    # 01. 서비스 계정 Google Drive, Gmail API 호출
     SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
+    INSIDE_CLIENT = doc.box.writer.email
+    user_id = doc.box.writer.email
+    SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+    gmail_credentials = service_account.Credentials.from_service_account_file(
+        'bluemove-docs-6a11a86cda0e.json',
+        scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
+    )
+    credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
+    mail_service = build('gmail', 'v1', credentials = credentials_delegated)
     # 02. 문서 삭제
     drive_response = drive_service.files().delete(
         fileId = file_id,
     ).execute()
+    if doc.submit_flag == True:
+        # 03. 메일 생성
+        sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
+        to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+        subject = doc.user.last_name + doc.user.first_name + '님의 문서가 삭제 및 접수 취소되었습니다.' ##### 문서명 INPUT #####
+        message_text = \
+            """
+            <!doctype html>
+            <html
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:v="urn:schemas-microsoft-com:vml"
+                xmlns:o="urn:schemas-microsoft-com:office:office">
+                <head>
+                    <!-- NAME: 1 COLUMN -->
+                    <!--[if gte mso 15]> <xml> <o:OfficeDocumentSettings> <o:AllowPNG/>
+                    <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
+                    <![endif]-->
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <title>블루무브 닥스 - """ + doc.user.last_name + doc.user.first_name + """님의 문서가 삭제 및 접수 취소되었습니다.</title>
+                </head>
+                <body>
+                    <center>
+                        <table
+                            align="center"
+                            border="0"
+                            cellpadding="0"
+                            cellspacing="0"
+                            height="100%"
+                            width="100%"
+                            id="bodyTable">
+                            <tr>
+                                <td align="center" valign="top" id="bodyCell">
+                                    <!-- BEGIN TEMPLATE // -->
+                                    <table align="center" border="0" cellspacing="0"
+                                    cellpadding="0" width="600" style="width:600px;"> <tr> <td align="center"
+                                    valign="top" width="600" style="width:600px;">
+                                    <table
+                                        border="0"
+                                        cellpadding="0"
+                                        cellspacing="0"
+                                        width="100%"
+                                        class="templateContainer">
+                                        <tr>
+                                            <td valign="top" id="templatePreheader"></td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" id="templateHeader">
+                                                <table
+                                                    border="0"
+                                                    cellpadding="0"
+                                                    cellspacing="0"
+                                                    width="100%"
+                                                    class="mcnImageBlock"
+                                                    style="min-width:100%;">
+                                                    <tbody class="mcnImageBlockOuter">
+                                                        <tr>
+                                                            <td valign="top" style="padding:9px" class="mcnImageBlockInner">
+                                                                <table
+                                                                    align="left"
+                                                                    width="100%"
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    class="mcnImageContentContainer"
+                                                                    style="min-width:100%;">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td
+                                                                                class="mcnImageContent"
+                                                                                valign="top"
+                                                                                style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
+                                                                                <img
+                                                                                    align="left"
+                                                                                    src="https://mcusercontent.com/8e85249d3fe980e2482c148b1/images/725d4688-6ae7-4f5d-8891-9c0796a9ebf4.png"
+                                                                                    width="110"
+                                                                                    style="max-width:1000px; padding-bottom: 0; display: inline !important; vertical-align: bottom;"
+                                                                                    class="mcnRetinaImage">
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" id="templateBody">
+                                                <table
+                                                    border="0"
+                                                    cellpadding="0"
+                                                    cellspacing="0"
+                                                    width="100%"
+                                                    class="mcnTextBlock"
+                                                    style="min-width:100%;">
+                                                    <tbody class="mcnTextBlockOuter">
+                                                        <tr>
+                                                            <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                                <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                                width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                                <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                                <table
+                                                                    align="left"
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    style="max-width:100%; min-width:100%;"
+                                                                    width="100%"
+                                                                    class="mcnTextContentContainer">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td
+                                                                                valign="top"
+                                                                                class="mcnTextContent"
+                                                                                style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+                                                                                <h1>""" + doc.user.last_name + doc.user.first_name + """님의 문서가 삭제 및 접수 취소되었습니다.</h1>
+                                                                                <p>안녕하세요, 블루무브 """ + doc.box.writer.last_name + doc.box.writer.first_name + """입니다.<br>
+                                                                                    """ + doc.user.last_name + doc.user.first_name + """님의 문서가 아래와 같이 삭제 및 접수 취소되었습니다.</p>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <!--[if mso]> </td> <![endif]-->
+
+                                                                <!--[if mso]> </tr> </table> <![endif]-->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                                <table
+                                                    border="0"
+                                                    cellpadding="0"
+                                                    cellspacing="0"
+                                                    width="100%"
+                                                    class="mcnBoxedTextBlock"
+                                                    style="min-width:100%;">
+                                                    <!--[if gte mso 9]> <table align="center" border="0" cellspacing="0"
+                                                    cellpadding="0" width="100%"> <![endif]-->
+                                                    <tbody class="mcnBoxedTextBlockOuter">
+                                                        <tr>
+                                                            <td valign="top" class="mcnBoxedTextBlockInner">
+
+                                                                <!--[if gte mso 9]> <td align="center" valign="top" "> <![endif]-->
+                                                                <table
+                                                                    align="left"
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    width="100%"
+                                                                    style="min-width:100%;"
+                                                                    class="mcnBoxedTextContentContainer">
+                                                                    <tbody>
+                                                                        <tr>
+
+                                                                            <td
+                                                                                style="padding-top:9px; padding-left:18px; padding-bottom:9px; padding-right:18px;">
+
+                                                                                <table
+                                                                                    border="0"
+                                                                                    cellspacing="0"
+                                                                                    class="mcnTextContentContainer"
+                                                                                    width="100%"
+                                                                                    style="min-width: 100% !important;background-color: #F7F7F7;">
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td
+                                                                                                valign="top"
+                                                                                                class="mcnTextContent"
+                                                                                                style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
+                                                                                                <strong style="color:#222222;">문서명</strong>: """ + doc.box.title + """<br>
+                                                                                                <strong style="color:#222222;">Google 계정</strong>: """ + doc.user.email + """<br>
+                                                                                                <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
+                                                                                                <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """<br>
+                                                                                                <strong style="color:#222222;">삭제일자</strong>(접수 취소일자): """ + datetime.date.today().strftime('%Y-%m-%d') + """
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <!--[if gte mso 9]> </td> <![endif]-->
+
+                                                                <!--[if gte mso 9]> </tr> </table> <![endif]-->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table
+                                                    border="0"
+                                                    cellpadding="0"
+                                                    cellspacing="0"
+                                                    width="100%"
+                                                    class="mcnTextBlock"
+                                                    style="min-width:100%;">
+                                                    <tbody class="mcnTextBlockOuter">
+                                                        <tr>
+                                                            <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                                <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                                width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                                <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                                <table
+                                                                    align="left"
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    style="max-width:100%; min-width:100%;"
+                                                                    width="100%"
+                                                                    class="mcnTextContentContainer">
+                                                                    <tbody>
+                                                                        <tr>
+
+                                                                            <td
+                                                                                valign="top"
+                                                                                class="mcnTextContent"
+                                                                                style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+
+                                                                                """ + doc.user.last_name + doc.user.first_name + """님의 요청에 의해 이미 접수된 문서가 삭제되어 자동으로 접수 취소되었습니다.<br>
+                                                                                다시 제출하시려면 새 문서를 생성하시기 바랍니다.<br>
+                                                                                감사합니다.<br><br>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <!--[if mso]> </td> <![endif]-->
+
+                                                                <!--[if mso]> </tr> </table> <![endif]-->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <table
+                                                    border="0"
+                                                    cellpadding="0"
+                                                    cellspacing="0"
+                                                    width="100%"
+                                                    class="mcnButtonBlock"
+                                                    style="min-width:100%;">
+                                                    <tbody class="mcnButtonBlockOuter">
+                                                        <tr>
+                                                            <td
+                                                                style="padding-top:0; padding-right:18px; padding-bottom:18px; padding-left:18px;"
+                                                                valign="top"
+                                                                align="center"
+                                                                class="mcnButtonBlockInner">
+                                                                <a
+                                                                    href="http://127.0.0.1:8000/"
+                                                                    target="_blank"
+                                                                    style="text-decoration:none;">
+                                                                    <table
+                                                                        border="0"
+                                                                        cellpadding="0"
+                                                                        cellspacing="0"
+                                                                        width="100%"
+                                                                        class="mcnButtonContentContainer"
+                                                                        style="border-collapse: separate !important;border-radius: 4px;background-color: #007DC5;">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td
+                                                                                    align="center"
+                                                                                    valign="middle"
+                                                                                    class="mcnButtonContent"
+                                                                                    style="font-family: Arial; font-size: 16px; padding-left: 12px; padding-top: 8px; padding-bottom: 8px; padding-right: 12px;">
+                                                                                    <a
+                                                                                        class="mcnButton"
+                                                                                        title="블루무브 닥스 열기"
+                                                                                        href="http://127.0.0.1:8000/"
+                                                                                        target="_blank"
+                                                                                        style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 열기</a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" id="templateFooter">
+                                                <table
+                                                    border="0"
+                                                    cellpadding="0"
+                                                    cellspacing="0"
+                                                    width="100%"
+                                                    class="mcnTextBlock"
+                                                    style="min-width:100%;">
+                                                    <tbody class="mcnTextBlockOuter">
+                                                        <tr>
+                                                            <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                                <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                                width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                                <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                                <table
+                                                                    align="left"
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    style="max-width:100%; min-width:100%;"
+                                                                    width="100%"
+                                                                    class="mcnTextContentContainer">
+                                                                    <tbody>
+                                                                        <tr>
+
+                                                                            <td
+                                                                                valign="top"
+                                                                                class="mcnTextContent"
+                                                                                style="padding: 0px 18px 9px; text-align: left;">
+                                                                                <hr style="border:0;height:.5px;background-color:#EEEEEE;">
+                                                                                <small style="color: #58595B;">
+                                                                                    이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                    ⓒ 파란물결 블루무브
+                                                                                </small>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                                <!--[if mso]> </td> <![endif]-->
+
+                                                                <!--[if mso]> </tr> </table> <![endif]-->
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    </td> </tr> </table>
+                                    <!-- // END TEMPLATE -->
+                                </td>
+                            </tr>
+                        </table>
+                    </center>
+                </body>
+            </html>
+            """
+        message = MIMEText(message_text, 'html')
+        message['from'] = sender
+        message['to'] = to
+        message['subject'] = subject
+        message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
+        # 04. 메일 발신
+        message = (
+            mail_service.users().messages().send(
+                userId = user_id,
+                body = message,
+            ).execute()
+        )
+        # message_id = message['id']
+    # 05. 문서 데이터 DB 반영
     doc.delete()
     return redirect('box:read', id=doc.box.id)
 
@@ -318,15 +690,15 @@ def submit_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
     file_id = doc.file_id
     outside_permission_id = doc.outside_permission_id
-    INSIDE_CLIENT = doc.box.writer.email
-    user_id = doc.box.writer.email
-    # 01. 서비스 계정 Google Drive, Gmail 호출
+    # 01. 서비스 계정 Google Drive, Gmail API 호출
     SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
+    INSIDE_CLIENT = doc.box.writer.email
+    user_id = doc.box.writer.email
     SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
     gmail_credentials = service_account.Credentials.from_service_account_file(
         'bluemove-docs-6a11a86cda0e.json',
@@ -395,46 +767,396 @@ def submit_doc(request, doc_id):
             ]
         }
     ).execute()
-    # 07. 메일 생성
-    sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove <' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
-    to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
-    subject = doc.box.title + '가 정상적으로 제출되었습니다.' ##### 문서명 INPUT #####
-    message_text = "<h1>블루무브 닥스</h1><p>테스트</p><strong>감사합니다</strong>" ##### 나중에 템플릿 만들어 넣기 #####
-    message = MIMEText(message_text, 'html')
-    message['from'] = sender
-    message['to'] = to
-    message['subject'] = subject
-    message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-    # 08. 메일 발신
-    message = (
-        mail_service.users().messages().send(
-            userId = user_id,
-            body = message,
-        ).execute()
-    )
-    message_id = message['id']
+    # 07. 문서 데이터 DB 반영
     doc.name = name
     doc.submission_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.inside_permission_id = inside_permission_id
     doc.submit_flag = True
     doc.reject_flag = False
     doc.save()
+    # 08. 메일 생성
+    sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
+    to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+    subject = doc.user.last_name + doc.user.first_name + '님의 문서가 접수되었습니다.' ##### 문서명 INPUT #####
+    message_text = \
+        """
+        <!doctype html>
+        <html
+            xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:v="urn:schemas-microsoft-com:vml"
+            xmlns:o="urn:schemas-microsoft-com:office:office">
+            <head>
+                <!-- NAME: 1 COLUMN -->
+                <!--[if gte mso 15]> <xml> <o:OfficeDocumentSettings> <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
+                <![endif]-->
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>블루무브 닥스 - """ + doc.user.last_name + doc.user.first_name + """님의 문서가 접수되었습니다.</title>
+            </head>
+            <body>
+                <center>
+                    <table
+                        align="center"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        height="100%"
+                        width="100%"
+                        id="bodyTable">
+                        <tr>
+                            <td align="center" valign="top" id="bodyCell">
+                                <!-- BEGIN TEMPLATE // -->
+                                <table align="center" border="0" cellspacing="0"
+                                cellpadding="0" width="600" style="width:600px;"> <tr> <td align="center"
+                                valign="top" width="600" style="width:600px;">
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    class="templateContainer">
+                                    <tr>
+                                        <td valign="top" id="templatePreheader"></td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateHeader">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnImageBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnImageBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" style="padding:9px" class="mcnImageBlockInner">
+                                                            <table
+                                                                align="left"
+                                                                width="100%"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                class="mcnImageContentContainer"
+                                                                style="min-width:100%;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td
+                                                                            class="mcnImageContent"
+                                                                            valign="top"
+                                                                            style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
+                                                                            <img
+                                                                                align="left"
+                                                                                src="https://mcusercontent.com/8e85249d3fe980e2482c148b1/images/725d4688-6ae7-4f5d-8891-9c0796a9ebf4.png"
+                                                                                width="110"
+                                                                                style="max-width:1000px; padding-bottom: 0; display: inline !important; vertical-align: bottom;"
+                                                                                class="mcnRetinaImage">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateBody">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+                                                                            <h1>""" + doc.user.last_name + doc.user.first_name + """님의 문서가 접수되었습니다.</h1>
+                                                                            <p>안녕하세요, 블루무브 """ + doc.box.writer.last_name + doc.box.writer.first_name + """입니다.<br>
+                                                                                """ + doc.user.last_name + doc.user.first_name + """님의 문서가 아래와 같이 접수되었습니다.</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnBoxedTextBlock"
+                                                style="min-width:100%;">
+                                                <!--[if gte mso 9]> <table align="center" border="0" cellspacing="0"
+                                                cellpadding="0" width="100%"> <![endif]-->
+                                                <tbody class="mcnBoxedTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnBoxedTextBlockInner">
+
+                                                            <!--[if gte mso 9]> <td align="center" valign="top" "> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                width="100%"
+                                                                style="min-width:100%;"
+                                                                class="mcnBoxedTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            style="padding-top:9px; padding-left:18px; padding-bottom:9px; padding-right:18px;">
+
+                                                                            <table
+                                                                                border="0"
+                                                                                cellspacing="0"
+                                                                                class="mcnTextContentContainer"
+                                                                                width="100%"
+                                                                                style="min-width: 100% !important;background-color: #F7F7F7;">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            valign="top"
+                                                                                            class="mcnTextContent"
+                                                                                            style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
+                                                                                            <strong style="color:#222222;">문서명</strong>: """ + doc.box.title + """<br>
+                                                                                            <strong style="color:#222222;">Google 계정</strong>: """ + doc.user.email + """<br>
+                                                                                            <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
+                                                                                            <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if gte mso 9]> </td> <![endif]-->
+
+                                                            <!--[if gte mso 9]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+
+                                                                            블루무브 닥스 문서함에서 문서를 조회하거나 삭제할 수 있습니다.<br>
+                                                                            문서 검토가 완료되면 다시 연락드리겠습니다.<br>
+                                                                            감사합니다.<br><br>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnButtonBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnButtonBlockOuter">
+                                                    <tr>
+                                                        <td
+                                                            style="padding-top:0; padding-right:18px; padding-bottom:18px; padding-left:18px;"
+                                                            valign="top"
+                                                            align="center"
+                                                            class="mcnButtonBlockInner">
+                                                            <a
+                                                                href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                target="_blank"
+                                                                style="text-decoration:none;">
+                                                                <table
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    width="100%"
+                                                                    class="mcnButtonContentContainer"
+                                                                    style="border-collapse: separate !important;border-radius: 4px;background-color: #007DC5;">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td
+                                                                                align="center"
+                                                                                valign="middle"
+                                                                                class="mcnButtonContent"
+                                                                                style="font-family: Arial; font-size: 16px; padding-left: 12px; padding-top: 8px; padding-bottom: 8px; padding-right: 12px;">
+                                                                                <a
+                                                                                    class="mcnButton"
+                                                                                    title="블루무브 닥스 문서함 열기"
+                                                                                    href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                                    target="_blank"
+                                                                                    style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateFooter">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding: 0px 18px 9px; text-align: left;">
+                                                                            <hr style="border:0;height:.5px;background-color:#EEEEEE;">
+                                                                            <small style="color: #58595B;">
+                                                                                이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                ⓒ 파란물결 블루무브
+                                                                            </small>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                </td> </tr> </table>
+                                <!-- // END TEMPLATE -->
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </body>
+        </html>
+        """
+    message = MIMEText(message_text, 'html')
+    message['from'] = sender
+    message['to'] = to
+    message['subject'] = subject
+    message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
+    # 09. 메일 발신
+    message = (
+        mail_service.users().messages().send(
+            userId = user_id,
+            body = message,
+        ).execute()
+    )
+    # message_id = message['id']
     return redirect('box:read', id=doc.box.id)
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def reject_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
     file_id = doc.file_id
     inside_permission_id = doc.inside_permission_id
     outside_permission_id = doc.outside_permission_id
-    # 01. 서비스 계정 Google Drive API 호출
+    # 01. 서비스 계정 Google Drive, Gmail API 호출
     SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
+    INSIDE_CLIENT = doc.box.writer.email
+    user_id = doc.box.writer.email
+    SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+    gmail_credentials = service_account.Credentials.from_service_account_file(
+        'bluemove-docs-6a11a86cda0e.json',
+        scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
+    )
+    credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
+    mail_service = build('gmail', 'v1', credentials = credentials_delegated)
     # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
@@ -491,29 +1213,399 @@ def reject_doc(request, doc_id):
             ]
         }
     ).execute()
+    # 07. 문서 데이터 DB 반영
     doc.name = name
     doc.submit_flag = False
     doc.reject_flag = True
     doc.reject_reason = request.POST.get('reject_reason')
     doc.rejection_date = datetime.date.today().strftime('%Y-%m-%d')
     doc.save()
+    # 08. 메일 생성
+    sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
+    to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+    subject = doc.user.last_name + doc.user.first_name + '님의 문서가 반려되었습니다.' ##### 문서명 INPUT #####
+    message_text = \
+        """
+        <!doctype html>
+        <html
+            xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:v="urn:schemas-microsoft-com:vml"
+            xmlns:o="urn:schemas-microsoft-com:office:office">
+            <head>
+                <!-- NAME: 1 COLUMN -->
+                <!--[if gte mso 15]> <xml> <o:OfficeDocumentSettings> <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
+                <![endif]-->
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>블루무브 닥스 - """ + doc.user.last_name + doc.user.first_name + """님의 문서가 반려되었습니다.</title>
+            </head>
+            <body>
+                <center>
+                    <table
+                        align="center"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        height="100%"
+                        width="100%"
+                        id="bodyTable">
+                        <tr>
+                            <td align="center" valign="top" id="bodyCell">
+                                <!-- BEGIN TEMPLATE // -->
+                                <table align="center" border="0" cellspacing="0"
+                                cellpadding="0" width="600" style="width:600px;"> <tr> <td align="center"
+                                valign="top" width="600" style="width:600px;">
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    class="templateContainer">
+                                    <tr>
+                                        <td valign="top" id="templatePreheader"></td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateHeader">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnImageBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnImageBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" style="padding:9px" class="mcnImageBlockInner">
+                                                            <table
+                                                                align="left"
+                                                                width="100%"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                class="mcnImageContentContainer"
+                                                                style="min-width:100%;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td
+                                                                            class="mcnImageContent"
+                                                                            valign="top"
+                                                                            style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
+                                                                            <img
+                                                                                align="left"
+                                                                                src="https://mcusercontent.com/8e85249d3fe980e2482c148b1/images/725d4688-6ae7-4f5d-8891-9c0796a9ebf4.png"
+                                                                                width="110"
+                                                                                style="max-width:1000px; padding-bottom: 0; display: inline !important; vertical-align: bottom;"
+                                                                                class="mcnRetinaImage">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateBody">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+                                                                            <h1>""" + doc.user.last_name + doc.user.first_name + """님의 문서가 반려되었습니다.</h1>
+                                                                            <p>안녕하세요, 블루무브 """ + doc.box.writer.last_name + doc.box.writer.first_name + """입니다.<br>
+                                                                                """ + doc.user.last_name + doc.user.first_name + """님의 문서가 아래와 같이 반려되었습니다.</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnBoxedTextBlock"
+                                                style="min-width:100%;">
+                                                <!--[if gte mso 9]> <table align="center" border="0" cellspacing="0"
+                                                cellpadding="0" width="100%"> <![endif]-->
+                                                <tbody class="mcnBoxedTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnBoxedTextBlockInner">
+
+                                                            <!--[if gte mso 9]> <td align="center" valign="top" "> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                width="100%"
+                                                                style="min-width:100%;"
+                                                                class="mcnBoxedTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            style="padding-top:9px; padding-left:18px; padding-bottom:9px; padding-right:18px;">
+
+                                                                            <table
+                                                                                border="0"
+                                                                                cellspacing="0"
+                                                                                class="mcnTextContentContainer"
+                                                                                width="100%"
+                                                                                style="min-width: 100% !important;background-color: #F7F7F7;">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            valign="top"
+                                                                                            class="mcnTextContent"
+                                                                                            style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
+                                                                                            <strong style="color:#222222;">문서명</strong>: """ + doc.box.title + """<br>
+                                                                                            <strong style="color:#222222;">Google 계정</strong>: """ + doc.user.email + """<br>
+                                                                                            <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
+                                                                                            <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """<br>
+                                                                                            <strong style="color:#222222;">반려일자</strong>: """ + doc.rejection_date + """<br>
+                                                                                            <strong style="color:#222222;">반려 사유</strong>: """ + doc.reject_reason + """
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if gte mso 9]> </td> <![endif]-->
+
+                                                            <!--[if gte mso 9]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+
+                                                                            블루무브 닥스 문서함에서 문서를 수정하거나 삭제할 수 있습니다.<br>
+                                                                            반려 사유를 해소하여 기한 """ + doc.box.deadline.strftime('%Y-%m-%d') + """ 내 다시 제출해주시기 바랍니다.<br>
+                                                                            감사합니다.<br><br>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnButtonBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnButtonBlockOuter">
+                                                    <tr>
+                                                        <td
+                                                            style="padding-top:0; padding-right:18px; padding-bottom:18px; padding-left:18px;"
+                                                            valign="top"
+                                                            align="center"
+                                                            class="mcnButtonBlockInner">
+                                                            <a
+                                                                href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                target="_blank"
+                                                                style="text-decoration:none;">
+                                                                <table
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    width="100%"
+                                                                    class="mcnButtonContentContainer"
+                                                                    style="border-collapse: separate !important;border-radius: 4px;background-color: #007DC5;">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td
+                                                                                align="center"
+                                                                                valign="middle"
+                                                                                class="mcnButtonContent"
+                                                                                style="font-family: Arial; font-size: 16px; padding-left: 12px; padding-top: 8px; padding-bottom: 8px; padding-right: 12px;">
+                                                                                <a
+                                                                                    class="mcnButton"
+                                                                                    title="블루무브 닥스 문서함 열기"
+                                                                                    href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                                    target="_blank"
+                                                                                    style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateFooter">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding: 0px 18px 9px; text-align: left;">
+                                                                            <hr style="border:0;height:.5px;background-color:#EEEEEE;">
+                                                                            <small style="color: #58595B;">
+                                                                                이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                ⓒ 파란물결 블루무브
+                                                                            </small>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                </td> </tr> </table>
+                                <!-- // END TEMPLATE -->
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </body>
+        </html>
+        """
+    message = MIMEText(message_text, 'html')
+    message['from'] = sender
+    message['to'] = to
+    message['subject'] = subject
+    message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
+    # 09. 메일 발신
+    message = (
+        mail_service.users().messages().send(
+            userId = user_id,
+            body = message,
+        ).execute()
+    )
+    # message_id = message['id']
     return redirect('box:read', id=doc.box.id)
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+@login_required
+# @permission_required('auth.add_permission', raise_exception=True)
 def return_doc(request, doc_id):
     doc = get_object_or_404(Doc, pk=doc_id)
     file_id = doc.file_id
     inside_permission_id = doc.inside_permission_id
     outside_permission_id = doc.outside_permission_id
     permission_id = doc.permission_id
-    # 01. 서비스 계정 Google Drive 호출
+    # 01. 서비스 계정 Google Drive, Gmail API 호출
     SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
         'bluemove-docs-6a11a86cda0e.json',
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
+    INSIDE_CLIENT = doc.box.writer.email
+    user_id = doc.box.writer.email
+    SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+    gmail_credentials = service_account.Credentials.from_service_account_file(
+        'bluemove-docs-6a11a86cda0e.json',
+        scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
+    )
+    credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
+    mail_service = build('gmail', 'v1', credentials = credentials_delegated)
     # 02. 문서 잠금 해제
     drive_response = drive_service.files().update(
         fileId=file_id,
@@ -576,6 +1668,7 @@ def return_doc(request, doc_id):
         fileId = file_id,
         permissionId = permission_id,
     ).execute()
+    # 08. 문서 데이터 DB 반영
     doc.submit_flag = False
     doc.return_flag = True
     doc.return_date = datetime.date.today().strftime('%Y-%m-%d')
@@ -583,4 +1676,362 @@ def return_doc(request, doc_id):
     doc.permission_id = None
     doc.inside_permission_id = None
     doc.save()
+    # 09. 메일 생성
+    sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
+    to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+    subject = doc.user.last_name + doc.user.first_name + '님의 문서가 반환되었습니다.' ##### 문서명 INPUT #####
+    message_text = \
+        """
+        <!doctype html>
+        <html
+            xmlns="http://www.w3.org/1999/xhtml"
+            xmlns:v="urn:schemas-microsoft-com:vml"
+            xmlns:o="urn:schemas-microsoft-com:office:office">
+            <head>
+                <!-- NAME: 1 COLUMN -->
+                <!--[if gte mso 15]> <xml> <o:OfficeDocumentSettings> <o:AllowPNG/>
+                <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings> </xml>
+                <![endif]-->
+                <meta charset="UTF-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <title>블루무브 닥스 - """ + doc.user.last_name + doc.user.first_name + """님의 문서가 반환되었습니다.</title>
+            </head>
+            <body>
+                <center>
+                    <table
+                        align="center"
+                        border="0"
+                        cellpadding="0"
+                        cellspacing="0"
+                        height="100%"
+                        width="100%"
+                        id="bodyTable">
+                        <tr>
+                            <td align="center" valign="top" id="bodyCell">
+                                <!-- BEGIN TEMPLATE // -->
+                                <table align="center" border="0" cellspacing="0"
+                                cellpadding="0" width="600" style="width:600px;"> <tr> <td align="center"
+                                valign="top" width="600" style="width:600px;">
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    width="100%"
+                                    class="templateContainer">
+                                    <tr>
+                                        <td valign="top" id="templatePreheader"></td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateHeader">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnImageBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnImageBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" style="padding:9px" class="mcnImageBlockInner">
+                                                            <table
+                                                                align="left"
+                                                                width="100%"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                class="mcnImageContentContainer"
+                                                                style="min-width:100%;">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td
+                                                                            class="mcnImageContent"
+                                                                            valign="top"
+                                                                            style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0;">
+                                                                            <img
+                                                                                align="left"
+                                                                                src="https://mcusercontent.com/8e85249d3fe980e2482c148b1/images/725d4688-6ae7-4f5d-8891-9c0796a9ebf4.png"
+                                                                                width="110"
+                                                                                style="max-width:1000px; padding-bottom: 0; display: inline !important; vertical-align: bottom;"
+                                                                                class="mcnRetinaImage">
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateBody">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+                                                                            <h1>""" + doc.user.last_name + doc.user.first_name + """님의 문서가 반환되었습니다.</h1>
+                                                                            <p>안녕하세요, 블루무브 """ + doc.box.writer.last_name + doc.box.writer.first_name + """입니다.<br>
+                                                                                """ + doc.user.last_name + doc.user.first_name + """님의 문서가 아래와 같이 반환되었습니다.</p>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnBoxedTextBlock"
+                                                style="min-width:100%;">
+                                                <!--[if gte mso 9]> <table align="center" border="0" cellspacing="0"
+                                                cellpadding="0" width="100%"> <![endif]-->
+                                                <tbody class="mcnBoxedTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnBoxedTextBlockInner">
+
+                                                            <!--[if gte mso 9]> <td align="center" valign="top" "> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                width="100%"
+                                                                style="min-width:100%;"
+                                                                class="mcnBoxedTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            style="padding-top:9px; padding-left:18px; padding-bottom:9px; padding-right:18px;">
+
+                                                                            <table
+                                                                                border="0"
+                                                                                cellspacing="0"
+                                                                                class="mcnTextContentContainer"
+                                                                                width="100%"
+                                                                                style="min-width: 100% !important;background-color: #F7F7F7;">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td
+                                                                                            valign="top"
+                                                                                            class="mcnTextContent"
+                                                                                            style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
+                                                                                            <strong style="color:#222222;">문서명</strong>: """ + doc.box.title + """<br>
+                                                                                            <strong style="color:#222222;">Google 계정</strong>: """ + doc.user.email + """<br>
+                                                                                            <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
+                                                                                            <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """<br>
+                                                                                            <strong style="color:#222222;">반환일자</strong>: """ + doc.return_date + """
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if gte mso 9]> </td> <![endif]-->
+
+                                                            <!--[if gte mso 9]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
+
+                                                                            문서 소유 권한이 """ + doc.user.last_name + doc.user.first_name + """님에게 이전되어 더 이상 블루무브 닥스에서 이 문서에 액세스할 수 없습니다.<br>
+                                                                            Google 드라이브에서 문서명을 검색하거나 '<a href="https://drive.google.com/drive/recent" style="color:#007DC5;">최근 문서함</a>'을 확인하시기 바랍니다.<br>
+                                                                            감사합니다.<br><br>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnButtonBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnButtonBlockOuter">
+                                                    <tr>
+                                                        <td
+                                                            style="padding-top:0; padding-right:18px; padding-bottom:18px; padding-left:18px;"
+                                                            valign="top"
+                                                            align="center"
+                                                            class="mcnButtonBlockInner">
+                                                            <a
+                                                                href="https://drive.google.com/drive/search?q=""" + doc.box.title.replace(' ', '') + doc.user.last_name + doc.user.first_name + """"
+                                                                target="_blank"
+                                                                style="text-decoration:none;">
+                                                                <table
+                                                                    border="0"
+                                                                    cellpadding="0"
+                                                                    cellspacing="0"
+                                                                    width="100%"
+                                                                    class="mcnButtonContentContainer"
+                                                                    style="border-collapse: separate !important;border-radius: 4px;background-color: #007DC5;">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td
+                                                                                align="center"
+                                                                                valign="middle"
+                                                                                class="mcnButtonContent"
+                                                                                style="font-family: Arial; font-size: 16px; padding-left: 12px; padding-top: 8px; padding-bottom: 8px; padding-right: 12px;">
+                                                                                <a
+                                                                                    class="mcnButton"
+                                                                                    title="Google 드라이브에서 찾아보기"
+                                                                                    href="https://drive.google.com/drive/search?q=""" + doc.box.title.replace(' ', '') + doc.user.last_name + doc.user.first_name + """"
+                                                                                    target="_blank"
+                                                                                    style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Google 드라이브에서 찾아보기</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top" id="templateFooter">
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                width="100%"
+                                                class="mcnTextBlock"
+                                                style="min-width:100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top:9px;">
+                                                            <!--[if mso]> <table align="left" border="0" cellspacing="0" cellpadding="0"
+                                                            width="100%" style="width:100%;"> <tr> <![endif]-->
+
+                                                            <!--[if mso]> <td valign="top" width="600" style="width:600px;"> <![endif]-->
+                                                            <table
+                                                                align="left"
+                                                                border="0"
+                                                                cellpadding="0"
+                                                                cellspacing="0"
+                                                                style="max-width:100%; min-width:100%;"
+                                                                width="100%"
+                                                                class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding: 0px 18px 9px; text-align: left;">
+                                                                            <hr style="border:0;height:.5px;background-color:#EEEEEE;">
+                                                                            <small style="color: #58595B;">
+                                                                                이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                ⓒ 파란물결 블루무브
+                                                                            </small>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <!--[if mso]> </td> <![endif]-->
+
+                                                            <!--[if mso]> </tr> </table> <![endif]-->
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                                </td> </tr> </table>
+                                <!-- // END TEMPLATE -->
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </body>
+        </html>
+        """
+    message = MIMEText(message_text, 'html')
+    message['from'] = sender
+    message['to'] = to
+    message['subject'] = subject
+    message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
+    # 10. 메일 발신
+    message = (
+        mail_service.users().messages().send(
+            userId = user_id,
+            body = message,
+        ).execute()
+    )
+    # message_id = message['id']
     return redirect('box:read', id=doc.box.id)

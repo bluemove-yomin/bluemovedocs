@@ -70,7 +70,13 @@ def gmailTest():
     sender = 'Sangjun at Bluemove <' + 'Sangjun@bluemove.or.kr' + '>' ##### 나중에 doc.box.writer.email'로 바꾸기 #####
     to = 'ssongyo@gmail.com' ##### 나중에 doc.user.email로 바꾸기 #####
     subject = 'OOO가 정상적으로 제출되었습니다.' ##### 나중에 문서명 채워넣기 #####
-    message_text = "<h1>테스트</h1><p>테스트</p><strong>감사합니다</strong>" ##### 나중에 템플릿 만들어 넣기 #####
+    message_text =\
+    """
+    <h1>테스트</h1>
+    <p>테스트</p>
+    <strong>감사합니다</strong>
+    """
+    ##### 나중에 템플릿 만들어 넣기 #####
     message = MIMEText(message_text, 'html')
     message['from'] = sender
     message['to'] = to
