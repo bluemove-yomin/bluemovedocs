@@ -16,4 +16,5 @@ urlpatterns = [
     path('submit_doc/<int:doc_id>/', submit_doc, name='submit_doc'),
     path('reject_doc/<int:doc_id>/', reject_doc, name='reject_doc'),
     path('return_doc/<int:doc_id>/', return_doc, name='return_doc'),
+    path('return_before_submit_doc/<int:doc_id>/', return_before_submit_doc, name='return_before_submit_doc'),
 ]
