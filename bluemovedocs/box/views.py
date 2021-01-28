@@ -686,56 +686,105 @@ def delete_doc(request, doc_id):
             ).execute()
         )
         # message_id = message['id']
-    # 05. 슬랙 메시지 발신
-    client = WebClient(token="TOKEN_VALUE")
-    client.chat_postMessage(
-        channel=doc.box.channel_id,
-        link_names=True,
-        blocks=[
-            {
-                "type": "header",
-                "text": {
-                    "type": "plain_text",
-                    "text": "💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하였습니다.\n더 이상 이 문서에 액세스할 수 없습니다.\n\n~*" + doc.name + "*~"
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "*문서명:*\n" + doc.box.title + "\n\n*Google 계정:*\n" +  doc.user.email + "\n\n*제출일자:*\n" +  doc.submission_date + "\n\n*접수 취소일자:*\n" + datetime.date.today().strftime('%Y-%m-%d')
-                },
-                "accessory": {
-                    "type": "image",
-                    "image_url": doc.avatar_src,
-                    "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                }
-            },
-            {
-                "type": "actions",
-                "elements": [
-                    {
-                        "type": "button",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "문서함 열기"
-                        },
-                        "value": "open_box",
-                        "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+        # 05. 슬랙 메시지 수정
+        client = WebClient(token="VALUE")
+        client.chat_update(
+            channel=doc.box.channel_id,
+            link_names=True,
+            ts=doc.slack_ts,
+            blocks=[
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
                     }
-                ]
-            }
-        ],
-        text=f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
-    )
-    # 06. 문서 데이터 DB 반영
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트: `*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*~문서명:~*\n~" + doc.box.title + "~\n\n*~Google 계정:~*\n~" +  doc.user.email + "~\n\n*~제출일자:~*\n~" + doc.submission_date + "~"
+                    },
+                    "accessory": {
+                        "type": "image",
+                        "image_url": doc.avatar_src,
+                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                    }
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "문서함 열기"
+                            },
+                            "value": "open_box",
+                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                        }
+                    ]
+                }
+            ],
+            text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
+        )
+        # 06. 슬랙 메시지 발신
+        client.chat_postMessage(
+            channel=doc.box.channel_id,
+            link_names=True,
+            blocks=[
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하였습니다.\n더 이상 이 문서에 액세스할 수 없습니다.\n\n*" + doc.name + "*"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*문서명:*\n" + doc.box.title + "\n\n*Google 계정:*\n" +  doc.user.email + "\n\n*제출일자:*\n" +  doc.submission_date + "\n\n*접수 취소일자:*\n" + datetime.date.today().strftime('%Y-%m-%d')
+                    },
+                    "accessory": {
+                        "type": "image",
+                        "image_url": doc.avatar_src,
+                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                    }
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "문서함 열기"
+                            },
+                            "value": "open_box",
+                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                        }
+                    ]
+                }
+            ],
+            text=f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
+        )
+    # 07. 문서 데이터 DB 반영
     doc.delete()
     return redirect('box:read', id=doc.box.id)
 
@@ -1190,8 +1239,8 @@ def submit_doc(request, doc_id):
     )
     # message_id = message['id']
     # 10. 슬랙 메시지 발신
-    client = WebClient(token="TOKEN_VALUE")
-    client.chat_postMessage(
+    client = WebClient(token="VALUE")
+    slack = client.chat_postMessage(
         channel=doc.box.channel_id,
         link_names=True,
         blocks=[
@@ -1238,6 +1287,8 @@ def submit_doc(request, doc_id):
         ],
         text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
     )
+    doc.slack_ts = slack['ts']
+    doc.save()
     return redirect('box:read', id=doc.box.id)
 
 

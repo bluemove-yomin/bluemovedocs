@@ -86,6 +86,7 @@ class Doc(models.Model):
     outside_permission_id = models.CharField(max_length = 300, null=True, blank=True)
     permission_id = models.CharField(max_length = 300, null=True, blank=True)
     inside_permission_id = models.CharField(max_length = 300, null=True, blank=True)
+    slack_ts = models.CharField(max_length = 50, null=True, blank=True)
     reject_reason = models.CharField(max_length = 100, null=True, blank=True)
     creation_date = models.CharField(max_length = 100, null=True, blank=True)
     submission_date = models.CharField(max_length = 100, null=True, blank=True)
