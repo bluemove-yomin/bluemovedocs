@@ -40,6 +40,15 @@
                 </div>
             </div>
             <div class="form-group mb-3">
+                <label for="channel_id" class="form-label">채널 ID<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="채널 ID를 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" required>
+                <div class="invalid-feedback">채널 ID을 입력하세요.</div>
+                <div id="channel_idHelp" class="form-text">
+                    <p class="mb-2">문서 접수 시 해당 Slack 채널로 알림 메시지가 전송됩니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 채널 ID 찾기</span><span style="word-break: break-word;">: 원하는 채널에서 <mark><strong>/sdt whoami</strong></mark>를 입력 후 전송하면 'Current Conversation ID' 값이 출력됩니다.</span>
+                </div>
+            </div>
+            <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
                 <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
@@ -235,6 +244,9 @@
                         alert("유효한 문서 ID를 입력하세요.")
                         return formCheck();
                     }
+                    else if ( !document.querySelector("#channel_id").value ) {
+                        alert("채널 ID를 입력하세요.")
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
@@ -302,6 +314,9 @@
                         alert("유효한 문서 ID를 입력하세요.")
                         return formCheck();
                     }
+                    else if ( !document.querySelector("#channel_id").value ) {
+                        alert("채널 ID를 입력하세요.")
+                    }
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
@@ -353,6 +368,9 @@
                     else if ( document.querySelector("#document_id").value.length !== 44 ) {
                         alert("유효한 문서 ID를 입력하세요.")
                         return formCheck();
+                    }
+                    else if ( !document.querySelector("#channel_id").value ) {
+                        alert("채널 ID를 입력하세요.")
                     }
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {

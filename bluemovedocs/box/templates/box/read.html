@@ -116,9 +116,12 @@
         <hr class="text-black-50">
         {% if user == box.writer %}
         <div class="callout" style="word-break: break-word;">
-            <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서 ID</span><br>
-            <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-            <small style="color: #6C757D;">이 콜아웃은 문서함 생성자에게만 표시됩니다.</small>
+            <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
+            <small style="color: #6C757D;">
+                ⊙ 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
+                ⊙ 채널 ID: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                이 콜아웃은 문서함 생성자에게만 표시됩니다.
+            </small>
         </div>
         {% endif %}
         {% if box.image %}

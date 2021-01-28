@@ -13,6 +13,7 @@ from email.mime.text import MIMEText
 from allauth.socialaccount.models import SocialToken, SocialApp, SocialAccount
 from oauth2client.service_account import ServiceAccountCredentials
 from users.models import Profile
+from slack_sdk import WebClient
 
 
 @login_required
@@ -32,9 +33,10 @@ def create(request):
             box_title = request.POST.get('title')
             box_writer = request.user
             box_document_id = request.POST.get('document_id')
+            box_channel_id = request.POST.get('channel_id')
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline, image=box_image)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -274,8 +276,9 @@ def update(request, id):
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id')
+            box_channel_id = request.POST.get('channel_id')
             box_deadline = request.POST.get('deadline')
-            form.update(category=box_category, title=box_title, document_id=box_document_id, deadline=box_deadline)
+            form.update(category=box_category, title=box_title, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline)
         return redirect('box:read', box.id)
     return render(request, 'box/update.html', {'box': box, 'form': form})
 
@@ -328,7 +331,7 @@ def delete_doc(request, doc_id):
         # 03. 메일 생성
         sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
         to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
-        subject = doc.user.last_name + doc.user.first_name + '님의 문서가 삭제(접수 취소)되었습니다.' ##### 문서명 INPUT #####
+        subject = doc.user.last_name + doc.user.first_name + '님의 문서가 삭제 및 접수 취소되었습니다.' ##### 문서명 INPUT #####
         message_text = \
             """
             <!doctype html>
@@ -344,7 +347,7 @@ def delete_doc(request, doc_id):
                     <meta charset="UTF-8">
                     <meta http-equiv="X-UA-Compatible" content="IE=edge">
                     <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <title>블루무브 닥스 - """ + doc.user.last_name + doc.user.first_name + """님의 문서가 삭제(접수 취소)되었습니다.</title>
+                    <title>블루무브 닥스 - """ + doc.user.last_name + doc.user.first_name + """님의 문서가 삭제 및 접수 취소되었습니다.</title>
                 </head>
                 <body>
                     <center>
@@ -443,9 +446,9 @@ def delete_doc(request, doc_id):
                                                                                 valign="top"
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                                                                                <h1>""" + doc.user.last_name + doc.user.first_name + """님의 문서가 삭제(접수 취소)되었습니다.</h1>
+                                                                                <h1>""" + doc.user.last_name + doc.user.first_name + """님의 문서가 삭제 및 접수 취소되었습니다.</h1>
                                                                                 <p>안녕하세요, 블루무브 """ + doc.box.writer.last_name + doc.box.writer.first_name + """입니다.<br>
-                                                                                    """ + doc.user.last_name + doc.user.first_name + """님의 문서가 아래와 같이 삭제(접수 취소)되었습니다.</p>
+                                                                                    """ + doc.user.last_name + doc.user.first_name + """님의 문서가 아래와 같이 삭제 및 접수 취소되었습니다.</p>
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>
@@ -502,7 +505,7 @@ def delete_doc(request, doc_id):
                                                                                                 <strong style="color:#222222;">Google 계정</strong>: """ + doc.user.email + """<br>
                                                                                                 <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
                                                                                                 <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """<br>
-                                                                                                <strong style="color:#222222;">삭제(접수 취소)일자</strong>: """ + datetime.date.today().strftime('%Y-%m-%d') + """
+                                                                                                <strong style="color:#222222;">삭제일자(접수 취소일자)</strong>: """ + datetime.date.today().strftime('%Y-%m-%d') + """
                                                                                             </td>
                                                                                         </tr>
                                                                                     </tbody>
@@ -683,7 +686,56 @@ def delete_doc(request, doc_id):
             ).execute()
         )
         # message_id = message['id']
-    # 05. 문서 데이터 DB 반영
+    # 05. 슬랙 메시지 발신
+    client = WebClient(token="TOKEN_VALUE")
+    client.chat_postMessage(
+        channel=doc.box.channel_id,
+        link_names=True,
+        blocks=[
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하였습니다.\n더 이상 이 문서에 액세스할 수 없습니다.\n\n~*" + doc.name + "*~"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*문서명:*\n" + doc.box.title + "\n\n*Google 계정:*\n" +  doc.user.email + "\n\n*제출일자:*\n" +  doc.submission_date + "\n\n*접수 취소일자:*\n" + datetime.date.today().strftime('%Y-%m-%d')
+                },
+                "accessory": {
+                    "type": "image",
+                    "image_url": doc.avatar_src,
+                    "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "문서함 열기"
+                        },
+                        "value": "open_box",
+                        "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                    }
+                ]
+            }
+        ],
+        text=f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
+    )
+    # 06. 문서 데이터 DB 반영
     doc.delete()
     return redirect('box:read', id=doc.box.id)
 
@@ -1137,6 +1189,55 @@ def submit_doc(request, doc_id):
         ).execute()
     )
     # message_id = message['id']
+    # 10. 슬랙 메시지 발신
+    client = WebClient(token="TOKEN_VALUE")
+    client.chat_postMessage(
+        channel=doc.box.channel_id,
+        link_names=True,
+        blocks=[
+            {
+                "type": "header",
+                "text": {
+                    "type": "plain_text",
+                    "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.\n\n*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "*문서명:*\n" + doc.box.title + "\n\n*Google 계정:*\n" +  doc.user.email + "\n\n*제출일자:*\n" + doc.submission_date
+                },
+                "accessory": {
+                    "type": "image",
+                    "image_url": doc.avatar_src,
+                    "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                }
+            },
+            {
+                "type": "actions",
+                "elements": [
+                    {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "문서함 열기"
+                        },
+                        "value": "open_box",
+                        "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                    }
+                ]
+            }
+        ],
+        text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
+    )
     return redirect('box:read', id=doc.box.id)
 
 
@@ -1451,7 +1552,7 @@ def reject_doc(request, doc_id):
                                                                             style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
                                                                             블루무브 닥스 문서함에서 문서를 수정하거나 삭제할 수 있습니다.<br>
-                                                                            반려 사유를 해소하여 """ + doc.box.deadline.strftime('%Y-%m-%d') + """ 내에 다시 제출해주시기 바랍니다.<br>
+                                                                            반려 사유를 해소하여 """ + doc.box.deadline.strftime('%Y-%m-%d') + """ 이내에 다시 제출해주시기 바랍니다.<br>
                                                                             감사합니다.<br><br>
                                                                         </td>
                                                                     </tr>

@@ -45,6 +45,12 @@
                 <div id="titleHelp" class="form-text">문서 ID를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
+                <label for="channel_id" class="form-label">채널 ID<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="채널 ID를 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" disabled>
+                <div class="invalid-feedback">채널 ID을 입력하세요.</div>
+                <div id="channel_idHelp" class="form-text">채널 ID를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한</label>
                 <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" disabled>
                 <div class="invalid-feedback">기한을 입력하세요.</div>
