@@ -114,7 +114,7 @@
         </div>
         <h5 class="card-title" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}">{{ box.title }}</a></h5>
         <p class="card-text mb-2" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
-            {{ box.content|striptags }}
+            {{ box.content|striptags|safe }}
         </p>
         <div class="d-flex w-100 justify-content-between">
             <small>{{ box.writer.last_name }}{{ box.writer.first_name }}</small>

@@ -687,7 +687,7 @@ def delete_doc(request, doc_id):
         )
         # message_id = message['id']
         # 05. 슬랙 메시지 수정
-        client = WebClient(token="VALUE")
+        client = WebClient(token="xoxb-")
         client.chat_update(
             channel=doc.box.channel_id,
             link_names=True,
@@ -1239,7 +1239,7 @@ def submit_doc(request, doc_id):
     )
     # message_id = message['id']
     # 10. 슬랙 메시지 발신
-    client = WebClient(token="VALUE")
+    client = WebClient(token="xoxb-")
     slack = client.chat_postMessage(
         channel=doc.box.channel_id,
         link_names=True,

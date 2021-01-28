@@ -169,14 +169,15 @@ SESSION_SAVE_EVERY_REQUEST = True
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
-            # 'https://www.googleapis.com/auth/drive',
-            # 'https://www.googleapis.com/auth/documents',
+            # 'https://www.googleapis.com/auth/drive', 블루무버 계정 로그인 시에만 적용되도록 설정해두었음
+            # 'https://www.googleapis.com/auth/documents', 블루무버 계정 로그인 시에만 적용되도록 설정해두었음
             'profile',
             'email',
         ],
         'AUTH_PARAMS': {
             'access_type': 'offline',
             'approval_prompt': 'auto',
+            # 'hd': 'bluemove.or.kr', 블루무버 계정 로그인 시에만 적용되도록 설정해두었음
         }
     }
 }

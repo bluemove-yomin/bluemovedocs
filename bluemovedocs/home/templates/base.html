@@ -42,6 +42,18 @@
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
         <style>
+            /* 로그인 모바일 최적화 */
+            @media screen and (max-width: 1199px) {
+                #loginPageLarge {
+                    display: none;
+                }
+            }
+            @media screen and (min-width: 1200px) {
+                #loginPageSmall {
+                    display: none;
+                }
+            }
+
             /* 에러 템플릿 모바일 최적화 */
             @media screen and (max-width: 340px) {
                 #errorPageLarge {
