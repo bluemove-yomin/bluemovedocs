@@ -406,7 +406,7 @@
                     </div>
                     <div class="container-md d-flex p-0 my-2">
                         {% if box.deadline_is_over %}
-                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_before_submit_doc' doc.id %}#docPosition'">반환받기</button>
+                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'">반환받기</button>
                         {% else %}
                             <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</a>
                         {% endif %}
@@ -433,7 +433,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide03">
-                                            문서 제출 시 조회 및 삭제 권한은 유지되지만 수정 권한은 잃게 됩니다.<br>정말 제출하시겠습니까?<br><br>
+                                            문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유가 해소된 경우에만 제출하세요.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
@@ -539,7 +539,7 @@
                         <div class="d-flex justify-content-between">
                             <div></div>
                             <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
-                                <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                                <span style="color: #58595B; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.creation_date }} 생성</small>
                             </a>
@@ -548,7 +548,7 @@
                     </div>
                     <div class="container-md d-flex p-0 my-2">
                         {% if box.deadline_is_over %}
-                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_before_submit_doc' doc.id %}#docPosition'">반환받기</button>
+                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'">반환받기</button>
                         {% else %}
                             <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
                         {% endif %}
@@ -575,7 +575,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide03">
-                                            문서 제출 시 조회 및 삭제 권한은 유지되지만 수정 권한은 잃게 됩니다.<br>정말 제출하시겠습니까?
+                                            문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>

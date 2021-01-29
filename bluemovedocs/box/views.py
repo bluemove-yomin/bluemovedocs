@@ -6,8 +6,6 @@ from django.db.models import Q
 import datetime
 import base64
 import requests
-import json
-from urllib.error import HTTPError
 from .forms import BoxContentForm
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -19,8 +17,9 @@ from users.models import Profile
 from slack_sdk import WebClient
 
 
-client_id = VALUE
-client_secret = VALUE
+client_id = asdf
+client_secret = asdf
+slack_bot_token = asdf
 
 
 @login_required
@@ -49,13 +48,13 @@ def create(request):
 
 @login_required
 def create_doc(request, id):
-    # 회원가입 실명등록 시작
+    # 회원가입 정보등록 시작
     profile = Profile.objects.get(user=request.user)
     name_verified = profile.info_update_flag
     if not name_verified == True:
         return redirect('users:write_info', request.user.id)
     else:
-    # 회원가입 실명등록 끝
+    # 회원가입 정보등록 끝
         box = get_object_or_404(Box, pk=id)
         # 00. 기한 초과 시 새로고침
         if box.deadline_is_over :
@@ -780,7 +779,7 @@ def delete_doc(request, doc_id):
             )
             # message_id = message['id']
             # 05. 슬랙 메시지 수정
-            client = WebClient(token="xoxb-82584804000-1692877306865-6f2AwqvSo0mJocJUIol5SmhI")
+            client = WebClient(token=slack_bot_token)
             client.chat_update(
                 channel=doc.box.channel_id,
                 link_names=True,
@@ -797,7 +796,7 @@ def delete_doc(request, doc_id):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트: `*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
+                            "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트:`*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
                         }
                     },
                     {
@@ -830,10 +829,13 @@ def delete_doc(request, doc_id):
                 text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
             )
             # 06. 슬랙 메시지 발신
+            client.conversations_join(
+                channel = doc.box.channel_id
+            )
             client.chat_postMessage(
-                channel=doc.box.channel_id,
-                link_names=True,
-                blocks=[
+                channel = doc.box.channel_id,
+                link_names = True,
+                blocks = [
                     {
                         "type": "header",
                         "text": {
@@ -875,7 +877,7 @@ def delete_doc(request, doc_id):
                         ]
                     }
                 ],
-                text=f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
+                text = f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
             )
         # 07. 문서 데이터 DB 반영
         doc.delete()
@@ -1264,7 +1266,7 @@ def delete_doc(request, doc_id):
             )
             # message_id = message['id']
             # 05. 슬랙 메시지 수정
-            client = WebClient(token="xoxb-82584804000-1692877306865-6f2AwqvSo0mJocJUIol5SmhI")
+            client = WebClient(token=slack_bot_token)
             client.chat_update(
                 channel=doc.box.channel_id,
                 link_names=True,
@@ -1281,7 +1283,7 @@ def delete_doc(request, doc_id):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트: `*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
+                            "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트:`*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
                         }
                     },
                     {
@@ -1314,10 +1316,13 @@ def delete_doc(request, doc_id):
                 text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
             )
             # 06. 슬랙 메시지 발신
+            client.conversations_join(
+                channel = doc.box.channel_id
+            )
             client.chat_postMessage(
-                channel=doc.box.channel_id,
-                link_names=True,
-                blocks=[
+                channel = doc.box.channel_id,
+                link_names = True,
+                blocks = [
                     {
                         "type": "header",
                         "text": {
@@ -1359,7 +1364,7 @@ def delete_doc(request, doc_id):
                         ]
                     }
                 ],
-                text=f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
+                text = f"💥 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수 취소되었습니다.",
             )
         # 07. 문서 데이터 DB 반영
         doc.delete()
@@ -1816,11 +1821,14 @@ def submit_doc(request, doc_id):
     )
     # message_id = message['id']
     # 10. 슬랙 메시지 발신
-    client = WebClient(token="xoxb-82584804000-1692877306865-6f2AwqvSo0mJocJUIol5SmhI")
+    client = WebClient(token=slack_bot_token)
+    client.conversations_join(
+        channel = doc.box.channel_id
+    )
     slack = client.chat_postMessage(
-        channel=doc.box.channel_id,
-        link_names=True,
-        blocks=[
+        channel = doc.box.channel_id,
+        link_names = True,
+        blocks = [
             {
                 "type": "header",
                 "text": {
@@ -1862,7 +1870,7 @@ def submit_doc(request, doc_id):
                 ]
             }
         ],
-        text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
+        text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
     )
     doc.slack_ts = slack['ts']
     doc.save()
