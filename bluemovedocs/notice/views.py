@@ -43,71 +43,51 @@ def create_comment(request, id):
 
 
 def main(request):
-    # 회원가입 실명등록 시작
+    # 회원가입 정보등록 시작
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
-        name_verified = profile.info_update_flag
-        if not name_verified == True:
+        if not profile.info_update_flag == True:
             return redirect('users:write_info', request.user.id)
         else:
-            all_notices = Notice.objects.all().order_by('-id')
-            page = request.GET.get('page', 1)
-            paginator = Paginator(all_notices, 10)
-            try:
-                all_notices = paginator.page(page)
-            except PageNotAnInteger:
-                all_notices = paginator.page(1)
-            except EmptyPage:
-                all_notices = paginator.page(paginator.num_pages)
-            return render(request, 'notice/main.html', {'all_notices': all_notices})
+            None
     else:
-    # 회원가입 실명등록 끝
-        all_notices = Notice.objects.all().order_by('-id')
-        page = request.GET.get('page', 1)
-        paginator = Paginator(all_notices, 10)
-        try:
-            all_notices = paginator.page(page)
-        except PageNotAnInteger:
-            all_notices = paginator.page(1)
-        except EmptyPage:
-            all_notices = paginator.page(paginator.num_pages)
-        return render(request, 'notice/main.html', {'all_notices': all_notices})
+        None
+    # 회원가입 정보등록 끝
+    all_notices = Notice.objects.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(all_notices, 10)
+    try:
+        all_notices = paginator.page(page)
+    except PageNotAnInteger:
+        all_notices = paginator.page(1)
+    except EmptyPage:
+        all_notices = paginator.page(paginator.num_pages)
+    return render(request, 'notice/main.html', {'all_notices': all_notices})
 
 
 def read(request, id):
-    # 회원가입 실명등록 시작
+    # 회원가입 정보등록 시작
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
-        name_verified = profile.info_update_flag
-        if not name_verified == True:
+        if not profile.info_update_flag == True:
             return redirect('users:write_info', request.user.id)
         else:
-            notice = Notice.objects.get(pk=id)
-            all_notices = Notice.objects.all().order_by('-id')
-            all_comments = notice.comments.all().order_by('-id')
-            page = request.GET.get('page', 1)
-            paginator = Paginator(all_notices, 10)
-            try:
-                all_notices = paginator.page(page)
-            except PageNotAnInteger:
-                all_notices = paginator.page(1)
-            except EmptyPage:
-                all_notices = paginator.page(paginator.num_pages)
-            return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
+            None
     else:
-    # 회원가입 실명등록 끝
-        notice = Notice.objects.get(pk=id)
-        all_notices = Notice.objects.all().order_by('-id')
-        all_comments = notice.comments.all().order_by('-id')
-        page = request.GET.get('page', 1)
-        paginator = Paginator(all_notices, 10)
-        try:
-            all_notices = paginator.page(page)
-        except PageNotAnInteger:
-            all_notices = paginator.page(1)
-        except EmptyPage:
-            all_notices = paginator.page(paginator.num_pages)
-        return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
+        None
+    # 회원가입 정보등록 끝
+    notice = Notice.objects.get(pk=id)
+    all_notices = Notice.objects.all().order_by('-id')
+    all_comments = notice.comments.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(all_notices, 10)
+    try:
+        all_notices = paginator.page(page)
+    except PageNotAnInteger:
+        all_notices = paginator.page(1)
+    except EmptyPage:
+        all_notices = paginator.page(paginator.num_pages)
+    return render(request, 'notice/read.html', {'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
 @login_required

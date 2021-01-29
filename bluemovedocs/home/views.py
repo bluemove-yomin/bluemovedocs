@@ -5,19 +5,18 @@ from users.models import Profile
 
 
 def home(request):
-    # 회원가입 실명등록 시작
+    # 회원가입 정보등록 시작
     if request.user.is_authenticated:
         profile = Profile.objects.get(user=request.user)
-        name_verified = profile.info_update_flag
-        if not name_verified == True:
+        if not profile.info_update_flag == True:
             return redirect('users:write_info', request.user.id)
         else:
-            all_noticies = Notice.objects.all().order_by('-id')
-            return render(request, 'home/home.html', {'all_noticies': all_noticies})
+            None
     else:
-    # 회원가입 실명등록 끝
-        all_noticies = Notice.objects.all().order_by('-id')
-        return render(request, 'home/home.html', {'all_noticies': all_noticies})
+        None
+    # 회원가입 정보등록 끝
+    all_noticies = Notice.objects.all().order_by('-id')
+    return render(request, 'home/home.html', {'all_noticies': all_noticies})
 
 
 def handler500(request):

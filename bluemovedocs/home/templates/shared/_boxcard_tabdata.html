@@ -59,10 +59,45 @@
         </p>
     </div>
     {% endif %}
-    {% if box.image %}
-    <div class="ratio" style="--aspect-ratio: 50%;"><a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}"><img src="{{ box.image.url }}" class="card-img-top" alt="문서함 이미지" style="height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0;"></a></div>
+    {% if request.user.profile.level == 'bluemover' %}
+        <div class="ratio" style="--aspect-ratio: 50%; position: relative; text-align: center;">
+            <a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}" onclick="openBox{{ box.id }}({{ box.id }});">
+                <img src="
+                    {% if box.image %}
+                        {{ box.image.url }}
+                    {% else %}
+                        /static/images/1800x900-default.png
+                    {% endif %}
+                " class="card-img-top hide{{ box.id }}-01" alt="문서함 이미지" style="height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0;">
+                <img src="
+                    {% if box.image %}
+                        {{ box.image.url }}
+                    {% else %}
+                        /static/images/1800x900-default.png
+                    {% endif %}
+                " class="card-img-top show{{ box.id }}-01" alt="문서함 이미지" style="height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0; filter: blur(5px); -webkit-filter: blur(5px); display: none;">
+            </a>
+            <div class="align-middle show{{ box.id }}-02" style="position: absolute; top: 40%; display: none;">
+                <mark style="background-color: #58595B; color: #ffffff; font-weight: 600;">&nbsp;⏳ 문서함 여는 중&nbsp;</mark>
+            </div>
+        </div>
+        <!-- openBox -->
+        <script>
+            // window.onerror = function(){
+            //     return true;
+            // }
+            function openBox{{ box.id }}() {
+                document.querySelector(".hide{{ box.id }}-01").setAttribute("style", "display:none;");
+                document.querySelector(".show{{ box.id }}-01").setAttribute("style", "height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0; filter: blur(5px); -webkit-filter: blur(5px);");
+                document.querySelector(".show{{ box.id }}-02").setAttribute("style", "position: absolute; top: 40%;");
+            };
+        </script>
     {% else %}
-    <a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}"><img src="/static/images/1800x900-default.png" class="card-img-top" alt="문서함 이미지"></a>
+        {% if box.image %}
+            <div class="ratio" style="--aspect-ratio: 50%;"><a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}"><img src="{{ box.image.url }}" class="card-img-top" alt="문서함 이미지" style="height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0;"></a></div>
+        {% else %}
+            <a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}"><img src="/static/images/1800x900-default.png" class="card-img-top" alt="문서함 이미지"></a>
+        {% endif %}
     {% endif %}
     <div class="card-body mb-1">
         <div class="d-flex w-100 justify-content-between">
@@ -112,7 +147,7 @@
             </div>
             {% endif %}
         </div>
-        <h5 class="card-title" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}">{{ box.title }}</a></h5>
+        <h5 class="card-title" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"><a href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}" onclick="openBox{{ box.id }}({{ box.id }});">{{ box.title }}</a></h5>
         <p class="card-text mb-2" style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
             {{ box.content|striptags|safe }}
         </p>
