@@ -76,7 +76,7 @@
                 {% endif %}
             " class="card-img-top show{{ box.id }}-01" alt="문서함 이미지" style="height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0; filter: blur(5px); -webkit-filter: blur(5px); display: none;">
         </a>
-        <div class="align-middle show{{ box.id }}-02" style="position: absolute; top: 40%; display: none;">
+        <div class="align-middle show{{ box.id }}-02" style="position: absolute; top: 42.5%; display: none;">
             <mark style="background-color: #58595B; color: #ffffff; font-weight: 600;">&nbsp;⏳ 문서함 여는 중&nbsp;</mark>
         </div>
     </div>
@@ -88,7 +88,7 @@
         function openBox{{ box.id }}() {
             document.querySelector(".hide{{ box.id }}-01").setAttribute("style", "display:none;");
             document.querySelector(".show{{ box.id }}-01").setAttribute("style", "height: 100%; object-fit: cover; object-position: 50% 50%; border-top-left-radius: 0; border-top-right-radius: 0; filter: blur(5px); -webkit-filter: blur(5px);");
-            document.querySelector(".show{{ box.id }}-02").setAttribute("style", "position: absolute; top: 40%;");
+            document.querySelector(".show{{ box.id }}-02").setAttribute("style", "position: absolute; top: 42.5%;");
         };
     </script>
     <div class="card-body mb-1">

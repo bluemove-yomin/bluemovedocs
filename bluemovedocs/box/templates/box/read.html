@@ -293,8 +293,12 @@
                                                 <input type="text" class="form-control" name="reject_reason" id="reject_reason" placeholder="반려 사유를 입력하세요." required>
                                                 <div class="invalid-feedback">반려 사유를 입력하세요.</div>
                                             </div>
-                                            문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유는 {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 표시됩니다.</small>
+                                            {% if doc.user.profile.level == 'bluemover' %}
+                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                            {% else %}
+                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                            {% endif %}
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유는 {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 전달됩니다.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 반려하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
@@ -433,7 +437,12 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide03">
-                                            문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?<br><br>
+                                            {% if doc.user.profile.level == 'bluemover' %}
+                                                문서 제출 시 수정 및 삭제 권한을 잃게 되며 조회 권한만 유지됩니다.<br>정말 제출하시겠습니까?
+                                            {% else %}
+                                                문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?
+                                            {% endif %}
+                                            <br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유가 해소된 경우에만 제출하세요.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
@@ -483,15 +492,25 @@
                         <p class="mb-2 text-muted"><i class="fas fa-check-circle" style="color: #007DC5;"></i> 제출됨</p>
                     </div>
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
-                        <div class="d-flex justify-content-between">
-                            <div></div>
-                            <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
-                                <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
-                                <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
-                                <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
-                            </a>
-                            <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
-                        </div>
+                        {% if doc.user.profile.level == 'bluemover' %}
+                            <div class="d-flex justify-content-between">
+                                <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                    <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                                    <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
+                                    <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="d-flex justify-content-between">
+                                <div></div>
+                                <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                    <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                                    <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
+                                    <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
+                                </a>
+                                <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="container-md d-flex p-0 my-2">
                         <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출 완료</button>
@@ -575,7 +594,11 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide03">
-                                            문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?
+                                            {% if doc.user.profile.level == 'bluemover' %}
+                                                문서 제출 시 수정 및 삭제 권한을 잃게 되며 조회 권한만 유지됩니다.<br>정말 제출하시겠습니까?
+                                            {% else %}
+                                                문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?
+                                            {% endif %}
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
