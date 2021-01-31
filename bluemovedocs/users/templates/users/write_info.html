@@ -12,7 +12,7 @@
         </div>
         <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
-            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
+            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace(구 G Suite) 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
         </div>
         <form action="{% url 'users:write_info' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}

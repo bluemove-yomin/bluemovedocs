@@ -78,8 +78,15 @@ def content_update_flag_on(sender, instance, **kwargs):
 
 
 class Doc(models.Model):
+
+    FOLDER_CHOICES = {
+        ('0ADF4LPECMczOUk9PVA', '2 교육사업'),
+        ('0ADNIg7OWApdMUk9PVA', '3 콘텐츠사업'),
+        ('0AIsg5YLQSTjaUk9PVA', '5 운영'),
+    }
+
     user = models.ForeignKey(User, on_delete = models.CASCADE)
-    avatar_src = models.CharField(max_length = 300, null=True, blank=True)
+    avatar_src = models.CharField(max_length = 1500, null=True, blank=True)
     box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name="docs")
     name = models.CharField(max_length = 300)
     file_id = models.CharField(max_length = 300)
@@ -87,6 +94,7 @@ class Doc(models.Model):
     permission_id = models.CharField(max_length = 300, null=True, blank=True)
     inside_permission_id = models.CharField(max_length = 300, null=True, blank=True)
     slack_ts = models.CharField(max_length = 50, null=True, blank=True)
+    folder = models.CharField(max_length = 50, choices = FOLDER_CHOICES, null=True, blank=True)
     reject_reason = models.CharField(max_length = 100, null=True, blank=True)
     creation_date = models.CharField(max_length = 100, null=True, blank=True)
     submission_date = models.CharField(max_length = 100, null=True, blank=True)
@@ -95,6 +103,7 @@ class Doc(models.Model):
     reject_flag = models.BooleanField(default = False, null=True, blank=True)
     return_date = models.CharField(max_length = 100, null=True, blank=True)
     return_flag = models.BooleanField(default = False, null=True, blank=True)
+    delete_flag = models.BooleanField(default = False, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now = True)
 

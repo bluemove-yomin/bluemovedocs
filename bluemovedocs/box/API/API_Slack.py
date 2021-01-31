@@ -48,46 +48,70 @@
 #     }
 #     requests.post(webhook_url, json = payload)
 
+################################################
 
-import os
-from slack_bolt import App
-
-
-API_Slack = App(
-    token='VALUE',
-    signing_secret='VALUE'
-)
+# import os
+# from slack_bolt import App
 
 
-@API_Slack.message("안녕!")
-def message_hello(message, say):
-    say(f"안녕하세요, <@{message['user']}>님!")
+# API_Slack = App(
+#     token='VALUE',
+#     signing_secret='VALUE'
+# )
 
 
-@API_Slack.message("버튼")
-def message_button(message, say):
-    say(
-        channel="VALUE",
-        blocks=[
-            {
-                "type": "section",
-                "text": {"type": "mrkdwn", "text": f"안녕하세요, <@{message['user']}>님!"},
-                "accessory": {
-                    "type": "button",
-                    "text": {"type": "plain_text", "text": "이것은 버튼입니다."},
-                    "action_id": "button_click"
-                }
-            }
-        ],
-        text=f"안녕하세요, <@{message['user']}>님!",
+# @API_Slack.message("안녕!")
+# def message_hello(message, say):
+#     say(f"안녕하세요, <@{message['user']}>님!")
+
+
+# @API_Slack.message("버튼")
+# def message_button(message, say):
+#     say(
+#         channel="VALUE",
+#         blocks=[
+#             {
+#                 "type": "section",
+#                 "text": {"type": "mrkdwn", "text": f"안녕하세요, <@{message['user']}>님!"},
+#                 "accessory": {
+#                     "type": "button",
+#                     "text": {"type": "plain_text", "text": "이것은 버튼입니다."},
+#                     "action_id": "button_click"
+#                 }
+#             }
+#         ],
+#         text=f"안녕하세요, <@{message['user']}>님!",
+#     )
+
+
+# @API_Slack.action("button_click")
+# def action_button_click(body, ack, say):
+#     ack()
+#     say(f"<@{body['user']['id']}>님께서 버튼을 누르셨습니다.")
+
+
+# if __name__ == "__main__":
+#     API_Slack.start(port=int(os.environ.get("PORT", 8000)))
+
+###############################################################
+
+from slack_sdk import WebClient
+
+
+def main():
+    slack_bot_token = "VALUE"
+
+    client = WebClient(token=slack_bot_token)
+    slack_response = client.conversations_list(
+        team_id = 'T2EH6PN00',
+        types = "public_channel, im"
     )
-
-
-@API_Slack.action("button_click")
-def action_button_click(body, ack, say):
-    ack()
-    say(f"<@{body['user']['id']}>님께서 버튼을 누르셨습니다.")
+    all_channels = slack_response.get('channels')
+    # return print(all_channels)
+    for channels_info in all_channels:
+        channels_name = channels_info.get('name')
+        print(channels_name)
 
 
 if __name__ == "__main__":
-    API_Slack.start(port=int(os.environ.get("PORT", 8000)))
+    main()

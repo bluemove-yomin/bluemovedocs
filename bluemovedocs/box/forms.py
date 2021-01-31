@@ -18,6 +18,7 @@ class BoxContentForm(forms.ModelForm):
         box.title = kwargs.get('title', None)
         box.document_id = kwargs.get('document_id', None)
         box.channel_id = kwargs.get('channel_id', None)
+        box.channel_id_text = kwargs.get('channel_id_text', None)
         box.deadline = kwargs.get('deadline', None)
         box.image = kwargs.get('image', None)
         box.save()
@@ -30,6 +31,7 @@ class BoxContentForm(forms.ModelForm):
         box.title = kwargs.get('title', None)
         box.document_id = kwargs.get('document_id', None)
         box.channel_id = kwargs.get('channel_id', None)
+        box.channel_id_text = kwargs.get('channel_id_text', None)
         box.deadline = kwargs.get('deadline', None)
         box.save()
         return box

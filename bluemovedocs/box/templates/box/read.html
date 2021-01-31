@@ -231,7 +231,11 @@
                             <tr>
                                 <td class="p-0 m-0" rowspan="1">
                                     <small>
-                                        <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                        {% if doc.user.profile.level == 'bluemover' %}
+                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
+                                        {% else %}
+                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                        {% endif %}
                                     </small>
                                 </td>
                             </tr>
@@ -269,7 +273,11 @@
                             <tr>
                                 <td class="p-0 m-0">
                                     <small>
-                                        <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                        {% if doc.user.profile.level == 'bluemover' %}
+                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
+                                        {% else %}
+                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                        {% endif %}
                                     </small>
                                 </td>
                             </tr>
@@ -294,11 +302,11 @@
                                                 <div class="invalid-feedback">반려 사유를 입력하세요.</div>
                                             </div>
                                             {% if doc.user.profile.level == 'bluemover' %}
-                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
                                             {% else %}
                                                 문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
                                             {% endif %}
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 반려 사유는 {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 전달됩니다.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 반려 사유가 전달됩니다.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 반려하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
@@ -314,31 +322,72 @@
                         </div>
                     </form>
                     <!-- docReturnModal -->
-                    <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title hide0101" id="docReturnModalLabel" style="font-weight: 600;">💥 반환 확인</h5>
-                                    <h5 class="modal-title show0101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
-                                    <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
+                    {% if doc.user.profile.level == 'bluemover' %}
+                        <form action="{% url 'box:return_doc' doc.id %}#docPosition" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title hide010101" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
+                                            <h5 class="modal-title show010101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                            <button type="button" class="btn-close hide020202" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <span class="hide030303">
+                                                {% csrf_token %}
+                                                <div class="form-group mb-3">
+                                                    <label for="folder" class="form-label">공유 드라이브 폴더<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                                                    <select class="form-select" name="folder" id="folder" placeholder="공유 드라이브 폴더를 선택하세요." required>
+                                                        <option value="" selected disabled>공유 드라이브 폴더를 선택하세요.</option>
+                                                        <option value="0ADF4LPECMczOUk9PVA">2 교육사업</option>
+                                                        <option value="0ADNIg7OWApdMUk9PVA">3 콘텐츠사업</option>
+                                                        <option value="0AIsg5YLQSTjaUk9PVA">5 운영</option>
+                                                    </select>
+                                                    <div class="invalid-feedback">공유 드라이브 폴더를 선택하세요.</div>
+                                                </div>
+                                                문서 승인 시<br>✔ 문서가 위에서 선택한 공유 드라이브 폴더로 이동되며<br>✔ 문서에 대한 권한은 해당 공유 드라이브 설정에 따르게 됩니다.<br>정말 승인하시겠습니까?<br><br>
+                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 승인하세요.</small>
+                                            </span>
+                                            <span class="show020202" style="display: none;">
+                                                {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 승인하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            </span>
+                                        </div>
+                                        <div class="modal-footer hide040404">
+                                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                            <input type="submit" value="네, 승인할게요!" class="btn btn-outline-primary" onclick="doNotClose3();">
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="modal-body">
-                                    <span class="hide0303">
-                                        문서 반환 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 소유 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
-                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 반환하세요.</small>
-                                    </span>
-                                    <span class="show0202" style="display: none;">
-                                        {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
-                                    </span>
-                                </div>
-                                <div class="modal-footer hide0404">
-                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose2();">네, 반환할게요!</a>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title hide0101" id="docReturnModalLabel" style="font-weight: 600;">💥 반환 확인</h5>
+                                        <h5 class="modal-title show0101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                        <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <span class="hide0303">
+                                            문서 반환 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 반환하세요.</small>
+                                        </span>
+                                        <span class="show0202" style="display: none;">
+                                            {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                        </span>
+                                    </div>
+                                    <div class="modal-footer hide0404">
+                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose2();">네, 반환할게요!</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
                 <!-- 접수된 문서 없을 경우 -->
                 {% empty %}
@@ -367,22 +416,50 @@
         {% for doc in all_docs %}
             <!-- 문서가 반환됐을 경우 -->
             {% if doc.return_flag == True %}
-            <div class="container-md">
-                <div class="container-md border rounded px-sm-4 px-3 py-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
-                        <p class="mb-2 text-muted"><i class="fas fa-share-square"></i> 반환됨</p>
+                {% if doc.user.profile.level == 'bluemover' %}
+                    <div class="container-md">
+                        <div class="container-md border rounded px-sm-4 px-3 py-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+                                <p class="mb-2 text-muted"><i class="fas fa-check-square" style="color: #007DC5;"></i> 승인됨</p>
+                            </div>
+                            {% if doc.delete_flag == True %}
+                                <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
+                                    <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-asterisk"></i></span><br>
+                                    <span style="color: #58595B;">{{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서가 승인 이후 삭제되었으며 더 이상 블루무브 닥스에서 액세스할 수 없습니다.</span><br>
+                                    <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 승인</small>
+                                </div>
+                            {% else %}
+                                <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
+                                    <div class="d-flex justify-content-between">
+                                        <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                            <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                                            <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
+                                            <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 승인</small>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="container-md border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem; margin-bottom: .95rem;">
-                        <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-asterisk"></i></span><br>
-                        <span style="color: #58595B;">{{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서가 반환되었으며 더 이상 블루무브 닥스에서 액세스할 수 없습니다.</span><br>
-                        <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 반환</small>
+                {% else %}
+                    <div class="container-md">
+                        <div class="container-md border rounded px-sm-4 px-3 py-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
+                                <p class="mb-2 text-muted"><i class="fas fa-share-square"></i> 반환됨</p>
+                            </div>
+                            <div class="container-md border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem; margin-bottom: .95rem;">
+                                <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-asterisk"></i></span><br>
+                                <span style="color: #58595B;">{{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서가 반환되었으며 더 이상 블루무브 닥스에서 액세스할 수 없습니다.</span><br>
+                                <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 반환</small>
+                            </div>
+                            <div class="container-md d-flex p-0 my-2">
+                                <a href="https://drive.google.com/drive/search?q={{ doc.box.title|cut:' ' }}{{ doc.user.last_name }}{{ doc.user.first_name }}" target="_blank" type="button" class="container btn btn-primary">Google 드라이브에서 찾아보기</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="container-md d-flex p-0 my-2">
-                        <a href="https://drive.google.com/drive/search?q={{ doc.box.title|cut:' ' }}{{ doc.user.last_name }}{{ doc.user.first_name }}" target="_blank" type="button" class="container btn btn-primary">Google 드라이브에서 찾아보기</a>
-                    </div>
-                </div>
-            </div>
+                {% endif %}
             <!-- 문서가 반려됐을 경우 -->
             {% elif doc.reject_flag == True and doc.submit_flag == False %}
             <div class="container-md">
@@ -596,6 +673,8 @@
                                         <span class="hide03">
                                             {% if doc.user.profile.level == 'bluemover' %}
                                                 문서 제출 시 수정 및 삭제 권한을 잃게 되며 조회 권한만 유지됩니다.<br>정말 제출하시겠습니까?
+                                                <br><br>
+                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 제출 포기가 불가하므로 최종 검토가 끝난 문서만 제출하세요.</small>
                                             {% else %}
                                                 문서 제출 시 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.<br>정말 제출하시겠습니까?
                                             {% endif %}
@@ -763,6 +842,37 @@
             document.querySelector(".hide0404").setAttribute("style", "display:none");
             document.querySelector(".show0101").setAttribute("style", "font-weight: 600; display:inline");
             document.querySelector(".show0202").setAttribute("style", "display:inline");
+        };
+    </script>
+
+    <!-- doNotClose3 -->
+    <script>
+        window.onerror = function(){
+            return true;
+        }
+        var folder = document.querySelector("#folder");
+        function doNotClose3() {
+            if ( folder ) {
+                if ( folder.value ) {
+                    document.querySelector(".hide010101").setAttribute("style", "display:none");
+                    document.querySelector(".hide020202").setAttribute("style", "display:none");
+                    document.querySelector(".hide030303").setAttribute("style", "display:none");
+                    document.querySelector(".hide040404").setAttribute("style", "display:none");
+                    document.querySelector(".show010101").setAttribute("style", "font-weight: 600; display:inline");
+                    document.querySelector(".show020202").setAttribute("style", "display:inline");
+                }
+                else {
+                    return alert('공유 드라이브 폴더를 선택하세요.')
+                }
+            }
+            else {
+                document.querySelector(".hide010101").setAttribute("style", "display:none");
+                document.querySelector(".hide020202").setAttribute("style", "display:none");
+                document.querySelector(".hide030303").setAttribute("style", "display:none");
+                document.querySelector(".hide040404").setAttribute("style", "display:none");
+                document.querySelector(".show010101").setAttribute("style", "font-weight: 600; display:inline");
+                document.querySelector(".show020202").setAttribute("style", "display:inline");
+            }
         };
     </script>
 

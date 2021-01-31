@@ -39,16 +39,35 @@
                 <div id="titleHelp" class="form-text">문서명을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="document_id" class="form-label">문서 ID</label>
-                <input type="text" class="form-control" name="document_id" id="document_id" placeholder="문서 ID를 입력하세요." value="{{ box.document_id }}" disabled>
-                <div class="invalid-feedback">문서 ID를 입력하세요.</div>
-                <div id="titleHelp" class="form-text">문서 ID를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <label for="document_id" class="form-label">템플릿 문서 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
+                <div class="invalid-feedback">유효한 템플릿 문서 링크를 입력하세요.</div>
+                <div id="document_idHelp" class="form-text">템플릿 문서 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="channel_id" class="form-label">채널 ID<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="채널 ID를 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" disabled>
-                <div class="invalid-feedback">채널 ID을 입력하세요.</div>
-                <div id="channel_idHelp" class="form-text">채널 ID를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <label for="channel_id" class="form-label">연동 Slack 채널<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <!-- <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" disabled> -->
+                <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." disabled>
+                    <option value="{{ box.channel_id }}" selected disabled>
+                        {% if box.channel_id == slack_user_id %}
+                            {{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널
+                        {% else %}
+                            {% for channel_id, channel_name in channels_list %}
+                                {% if box.channel_id == channel_id %}
+                                    #{{ channel_name }}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </option>
+                    <option value="{{ slack_user_id }}">{{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널</option>
+                    {% for channel_id, channel_name in channels_list %}
+                        <option value="{{ channel_id }}">#{{ channel_name }}</option>
+                    {% empty %}
+                        <option value="" disabled>공개 채널을 불러올 수 없습니다.</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">연동 Slack 채널을 입력하세요.</div>
+                <div id="channel_idHelp" class="form-text">연동 Slack 채널을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한</label>
