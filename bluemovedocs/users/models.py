@@ -10,6 +10,7 @@ class Profile(models.Model):
     phone = models.CharField(max_length = 20, null=True)
     info_update_flag = models.BooleanField(default = False)
     level = models.CharField(max_length = 50, null=True)
+    slack_user_id = models.CharField(max_length = 50, null=True)
 
 
 @receiver(post_save, sender=User)

@@ -119,7 +119,7 @@
             <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
             <small style="color: #6C757D;">
                 ⊙ 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-                ⊙ 채널 ID: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                ⊙ 채널 ID: <a href="https://slack.com/app_redirect?channel={{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
                 이 콜아웃은 문서함 생성자에게만 표시됩니다.
             </small>
         </div>
@@ -310,7 +310,7 @@
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 반려하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                     <div class="modal-footer hide04">
@@ -350,7 +350,7 @@
                                             </span>
                                             <span class="show020202" style="display: none;">
                                                 {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 승인하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                             </span>
                                         </div>
                                         <div class="modal-footer hide040404">
@@ -377,7 +377,7 @@
                                         </span>
                                         <span class="show0202" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                     <div class="modal-footer hide0404">
@@ -503,7 +503,7 @@
                                     <div class="modal-body">
                                         <span>
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                 {% else %}
@@ -524,7 +524,7 @@
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                     <div class="modal-footer hide04">
@@ -548,7 +548,7 @@
                                     <span class="hide0303">문서 삭제 시 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
                                     <span class="show0202" style="display: none;">
                                         {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </span>
                                 </div>
                                 <div class="modal-footer hide0404">
@@ -605,7 +605,7 @@
                                     <span class="hide03">제출된 문서 삭제 시 제출 포기로 간주되며 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
                                     <span class="show02" style="display: none;">
                                         {{ doc.user.last_name }}{{ doc.user.first_name }}님의 제출 기록을 초기화하고 문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </span>
                                 </div>
                                 <div class="modal-footer hide04">
@@ -660,7 +660,7 @@
                                     <div class="modal-body">
                                         <span>
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                 {% else %}
@@ -681,7 +681,7 @@
                                         </span>
                                         <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 제출하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                     <div class="modal-footer hide04">
@@ -705,7 +705,7 @@
                                     <span class="hide0303">문서 삭제 시 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
                                     <span class="show0202" style="display: none;">
                                         {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </span>
                                 </div>
                                 <div class="modal-footer hide0404">
@@ -775,7 +775,7 @@
                                                 기한이 초과되어 새 문서를 생성할 수 없습니다.<br>페이지가 새로고침됩니다.
                                             {% else %}
                                                 {{ user.last_name }}{{ user.first_name }}님의 문서를 생성하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 1분 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                             {% endif %}
                                         </div>
                                     </div>
