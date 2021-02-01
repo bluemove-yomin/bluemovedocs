@@ -9,7 +9,7 @@
             {% csrf_token %}
             <div class="form-group mb-3">
                 <label for="category" class="form-label">대상<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." required>
+                <select class="form-select" name="category" id="category" onchange="categoryChange(this)" placeholder="대상을 선택하세요." required>
                     <option value="{{ box.category }}" selected hidden>
                         {% if box.category == 'bluemover' %}
                             블루무버
@@ -24,6 +24,35 @@
                     <option value="guest">게스트</option>
                 </select>
                 <div class="invalid-feedback">대상을 선택하세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="prefix" class="form-label">프리픽스<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <select class="form-select" name="prefix" id="prefix" placeholder="프리픽스를 선택하세요." required>
+                    <option value="{{ box.prefix }}" selected hidden>{{ box.prefix }}</option>
+                    <option value="" disabled>프리픽스를 선택하세요.</option>
+                    <option value="파란물결블루무브">파란물결블루무브</option>
+                    <option value="교육">교육</option>
+                    <option value="콘텐츠">콘텐츠</option>
+                    <option value="매뉴얼">매뉴얼</option>
+                    <option value="운영">운영</option>
+                    <option value="행사">행사</option>
+                    <option value="비주얼에셋">비주얼에셋</option>
+                    <option value="임원">임원</option>
+                </select>
+                <div class="invalid-feedback">프리픽스를 선택하세요.</div>
+                <div id="prefixHelp" class="form-text">
+                    <p class="mb-2">프리픽스란 효율적인 파일 관리를 위하여 문서명 앞에 붙이는 분류용 키워드입니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: <mark><strong>교육</strong></mark>_2021공항중교재_210201</span>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="folder_id" class="form-label">보관 폴더 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="folder_id" id="folder_id" minlength="72" placeholder="보관 폴더 링크를 입력하세요." aria-describedby="folder_idHelp" value="https://drive.google.com/drive/folders/{{ box.folder_id }}" required>
+                <div class="invalid-feedback">유효한 보관 폴더 링크를 입력하세요.</div>
+                <div id="folder_idHelp" class="form-text">
+                    <p class="mb-2">보관 폴더는 공유 드라이브 안에 위치해야 합니다.</p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://drive.google.com/drive/folders/13o3t-Ig-OKzNpmXi-QCF7S88p2KXaHhQ</span>
+                </div>
             </div>
             <div class="form-group mb-3">
                 <label for="title" class="form-label">문서명<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -43,7 +72,7 @@
                 <label for="channel_id" class="form-label">연동 Slack 채널<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <!-- <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" required> -->
                 <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." required>
-                    <option value="{{ box.channel_id }}" selected disabled>
+                    <option value="{{ box.channel_id }}" selected hidden>
                         {% if box.channel_id == box.writer.profile.slack_user_id %}
                             {{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널
                         {% else %}
@@ -54,6 +83,7 @@
                             {% endfor %}
                         {% endif %}
                     </option>
+                    <option value="" disabled>연동 Slack 채널을 선택하세요.</option>
                     {% for channel_id, channel_name in channels_list %}
                         <option value="{{ channel_id }}">#{{ channel_name }}</option>
                     {% empty %}
@@ -143,6 +173,30 @@
             </div>
         </form>
 
+        <!-- 대상에 따라 일부 input field의 display, required 변경 -->
+        <script>
+            function categoryChange(obj) {
+                var prefixDiv = document.querySelector("body > main > div > form > div:nth-child(3)")
+                var prefix = document.querySelector("#prefix")
+                var folder_idDiv = document.querySelector("body > main > div > form > div:nth-child(4)")
+                var folder_id = document.querySelector("#folder_id")
+                if ($(obj).val() == "bluemover") {
+                    prefixDiv.setAttribute("style", "");
+                    prefix.required = true;
+                    prefix.disabled = false;
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                }
+                else if ($(obj).val() == "guest") {
+                    prefixDiv.setAttribute("style", "display:none;");
+                    prefix.required = false;
+                    folder_idDiv.setAttribute("style", "display:none;");
+                    folder_id.required = false;
+                }
+            }
+        </script>
+
         <!-- Forms Validation -->
         <script>
             // Disable form submissions if there are invalid fields
@@ -194,64 +248,19 @@
                     // 대상 input이 비어 있을 경우
                     if ( !document.querySelector("#category").value ) {
                         alert("대상을 선택하세요.")
-                        return formCheck();
+                    }
+                    else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("프리픽스를 선택하세요.")
+                    }
+                    else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("보관 폴더 링크를 입력하세요.")
+                    }
+                    else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("유효한 보관 폴더 링크를 입력하세요.")
                     }
                     // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
                         alert("문서명을 입력하세요.")
-                        return formCheck();
-                    }
-                    // 문서 ID input이 비어 있을 경우
-                    else if ( !document.querySelector("#document_id").value ) {
-                        alert("문서 ID를 입력하세요.")
-                        return formCheck();
-                    }
-                    else if ( document.querySelector("#document_id").value.length !== 44 ) {
-                        alert("유효한 문서 ID를 입력하세요.")
-                        return formCheck();
-                    }
-                    // 유저가 기한을 아예 입력하지 않았을 경우
-                    else if ( !document.querySelector("#deadline").value ) {
-                        alert("기한을 입력하세요.")
-                        return formCheck();
-                    }
-                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
-                    else if ( document.querySelector("#deadline").value < today ) {
-                        alert("유효 범위 내 기한을 입력하세요.")
-                        document.querySelector("#deadline").value = '';
-                        return formCheck();
-                    }
-                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
-                        alert("유효 범위 내 기한을 입력하세요.")
-                        document.querySelector("#deadline").value = '';
-                        return formCheck();
-                    }
-                    // 내용 input이 비어 있을 경우
-                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                        alert("내용을 입력하세요.")
-                        return formCheck();
-                    }
-                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                        alert("내용을 입력하세요.")
-                        return formCheck();
-                    }
-                    // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
-                    else {
-                        form.submit();
-                    }
-                }
-                // 유저가 새로운 기한을 입력했을 경우
-                else {
-                    // 대상 input이 비어 있을 경우
-                    if ( !document.querySelector("#category").value ) {
-                        alert("대상을 선택하세요.")
-                        return formCheck();
-                    }
-                    // 문서명 input이 비어 있을 경우
-                    else if ( !document.querySelector("#title").value ) {
-                        alert("문서명을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( !document.querySelector("#document_id").value ) {
                         alert("템플릿 문서 링크를 입력하세요.")
@@ -265,28 +274,77 @@
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
-                        return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     // 내용 input이 비어 있을 경우
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
+                    }
+                    // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
+                    else {
+                        form.submit();
+                    }
+                }
+                // 유저가 새로운 기한을 입력했을 경우
+                else {
+                    // 대상 input이 비어 있을 경우
+                    if ( !document.querySelector("#category").value ) {
+                        alert("대상을 선택하세요.")
+                    }
+                    else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("프리픽스를 선택하세요.")
+                    }
+                    else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("보관 폴더 링크를 입력하세요.")
+                    }
+                    else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("유효한 보관 폴더 링크를 입력하세요.")
+                    }
+                    // 문서명 input이 비어 있을 경우
+                    else if ( !document.querySelector("#title").value ) {
+                        alert("문서명을 입력하세요.")
+                    }
+                    else if ( !document.querySelector("#document_id").value ) {
+                        alert("템플릿 문서 링크를 입력하세요.")
+                    }
+                    else if ( document.querySelector("#document_id").value.length < 79 ) {
+                        alert("유효한 템플릿 문서 링크를 입력하세요.")
+                    }
+                    else if ( !document.querySelector("#channel_id").value ) {
+                        alert("연동 Slack 채널을 선택하세요.")
+                    }
+                    // 유저가 기한을 아예 입력하지 않았을 경우
+                    else if ( !document.querySelector("#deadline").value ) {
+                        alert("기한을 입력하세요.")
+                    }
+                    // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value < today ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
+                        document.querySelector("#deadline").value = '';
+                    }
+                    // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
+                    else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                        alert("유효 범위 내 기한을 입력하세요.")
+                        document.querySelector("#deadline").value = '';
+                    }
+                    // 내용 input이 비어 있을 경우
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                        alert("내용을 입력하세요.")
+                    }
+                    else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                        alert("내용을 입력하세요.")
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                     else {
@@ -313,12 +371,19 @@
                     // 대상 input이 비어 있을 경우
                     if ( !document.querySelector("#category").value ) {
                         alert("대상을 선택하세요.")
-                        return formCheck();
+                    }
+                    else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("프리픽스를 선택하세요.")
+                    }
+                    else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("보관 폴더 링크를 입력하세요.")
+                    }
+                    else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("유효한 보관 폴더 링크를 입력하세요.")
                     }
                     // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
                         alert("문서명을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( !document.querySelector("#document_id").value ) {
                         alert("템플릿 문서 링크를 입력하세요.")
@@ -332,28 +397,23 @@
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
-                        return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     // 내용 input이 비어 있을 경우
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                     else {
@@ -365,12 +425,19 @@
                     // 대상 input이 비어 있을 경우
                     if ( !document.querySelector("#category").value ) {
                         alert("대상을 선택하세요.")
-                        return formCheck();
+                    }
+                    else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("프리픽스를 선택하세요.")
+                    }
+                    else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("보관 폴더 링크를 입력하세요.")
+                    }
+                    else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("유효한 보관 폴더 링크를 입력하세요.")
                     }
                     // 문서명 input이 비어 있을 경우
                     else if ( !document.querySelector("#title").value ) {
                         alert("문서명을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( !document.querySelector("#document_id").value ) {
                         alert("템플릿 문서 링크를 입력하세요.")
@@ -384,28 +451,23 @@
                     // 유저가 기한을 아예 입력하지 않았을 경우
                     else if ( !document.querySelector("#deadline").value ) {
                         alert("기한을 입력하세요.")
-                        return formCheck();
                     }
                     // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value < today ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
                     else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
                         alert("유효 범위 내 기한을 입력하세요.")
                         document.querySelector("#deadline").value = '';
-                        return formCheck();
                     }
                     // 내용 input이 비어 있을 경우
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                         alert("내용을 입력하세요.")
-                        return formCheck();
                     }
                     // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                     else {

@@ -118,8 +118,15 @@
         <div class="callout" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
             <small style="color: #6C757D;">
-                ⊙ 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-                ⊙ 채널 ID: <a href="https://slack.com/app_redirect?channel={{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                {% if box.category == 'bluemover' %}
+                    ⊙ 프리픽스: <mark><strong>{{ box.prefix }}</strong></mark><br>
+                    ⊙ 보관 폴더 ID: <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_id }}</a><br>
+                    ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
+                    ⊙ 연동 Slack 채널 ID: <a href="https://slack.com/app_redirect?channel={{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                {% else %}
+                    ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
+                    ⊙ 연동 Slack 채널 ID: <a href="https://slack.com/app_redirect?channel={{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                {% endif %}
                 이 콜아웃은 문서함 생성자에게만 표시됩니다.
             </small>
         </div>
@@ -323,7 +330,7 @@
                     </form>
                     <!-- docReturnModal -->
                     {% if doc.user.profile.level == 'bluemover' %}
-                        <form action="{% url 'box:return_doc' doc.id %}#docPosition" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <!-- <form action="{% url 'box:return_doc' doc.id %}#docPosition" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                             <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -360,7 +367,32 @@
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                        </form> -->
+                        <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title hide010101" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
+                                        <h5 class="modal-title show010101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                        <button type="button" class="btn-close hide020202" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <span class="hide030303">
+                                            문서 승인 시<br>✔ 문서가 이 문서함의 보관 폴더로 이동되며<br>✔ 문서에 대한 권한은 보관 폴더 설정에 따르게 됩니다.<br>정말 승인하시겠습니까?<br><br>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 승인하세요.</small>
+                                        </span>
+                                        <span class="show020202" style="display: none;">
+                                            {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 승인하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                                        </span>
+                                    </div>
+                                    <div class="modal-footer hide040404">
+                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose3();">네, 승인할게요!</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     {% else %}
                         <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
                             <div class="modal-dialog">

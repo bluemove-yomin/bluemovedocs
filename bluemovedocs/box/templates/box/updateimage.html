@@ -33,6 +33,28 @@
                 <div id="categoryHelp" class="form-text">대상을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
+                <label for="prefix" class="form-label">프리픽스<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <select class="form-select" name="prefix" id="prefix" placeholder="프리픽스를 선택하세요." disabled>
+                    <option value="{{ box.prefix }}" selected hidden>{{ box.prefix }}</option>
+                    <option value="파란물결블루무브">파란물결블루무브</option>
+                    <option value="교육">교육</option>
+                    <option value="콘텐츠">콘텐츠</option>
+                    <option value="매뉴얼">매뉴얼</option>
+                    <option value="운영">운영</option>
+                    <option value="행사">행사</option>
+                    <option value="비주얼에셋">비주얼에셋</option>
+                    <option value="임원">임원</option>
+                </select>
+                <div class="invalid-feedback">프리픽스를 선택하세요.</div>
+                <div id="prefixHelp" class="form-text">프리픽스를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="folder_id" class="form-label">보관 폴더 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="folder_id" id="folder_id" minlength="72" placeholder="보관 폴더 링크를 입력하세요." aria-describedby="folder_idHelp" value="https://drive.google.com/drive/folders/{{ box.folder_id }}" disabled>
+                <div class="invalid-feedback">유효한 보관 폴더 링크를 입력하세요.</div>
+                <div id="folder_idHelp" class="form-text">보관 폴더 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            <div class="form-group mb-3">
                 <label for="title" class="form-label">문서명</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="문서명을 입력하세요." aria-describedby="titleHelp" value="{{ box.title }}" disabled>
                 <div class="invalid-feedback">문서명을 입력하세요.</div>
@@ -48,7 +70,7 @@
                 <label for="channel_id" class="form-label">연동 Slack 채널<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <!-- <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" disabled> -->
                 <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." disabled>
-                    <option value="{{ box.channel_id }}" selected disabled>
+                    <option value="{{ box.channel_id }}" selected hidden>
                         {% if box.channel_id == box.writer.profile.slack_user_id %}
                             {{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널
                         {% else %}
@@ -59,6 +81,7 @@
                             {% endfor %}
                         {% endif %}
                     </option>
+                    <option value="" disabled>연동 Slack 채널을 선택하세요.</option>
                     {% for channel_id, channel_name in channels_list %}
                         <option value="{{ channel_id }}">#{{ channel_name }}</option>
                     {% empty %}

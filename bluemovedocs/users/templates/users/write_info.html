@@ -36,9 +36,9 @@
                 <input type="tel" class="form-control" name="phone" id="phone" placeholder="010-1234-5678" minlength="12" maxlength="13" required>
                 <label for="phone">휴대전화 번호</label>
                 <div class="invalid-feedback">휴대전화 번호 10자리 또는 11자리를 입력하세요. 숫자만 입력할 수 있습니다.</div>
-              </div>
+            </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
-                <a type="button" class="btn btn-outline-secondary" href="{% url 'users:login_cancelled_after_delete' user.id %}">로그인 취소하기</a>
+                <a type="button" class="btn btn-outline-secondary" href="{% url 'users:login_cancelled_delete' user.id %}">로그인 취소하기</a>
                 <input type="submit" value="등록하기" class="btn btn-outline-primary hide04">
             </div>
         </form>

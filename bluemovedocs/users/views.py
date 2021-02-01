@@ -34,18 +34,22 @@ def write_info(request, id):
     user = get_object_or_404(User, pk=id)
     profile = Profile.objects.get(user=user)
     if 'bluemove.or.kr' in user.email:
-        profile.level = 'bluemover'
-        if request.method == "POST":
-            user.last_name = request.POST.get("last_name")
-            user.first_name = request.POST.get("first_name")
-            profile.phone = request.POST.get("phone")
-            profile.info_update_flag = True
+        try:
             client = WebClient(token=slack_bot_token)
             slack_response = client.users_lookupByEmail(
                 email = request.user.email
             )
             slack_user_data = slack_response.get('user')
             profile.slack_user_id = slack_user_data.get('id')
+        except:
+            user.delete()
+            return redirect('users:login_cancelled_no_slack')
+        profile.level = 'bluemover'
+        if request.method == "POST":
+            user.last_name = request.POST.get("last_name")
+            user.first_name = request.POST.get("first_name")
+            profile.phone = request.POST.get("phone")
+            profile.info_update_flag = True
             user.save(update_fields=['last_name', 'first_name'])
             profile.save(update_fields=['level', 'phone', 'slack_user_id', 'info_update_flag'])
             return redirect('users:myaccount', user.id)
@@ -72,7 +76,14 @@ def login_cancelled(request):
     return render(request, 'users/login_cancelled.html')
 
 
-def login_cancelled_after_delete(request, id):
-    user = get_object_or_404(User, pk=id)
-    user.delete()
-    return render(request, 'users/login_cancelled_after_delete.html')
+def login_cancelled_no_slack(request):
+    return render(request, 'users/login_cancelled_no_slack.html')
+
+
+def login_cancelled_delete(request, id):
+    try:
+        user = get_object_or_404(User, pk=id)
+        user.delete()
+    except:
+        None
+    return render(request, 'users/login_cancelled_delete.html')

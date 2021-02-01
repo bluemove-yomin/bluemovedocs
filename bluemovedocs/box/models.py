@@ -16,6 +16,8 @@ class Box(models.Model):
     title = models.CharField(max_length = 50)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
+    prefix = models.CharField(max_length = 50, null = True, blank = True)
+    folder_id = models.CharField(max_length = 100, null = True, blank = True)
     document_id = models.CharField(max_length = 300)
     channel_id = models.CharField(max_length = 50)
     deadline = models.DateField()
@@ -78,13 +80,6 @@ def content_update_flag_on(sender, instance, **kwargs):
 
 
 class Doc(models.Model):
-
-    FOLDER_CHOICES = {
-        ('0ADF4LPECMczOUk9PVA', '2 교육사업'),
-        ('0ADNIg7OWApdMUk9PVA', '3 콘텐츠사업'),
-        ('0AIsg5YLQSTjaUk9PVA', '5 운영'),
-    }
-
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     avatar_src = models.CharField(max_length = 1500, null=True, blank=True)
     box = models.ForeignKey(Box, on_delete=models.CASCADE, related_name="docs")
@@ -94,7 +89,6 @@ class Doc(models.Model):
     permission_id = models.CharField(max_length = 300, null=True, blank=True)
     inside_permission_id = models.CharField(max_length = 300, null=True, blank=True)
     slack_ts = models.CharField(max_length = 50, null=True, blank=True)
-    folder = models.CharField(max_length = 50, choices = FOLDER_CHOICES, null=True, blank=True)
     reject_reason = models.CharField(max_length = 100, null=True, blank=True)
     creation_date = models.CharField(max_length = 100, null=True, blank=True)
     submission_date = models.CharField(max_length = 100, null=True, blank=True)
