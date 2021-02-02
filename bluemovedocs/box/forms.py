@@ -12,48 +12,27 @@ class BoxContentForm(forms.ModelForm):
 
 
     def save(self, **kwargs):
-        if kwargs.get('category', None) == 'bluemover':
-            box = super().save(commit=False)
-            box.writer = kwargs.get('writer', None)
-            box.category = kwargs.get('category', None)
-            box.prefix = kwargs.get('prefix', None)
-            box.title = kwargs.get('title', None)
-            box.document_id = kwargs.get('document_id', None)
-            box.folder_id = kwargs.get('folder_id', None)
-            box.channel_id = kwargs.get('channel_id', None)
-            box.deadline = kwargs.get('deadline', None)
-            box.image = kwargs.get('image', None)
-            box.save()
-        else:
-            box = super().save(commit=False)
-            box.writer = kwargs.get('writer', None)
-            box.category = kwargs.get('category', None)
-            box.title = kwargs.get('title', None)
-            box.document_id = kwargs.get('document_id', None)
-            box.channel_id = kwargs.get('channel_id', None)
-            box.deadline = kwargs.get('deadline', None)
-            box.image = kwargs.get('image', None)
-            box.save()
+        box = super().save(commit=False)
+        box.writer = kwargs.get('writer', None)
+        box.category = kwargs.get('category', None)
+        box.prefix = kwargs.get('prefix', None)
+        box.title = kwargs.get('title', None)
+        box.document_id = kwargs.get('document_id', None)
+        box.folder_id = kwargs.get('folder_id', None)
+        box.channel_id = kwargs.get('channel_id', None)
+        box.deadline = kwargs.get('deadline', None)
+        box.image = kwargs.get('image', None)
+        box.save()
         return box
 
 
     def update(self, **kwargs):
-        if kwargs.get('category', None) == 'bluemover':
-            box = super().save(commit=False)
-            box.category = kwargs.get('category', None)
-            box.prefix = kwargs.get('prefix', None)
-            box.title = kwargs.get('title', None)
-            box.document_id = kwargs.get('document_id', None)
-            box.folder_id = kwargs.get('folder_id', None)
-            box.channel_id = kwargs.get('channel_id', None)
-            box.deadline = kwargs.get('deadline', None)
-            box.save()
-        else:
-            box = super().save(commit=False)
-            box.category = kwargs.get('category', None)
-            box.title = kwargs.get('title', None)
-            box.document_id = kwargs.get('document_id', None)
-            box.channel_id = kwargs.get('channel_id', None)
-            box.deadline = kwargs.get('deadline', None)
-            box.save()
+        box = super().save(commit=False)
+        box.prefix = kwargs.get('prefix', None)
+        box.title = kwargs.get('title', None)
+        box.document_id = kwargs.get('document_id', None)
+        box.folder_id = kwargs.get('folder_id', None)
+        box.channel_id = kwargs.get('channel_id', None)
+        box.deadline = kwargs.get('deadline', None)
+        box.save()
         return box

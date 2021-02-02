@@ -42,9 +42,9 @@ def write(request):
 @login_required
 # @permission_required('auth.add_permission', raise_exception=True)
 def create(request):
-    if request.method == "POST" and request.POST.get('category') == 'bluemover':
-        form = BoxContentForm(request.POST, request.FILES)            
-        if form.is_valid():
+    if request.method == "POST":
+        form = BoxContentForm(request.POST, request.FILES)
+        if form.is_valid() and request.POST.get('category') == 'bluemover':
             box_category = request.POST.get('category')
             box_prefix = request.POST.get('prefix')
             box_title = request.POST.get('title')
@@ -55,9 +55,7 @@ def create(request):
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
             form.save(category=box_category, prefix=box_prefix, title=box_title, writer=box_writer, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, deadline=box_deadline, image=box_image)
-    elif request.method == "POST" and request.POST.get('category') == 'guest':
-        form = BoxContentForm(request.POST, request.FILES)            
-        if form.is_valid():
+        elif form.is_valid() and request.POST.get('category') == 'guest':
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
             box_writer = request.user
@@ -66,8 +64,6 @@ def create(request):
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
             form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline, image=box_image)
-    else:
-        None
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -427,27 +423,22 @@ def update(request, id):
         channels_name = channels_data.get('name')
         channels_list.append(tuple((channels_id, channels_name)))
     channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
-    if request.method == "POST" and request.POST.get('category') == 'bluemover':
+    if request.method == "POST":
         form = BoxContentForm(request.POST, instance=box)
-        if form.is_valid():
-            box_category = request.POST.get('category')
+        if form.is_valid() and box.category == 'bluemover':
             box_prefix = request.POST.get('prefix')
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
             box_folder_id = request.POST.get('folder_id').replace("https://drive.google.com/drive/folders/","")[0:33]
             box_channel_id = request.POST.get('channel_id')
             box_deadline = request.POST.get('deadline')
-            form.update(category=box_category, prefix=box_prefix, title=box_title, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, deadline=box_deadline)
-        return redirect('box:read', box.id)
-    elif request.method == "POST" and request.POST.get('category') == 'guest':
-        form = BoxContentForm(request.POST, instance=box)
-        if form.is_valid():
-            box_category = request.POST.get('category')
+            form.update(prefix=box_prefix, title=box_title, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, deadline=box_deadline)
+        elif form.is_valid() and box.category == 'guest':
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
             box_channel_id = request.POST.get('channel_id')
             box_deadline = request.POST.get('deadline')
-            form.update(category=box_category, title=box_title, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline)
+            form.update(title=box_title, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline)
         return redirect('box:read', box.id)
     return render(request, 'box/update.html', {'box': box, 'form': form, 'channels_list': channels_list})
 
