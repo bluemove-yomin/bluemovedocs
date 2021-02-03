@@ -351,43 +351,37 @@ def read(request, id):
                     #     None
                 else:
                     None
-        ###########################################
-        ##### OUTSIDE 클라이언트가 guest일 경우 #####
-        ###########################################
+        ####################################
+        ##### OUTSIDE 클라이언트일 경우 #####
+        ####################################
         else:
             all_docs = box.docs.filter(user=request.user)
-            ###############################################
-            ##### OUTSIDE 클라이언트가 bluemover일 경우 #####
-            ###############################################
             for doc in all_docs:
-                if doc.user.profile.level == 'bluemover':
-                    if doc.delete_flag == True:
-                        None
-                    else:
-                        doc_src = "https://docs.google.com/document/d/" + doc.file_id
-                        try:
-                            urllib.request.urlopen(doc_src)
-                        except urllib.error.HTTPError:
-                            if doc.return_flag == True:
-                                doc.delete_flag = True
-                                doc.save()
-                                return redirect('box:read', id=doc.box.id)
-                            else:
-                                doc.delete()
-                                return redirect('box:read', id=doc.box.id)
-                        # r = requests.get(doc_src)
-                        # if not r.status_code == 200:
-                        #     if doc.return_flag == True:
-                        #         doc.delete_flag = True
-                        #         doc.save()
-                        #         return redirect('box:read', id=doc.box.id)
-                        #     else:
-                        #         doc.delete()
-                        #         return redirect('box:read', id=doc.box.id)
-                        # else:
-                        #     None
-                else:
+                if doc.delete_flag == True:
                     None
+                else:
+                    doc_src = "https://docs.google.com/document/d/" + doc.file_id
+                    try:
+                        urllib.request.urlopen(doc_src)
+                    except urllib.error.HTTPError:
+                        if doc.return_flag == True:
+                            doc.delete_flag = True
+                            doc.save()
+                            return redirect('box:read', id=doc.box.id)
+                        else:
+                            doc.delete()
+                            return redirect('box:read', id=doc.box.id)
+                    # r = requests.get(doc_src)
+                    # if not r.status_code == 200:
+                    #     if doc.return_flag == True:
+                    #         doc.delete_flag = True
+                    #         doc.save()
+                    #         return redirect('box:read', id=doc.box.id)
+                    #     else:
+                    #         doc.delete()
+                    #         return redirect('box:read', id=doc.box.id)
+                    # else:
+                    #     None
     else:
         all_docs = None
     return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'all_docs': all_docs})
@@ -888,54 +882,58 @@ def delete_doc(request, doc_id):
             # message_id = message['id']
             # 05. 슬랙 메시지 수정
             client = WebClient(token=slack_bot_token)
-            client.chat_update(
-                channel=doc.box.channel_id,
-                link_names=True,
-                ts=doc.slack_ts,
-                blocks=[
-                    {
-                        "type": "header",
-                        "text": {
-                            "type": "plain_text",
-                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
-                        }
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트:`*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
-                        }
-                    },
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "*~문서명:~*\n~" + doc.box.title + "~\n\n*~Google 계정:~*\n~" +  doc.user.email + "~\n\n*~제출일자:~*\n~" + doc.submission_date + "~"
-                        },
-                        "accessory": {
-                            "type": "image",
-                            "image_url": doc.avatar_src,
-                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                        }
-                    },
-                    {
-                        "type": "actions",
-                        "elements": [
-                            {
-                                "type": "button",
-                                "text": {
-                                    "type": "plain_text",
-                                    "text": "문서함 열기"
-                                },
-                                "value": "open_box",
-                                "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+            try:
+                client.chat_update(
+                    channel=doc.box.channel_id,
+                    link_names=True,
+                    as_user = True,
+                    ts=doc.slack_ts,
+                    blocks=[
+                        {
+                            "type": "header",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
                             }
-                        ]
-                    }
-                ],
-                text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
-            )
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": "*`" + datetime.date.today().strftime('%Y-%m-%d') + " 업데이트:`*\n`" + doc.user.last_name + doc.user.first_name + "님이 문서 제출을 포기하여 자동으로 접수 취소되었습니다.`\n`더 이상 이 문서에 액세스할 수 없습니다.`" + "\n\n~<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.~\n\n~*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*~"
+                            }
+                        },
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": "*~문서명:~*\n~" + doc.box.title + "~\n\n*~Google 계정:~*\n~" +  doc.user.email + "~\n\n*~제출일자:~*\n~" + doc.submission_date + "~"
+                            },
+                            "accessory": {
+                                "type": "image",
+                                "image_url": doc.avatar_src,
+                                "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                            }
+                        },
+                        {
+                            "type": "actions",
+                            "elements": [
+                                {
+                                    "type": "button",
+                                    "text": {
+                                        "type": "plain_text",
+                                        "text": "문서함 열기"
+                                    },
+                                    "value": "open_box",
+                                    "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                                }
+                            ]
+                        }
+                    ],
+                    text=f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 접수되었습니다.",
+                )
+            except:
+                None
             # 06. 슬랙 메시지 발신
             try:
                 client.conversations_join(
@@ -946,6 +944,7 @@ def delete_doc(request, doc_id):
             client.chat_postMessage(
                 channel = doc.box.channel_id,
                 link_names = True,
+                as_user = True,
                 blocks = [
                     {
                         "type": "header",
@@ -1463,6 +1462,7 @@ def submit_doc(request, doc_id):
         slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -1512,6 +1512,7 @@ def submit_doc(request, doc_id):
         client.chat_postMessage(
             channel = doc.user.profile.slack_user_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -1645,7 +1646,6 @@ def submit_doc(request, doc_id):
         doc.inside_permission_id = inside_permission_id
         doc.submit_flag = True
         doc.reject_flag = False
-        doc.save()
         # 08. 메일 생성
         sender = doc.box.writer.email.replace('@bluemove.or.kr', '').capitalize() + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
         to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
@@ -2014,6 +2014,7 @@ def submit_doc(request, doc_id):
         slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -2527,6 +2528,7 @@ def reject_doc(request, doc_id):
         slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -2571,11 +2573,11 @@ def reject_doc(request, doc_id):
             ],
             text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 문서가 반려되었습니다.",
         )
-        doc.slack_ts = slack['ts']
         # 11. OUTSIDE 클라이언트 슬랙 메시지 발신
         client.chat_postMessage(
             channel = doc.user.profile.slack_user_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -2620,7 +2622,6 @@ def reject_doc(request, doc_id):
             ],
             text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 문서가 반려되었습니다.",
         )
-        doc.save()
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -3075,6 +3076,7 @@ def reject_doc(request, doc_id):
         slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -3119,7 +3121,6 @@ def reject_doc(request, doc_id):
             ],
             text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 문서가 반려되었습니다.",
         )
-        doc.slack_ts = slack['ts']
         return redirect('box:read', id=doc.box.id)
 
 
@@ -3435,8 +3436,7 @@ def return_doc(request, doc_id):
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
-                                                                                문서가 승인되어 보관 폴더로 이동되었습니다.<br>
-                                                                                문서에 대한 권한은 보관 폴더 설정에 따릅니다.<br>
+                                                                                문서가 승인되어 보관 폴더로 이동되었으며 문서에 대한 권한은 보관 폴더 설정에 따릅니다.<br>
                                                                                 감사합니다.<br><br>
                                                                             </td>
                                                                         </tr>
@@ -3581,6 +3581,7 @@ def return_doc(request, doc_id):
         slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -3625,11 +3626,11 @@ def return_doc(request, doc_id):
             ],
             text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 문서가 승인되었습니다.",
         )
-        doc.slack_ts = slack['ts']
         # 10. OUTSIDE 클라이언트 슬랙 메시지 발신
         client.chat_postMessage(
             channel = doc.user.profile.slack_user_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -3674,7 +3675,6 @@ def return_doc(request, doc_id):
             ],
             text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 문서가 승인되었습니다.",
         )
-        doc.save()
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -4135,6 +4135,7 @@ def return_doc(request, doc_id):
         slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
+            as_user = True,
             blocks = [
                 {
                     "type": "header",
@@ -4179,7 +4180,6 @@ def return_doc(request, doc_id):
             ],
             text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 문서가 반환되었습니다.",
         )
-        doc.slack_ts = slack['ts']
         return redirect('box:read', id=doc.box.id)
 
 

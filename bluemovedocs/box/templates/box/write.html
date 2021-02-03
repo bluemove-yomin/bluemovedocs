@@ -69,26 +69,36 @@
                     {% empty %}
                         <option value="" disabled>공개 채널을 불러올 수 없습니다.</option>
                     {% endfor %}
-                    <option value="{{ request.user.profile.slack_user_id }}">{{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널</option>
+                    <option value="{{ request.user.profile.slack_user_id }}" id='option_dm'>블루무브 닥스 DM</option>
                 </select>
                 <div class="invalid-feedback">연동 Slack 채널을 입력하세요.</div>
-                <div id="channel_idHelp" class="form-text">
-                    <p class="mb-2">연동 Slack 채널로 문서함 업데이트 정보가 전달됩니다.</p>
-                </div>
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" required>
+                <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" required>
                 <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
                 <script>
                     var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);
                     var today = timezoneDate.toISOString().split('T')[0];
                     document.getElementsByName("deadline")[0].setAttribute('min', today);
+                    function minDateWrite() {
+                        document.write(today);
+                    };
                 </script>
-                <div id="deadlineHelp" class="form-text">
+                <script>
+                    var timezoneOffset2 = new Date().getTimezoneOffset() * 60000;
+                    var timezoneDate2 = new Date(Date.now() - timezoneOffset2);
+                    timezoneDate2.setDate(timezoneDate2.getDate() + 365);
+                    var oneYearFromToday = timezoneDate2.toISOString().split('T')[0];
+                    document.getElementsByName("deadline")[0].setAttribute('max', oneYearFromToday);
+                    function maxDateWrite() {
+                        document.write(oneYearFromToday);
+                    };
+                </script>
+                <div id="deadlineHelp" class="form-text" onload="">
                     <p class="mb-2">기한이 초과되면 문서함이 자동으로 닫힙니다.</p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 오늘 ~ 최대 2022-01-31
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지
                 </div>
             </div>
             <div class="form-group mb-3">
@@ -144,6 +154,8 @@
                 var prefix = document.querySelector("#prefix")
                 var folder_idDiv = document.querySelector("body > main > div > form > div:nth-child(4)")
                 var folder_id = document.querySelector("#folder_id")
+                var channel_id = document.querySelector("#channel_id")
+                var option_dm = document.querySelector("#option_dm")
                 if ($(obj).val() == "bluemover") {
                     prefixDiv.setAttribute("style", "");
                     prefix.required = true;
@@ -151,12 +163,29 @@
                     folder_idDiv.setAttribute("style", "");
                     folder_id.required = true;
                     folder_id.disabled = false;
-                }
-                else if ($(obj).val() == "guest") {
+                    option_dm.setAttribute("style", "");
+                    option_dm.disabled = false;
+                } else if ($(obj).val() == "guest" && channel_id.value == "{{ request.user.profile.slack_user_id }}") {
                     prefixDiv.setAttribute("style", "display:none;");
                     prefix.required = false;
+                    prefix.value = "";
                     folder_idDiv.setAttribute("style", "display:none;");
                     folder_id.required = false;
+                    folder_id.value = "";
+                    option_dm.setAttribute("style", "display:none;");
+                    option_dm.disabled = true;
+                    option_dm.selected = false;
+                    channel_id.value = "";
+                } else if ($(obj).val() == "guest") {
+                    prefixDiv.setAttribute("style", "display:none;");
+                    prefix.required = false;
+                    prefix.value = "";
+                    folder_idDiv.setAttribute("style", "display:none;");
+                    folder_id.required = false;
+                    folder_id.value = "";
+                    option_dm.setAttribute("style", "display:none;");
+                    option_dm.disabled = true;
+                    option_dm.selected = false;
                 }
             }
         </script>

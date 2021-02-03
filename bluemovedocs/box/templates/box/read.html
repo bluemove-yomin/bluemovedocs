@@ -481,7 +481,7 @@
                                 <h3 class="mb-3" style="font-weight: 600; color: #58595B;">내 문서</h3>
                                 <p class="mb-2 text-muted"><i class="fas fa-share-square"></i> 반환됨</p>
                             </div>
-                            <div class="container-md border rounded text-center" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem; margin-bottom: .95rem;">
+                            <div class="container-md border rounded text-center mb-3" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                                 <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-asterisk"></i></span><br>
                                 <span style="color: #58595B;">{{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서가 반환되었으며 더 이상 블루무브 닥스에서 액세스할 수 없습니다.</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 반환</small>
@@ -787,7 +787,7 @@
                         </div>
                         <form id="docForm" name="docForm" action="{% url 'box:create_doc' box.id %}#docPosition" method="POST">
                             {% csrf_token %}
-                            <button class="container btn shadow-sm border rounded text-center" id="docButton" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
+                            <button class="container btn shadow-sm border rounded text-center mb-2" id="docButton" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
                                 <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
                                 <span style="color: #58595B;">새 문서를 생성하려면 누르세요.</span>
                             </button>

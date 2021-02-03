@@ -78,7 +78,7 @@
                 <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." required>
                     <option value="{{ box.channel_id }}" selected hidden>
                         {% if box.channel_id == box.writer.profile.slack_user_id %}
-                            {{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널
+                            블루무브 닥스 DM
                         {% else %}
                             {% for channel_id, channel_name in channels_list %}
                                 {% if box.channel_id == channel_id %}
@@ -93,27 +93,39 @@
                     {% empty %}
                         <option value="" disabled>공개 채널을 불러올 수 없습니다.</option>
                     {% endfor %}
-                    <option value="{{ box.writer.profile.slack_user_id }}">{{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널</option>
+                    {% if box.category == 'bluemover' %}
+                        <option value="{{ box.writer.profile.slack_user_id }}">블루무브 닥스 DM</option>
+                    {% endif %}
                 </select>
                 <div class="invalid-feedback">연동 Slack 채널을 입력하세요.</div>
-                <div id="channel_idHelp" class="form-text">
-                    <p class="mb-2">연동 Slack 채널로 문서함 업데이트 정보가 전달됩니다.</p>
-                </div>
             </div>
             <div class="form-group mb-3">
                 <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="date" class="form-control" name="deadline" id="deadline" max="2022-01-31" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
+                <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
                 <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
                 <script>
                     var timezoneOffset = new Date().getTimezoneOffset() * 60000;
                     var timezoneDate = new Date(Date.now() - timezoneOffset);
                     var today = timezoneDate.toISOString().split('T')[0];
                     document.getElementsByName("deadline")[0].setAttribute('min', today);
+                    function minDateWrite() {
+                        document.write(today);
+                    };
                 </script>
-                <div id="deadlineHelp" class="form-text">
+                <script>
+                    var timezoneOffset2 = new Date().getTimezoneOffset() * 60000;
+                    var timezoneDate2 = new Date(Date.now() - timezoneOffset2);
+                    timezoneDate2.setDate(timezoneDate2.getDate() + 365);
+                    var oneYearFromToday = timezoneDate2.toISOString().split('T')[0];
+                    document.getElementsByName("deadline")[0].setAttribute('max', oneYearFromToday);
+                    function maxDateWrite() {
+                        document.write(oneYearFromToday);
+                    };
+                </script>
+                <div id="deadlineHelp" class="form-text" onload="">
                     <p class="mb-2">기한이 초과되면 문서함이 자동으로 닫힙니다.</p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 오늘에서 최대 2022-01-31까지 입력할 수 있습니다.<span id="old_deadline" style="display: none;">{{ box.deadline|date:'Y-m-d' }}</span><br>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지<br>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내 텍스트</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트 표시
                 </div>
             </div>
             {% if box.image %}
@@ -249,7 +261,7 @@
                         var form = this;
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
                             // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
@@ -353,7 +365,7 @@
                             }
                             // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
-                                if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + document.querySelector("#old_deadline").innerText + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
+                                if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                                     form.submit();
                                 }
                                 else {
@@ -372,7 +384,7 @@
                         var form = this;
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
                             // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
@@ -458,7 +470,7 @@
                             }
                             // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
-                                if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + document.querySelector("#old_deadline").innerText + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
+                                if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                                     form.submit();
                                 }
                                 else {
@@ -479,7 +491,7 @@
                         var form = this;
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
                             // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
@@ -583,7 +595,7 @@
                             }
                             // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
-                                if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + document.querySelector("#old_deadline").innerText + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                                if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                                     form.submit();
                                 }
                                 else {
@@ -602,7 +614,7 @@
                         var form = this;
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( document.querySelector("#old_deadline").innerText == document.querySelector("#deadline").value ) {
+                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
                             // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
@@ -688,7 +700,7 @@
                             }
                             // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
-                                if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + document.querySelector("#old_deadline").innerText + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                                if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                                     form.submit();
                                 }
                                 else {
