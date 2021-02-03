@@ -351,10 +351,10 @@ def read(request, id):
                     #     None
                 else:
                     None
-        ####################################
-        ##### OUTSIDE 클라이언트일 경우 #####
-        ####################################
-        else:
+        ###############################################
+        ##### OUTSIDE 클라이언트가 bluemover일 경우 #####
+        ###############################################
+        elif request.user.profile.level == 'bluemover':
             all_docs = box.docs.filter(user=request.user)
             for doc in all_docs:
                 if doc.delete_flag == True:
@@ -382,6 +382,11 @@ def read(request, id):
                     #         return redirect('box:read', id=doc.box.id)
                     # else:
                     #     None
+        ###########################################
+        ##### OUTSIDE 클라이언트가 guest일 경우 #####
+        ###########################################
+        else:
+            all_docs = box.docs.filter(user=request.user)
     else:
         all_docs = None
     return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'all_docs': all_docs})

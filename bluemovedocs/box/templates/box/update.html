@@ -262,7 +262,6 @@
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
                         if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
@@ -275,7 +274,6 @@
                             else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("유효한 보관 폴더 링크를 입력하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -288,35 +286,29 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 form.submit();
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
@@ -329,7 +321,6 @@
                             else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("유효한 보관 폴더 링크를 입력하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -342,28 +333,23 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                                     form.submit();
@@ -385,11 +371,9 @@
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
                         if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -402,39 +386,32 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 form.submit();
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -447,28 +424,23 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                                     form.submit();
@@ -492,7 +464,6 @@
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
                         if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
@@ -505,7 +476,6 @@
                             else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("유효한 보관 폴더 링크를 입력하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -518,35 +488,29 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 form.submit();
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
@@ -559,7 +523,6 @@
                             else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("유효한 보관 폴더 링크를 입력하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -572,28 +535,23 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                                     form.submit();
@@ -615,11 +573,9 @@
                         e.preventDefault();
                         // 유저가 새로운 기한을 입력하지 않았을 경우
                         if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -632,39 +588,32 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 form.submit();
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            // 대상 input이 비어 있을 경우
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
-                            // 문서명 input이 비어 있을 경우
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -677,28 +626,23 @@
                             else if ( !document.querySelector("#channel_id").value ) {
                                 alert("연동 Slack 채널을 선택하세요.")
                             }
-                            // 유저가 기한을 아예 입력하지 않았을 경우
                             else if ( !document.querySelector("#deadline").value ) {
                                 alert("기한을 입력하세요.")
                             }
-                            // 유저가 기한을 오늘보다 빠른 날로 입력했을 경우
                             else if ( document.querySelector("#deadline").value < today ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 유저가 기한을 2022-01-31보다 늦은 날로 입력했을 경우
-                            else if ( document.querySelector("#deadline").value > '2022-01-31' ) {
+                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
                                 alert("유효 범위 내 기한을 입력하세요.")
                                 document.querySelector("#deadline").value = '';
                             }
-                            // 내용 input이 비어 있을 경우
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
                                 alert("내용을 입력하세요.")
                             }
                             else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
                                 alert("내용을 입력하세요.")
                             }
-                            // 유저가 입력한 기한과 위의 모든 유효성 검사를 통과했을 경우
                             else {
                                 if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                                     form.submit();

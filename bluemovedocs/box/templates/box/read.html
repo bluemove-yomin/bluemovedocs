@@ -501,9 +501,9 @@
                         <p class="mb-2 text-muted"><i class="fas fa-times-circle"></i> 반려됨</p>
                     </div>
                     {% if box.deadline_is_over %}
-                        <div class="callout callout-danger my-0 mb-3" style="word-break: break-word;">
-                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 재제출 불가</span><br>
-                            <small style="color: #6C757D;">기한이 초과되어 문서를 다시 제출할 수 없습니다. 문서를 삭제하거나 반환받으세요.</small>
+                        <div class="callout callout-dark my-0 mb-3" style="word-break: break-word;">
+                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 초과</span><br>
+                            <small style="color: #6C757D;">기한이 초과되어 문서를 다시 제출할 수 없습니다.</small>
                         </div>
                     {% endif %}
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
@@ -517,13 +517,19 @@
                             <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
-                    <div class="container-md d-flex p-0 my-2">
-                        {% if box.deadline_is_over %}
+                    {% if box.deadline_is_over and doc.user.profile.level == 'guest' %}
+                        <div class="container-md d-flex p-0 my-2">
                             <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'">반환받기</button>
-                        {% else %}
+                        </div>
+                    {% elif box.deadline_is_over and doc.user.profile.level == 'bluemover' %}
+                        <div class="container-md d-flex p-0 my-2">
+                            <button href="#" class="container btn btn-primary" disabled>제출 불가</button>
+                        </div>
+                    {% else %}
+                        <div class="container-md d-flex p-0 my-2">
                             <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</a>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                     <!-- docSubmitModal -->
                     <div class="modal fade" id="docSubmitModal" tabindex="-1" aria-labelledby="docSubmitModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -658,9 +664,9 @@
                         <p class="mb-2 text-muted"><i class="fas fa-paperclip"></i> 첨부됨</p>
                     </div>
                     {% if box.deadline_is_over %}
-                        <div class="callout callout-danger my-0 mb-3" style="word-break: break-word;">
-                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 제출 불가</span><br>
-                            <small style="color: #6C757D;">기한이 초과되어 문서를 제출할 수 없습니다. 문서를 삭제하거나 반환받으세요.</small>
+                        <div class="callout callout-dark my-0 mb-3" style="word-break: break-word;">
+                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 초과</span><br>
+                            <small style="color: #6C757D;">기한이 초과되어 문서를 제출할 수 없습니다.</small>
                         </div>
                     {% endif %}
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
@@ -674,13 +680,19 @@
                             <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
-                    <div class="container-md d-flex p-0 my-2">
-                        {% if box.deadline_is_over %}
+                    {% if box.deadline_is_over and doc.user.profile.level == 'guest' %}
+                        <div class="container-md d-flex p-0 my-2">
                             <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'">반환받기</button>
-                        {% else %}
+                        </div>
+                    {% elif box.deadline_is_over and doc.user.profile.level == 'bluemover' %}
+                        <div class="container-md d-flex p-0 my-2">
+                            <button href="#" class="container btn btn-primary" disabled>제출 불가</button>
+                        </div>
+                    {% else %}
+                        <div class="container-md d-flex p-0 my-2">
                             <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                     <!-- docSubmitModal -->
                     <div class="modal fade" id="docSubmitModal" tabindex="-1" aria-labelledby="docSubmitModalLabel" aria-hidden="true">
                         <div class="modal-dialog">

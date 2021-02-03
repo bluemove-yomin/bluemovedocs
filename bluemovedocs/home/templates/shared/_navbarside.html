@@ -1,22 +1,33 @@
 <ul class="navbar-nav flex-row flex-wrap ms-md-auto mb-2">
-    <li class="nav-item col-6 col-md-auto">
-        <a class="nav-link p-2" href="http://drive.bluemove.or.kr" target="_blank" rel="noopener">
-            <img src="/static/images/googledrivelogo.png" alt="구글 드라이브" title="구글 드라이브" height="20" class="d-inline-block">
-            <small class="d-md-none ms-2">Google Drive</small>
-        </a>
-    </li>
-    <li class="nav-item col-6 col-md-auto">
-        <a class="nav-link p-2" href="https://notion.so/bluemove" target="_blank" rel="noopener">
-            <img src="/static/images/notionlogo.png" alt="노션" title="노션" height="20" class="d-inline-block">
-            <small class="d-md-none ms-2">Notion</small>
-        </a>
-    </li>
-    <li class="nav-item col-6 col-md-auto">
-        <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
-            <img src="/static/images/slacklogo.png" alt="슬랙" title="슬랙" height="20" class="d-inline-block">
-            <small class="d-md-none ms-2">Slack</small>
-        </a>
-    </li>
+    {% if user.is_authenticated %}
+        <li class="nav-item col-6 col-md-auto">
+            {% if request.user.profile.level == 'bluemover' %}
+                <a class="nav-link p-2" href="http://drive.bluemove.or.kr" target="_blank" rel="noopener">
+                    <img src="/static/images/googledrivelogo.png" alt="구글 드라이브" title="구글 드라이브" height="20" class="d-inline-block">
+                    <small class="d-md-none ms-2">Google Drive</small>
+                </a>
+            {% else %}
+                <a class="nav-link p-2" href="http://drive.google.com" target="_blank" rel="noopener">
+                    <img src="/static/images/googledrivelogo.png" alt="구글 드라이브" title="구글 드라이브" height="20" class="d-inline-block">
+                    <small class="d-md-none ms-2">Google Drive</small>
+                </a>
+            {% endif %}
+        </li>
+    {% endif %}
+    {% if request.user.profile.level == 'bluemover' %}
+        <li class="nav-item col-6 col-md-auto">
+            <a class="nav-link p-2" href="https://notion.so/bluemove" target="_blank" rel="noopener">
+                <img src="/static/images/notionlogo.png" alt="노션" title="노션" height="20" class="d-inline-block">
+                <small class="d-md-none ms-2">Notion</small>
+            </a>
+        </li>
+        <li class="nav-item col-6 col-md-auto">
+            <a class="nav-link p-2" href="https://bwbluemove.slack.com" target="_blank" rel="noopener">
+                <img src="/static/images/slacklogo.png" alt="슬랙" title="슬랙" height="20" class="d-inline-block">
+                <small class="d-md-none ms-2">Slack</small>
+            </a>
+        </li>
+    {% endif %}
     {% if not user.is_authenticated %}
     <li class="nav-item col-6 col-md-auto">
         <a class="nav-link p-2" href="{% url 'account_login' %}?next={{ request.path }}">

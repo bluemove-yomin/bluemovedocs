@@ -2,9 +2,13 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-md navbar-dark px-2 px-md-5">
         <div class="container-md">
-            <a class="navbar-brand" href="{% url 'home:home' %}" style="font-weight: 600;">
+            <a class="navbar-brand" href="{% url 'home:home' %}" style="font-weight: 600;" id="logoLarge">
                 <img src="/static/images/bluemovelogo.png" alt="블루무브" height="28" class="d-inline-block align-top">
                 Docs
+            </a>
+            <a class="navbar-brand" href="{% url 'home:home' %}" style="font-weight: 600;" id="logoSmall">
+                <img src="/static/images/bluemovelogo.png" alt="블루무브" height="25.5" class="d-inline-block align-top" style="margin-top: .15rem;">
+                <span style="font-size: 18px;">Docs</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

@@ -74,7 +74,7 @@ def main():
 
     ##### 00. 테스트 파일 또는 폴더 삭제
     drive_response = drive_service.files().delete(
-        fileId = '1l_-zHJCllYNoHHxid-gWzjcqRtm0tY5mbldbZjC2EKY',
+        fileId = '1m4g8zZQP2YOih4vEU2z1cu9-mxWmSiUMoIhXC-GWWiQ',
     ).execute()
     return print('00. 테스트 파일 또는 폴더 삭제에 성공했습니다.')
 
