@@ -11,7 +11,7 @@
             📁 문서함 이미지 추가
             {% endif %}
         </h1>
-        <form action="{% url 'box:updateimage' box.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'box:updateimage' box.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" id="boxForm" novalidate>
             {% csrf_token %}
             <div class="form-group mb-3">
                 <label for="category" class="form-label">대상</label>
@@ -87,7 +87,7 @@
                     {% for channel_id, channel_name in channels_list %}
                         <option value="{{ channel_id }}">#{{ channel_name }}</option>
                     {% empty %}
-                        <option value="" disabled>공개 채널을 불러올 수 없습니다.</option>
+                        <option value="" disabled>Slack 공개 채널을 불러올 수 없습니다.</option>
                     {% endfor %}
                     <option value="{{ box.writer.profile.slack_user_id }}">{{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널</option>
                 </select>
@@ -232,7 +232,7 @@
             }
 
             var _URL = window.URL || window.webkitURL;
-            $("form").submit( function( e ) {
+            $("#boxForm").submit( function( e ) {
                 var form = this;
                 e.preventDefault(); // Stop the submit for now
                 // Replace with your selector to find the file input in your form

@@ -33,6 +33,24 @@ def main():
 
     drive_service = build('drive', 'v3', credentials=creds)
 
+    results = drive_service.files().list(
+        corpora="drive",
+        driveId="0ADF4LPECMczOUk9PVA",
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        q="mimeType='application/vnd.google-apps.folder' and '13o3t-Ig-OKzNpmXi-QCF7S88p2KXaHhQ' in parents",
+        supportsAllDrives=True,
+    ).execute()
+    items = results.get('files', [])
+
+    if not items:
+        return print('No files found.')
+    else:
+        print('Files:')
+        for item in items:
+            print(u'{0} ({1})'.format(item['name'], item['id']))
+    return None
+
     # 01. 유저 My Drive에 블루무브 폴더 생성하기
     file_metadata = {
         'name': '블루무브',

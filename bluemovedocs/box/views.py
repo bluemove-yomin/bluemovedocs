@@ -5,8 +5,8 @@ from .models import *
 from django.db.models import Q
 import datetime
 import base64
-import requests
 import urllib
+import re
 from .forms import BoxContentForm
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
@@ -25,6 +25,76 @@ from slack_sdk import WebClient
 # @permission_required('auth.add_permission', raise_exception=True)
 def write(request):
     form = BoxContentForm()
+    # Google Drive 공유 드라이브 폴더 불러오기 시작
+    token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+    credentials = Credentials(
+        client_id=client_id,
+        client_secret=client_secret,
+        token_uri='https://oauth2.googleapis.com/token',
+        token=token.token,
+        refresh_token=token.token_secret,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+    drive_response = drive_service.drives().list().execute()
+    all_drives = drive_response.get('drives')
+    drives_list = []
+    for drive in all_drives:
+        drive_id = drive['id']
+        drive_name = drive['name']
+        if 'A' in drive_name:
+            Adrive = drive_id
+        if 'B' in drive_name:
+            Bdrive = drive_id
+        if 'C' in drive_name:
+            Cdrive = drive_id
+        if 'D' in drive_name:
+            Ddrive = drive_id
+        if 'E' in drive_name:
+            Edrive = drive_id
+        if 'F' in drive_name:
+            Fdrive = drive_id
+        if 'G' in drive_name:
+            Gdrive = drive_id
+        if 'H' in drive_name:
+            Hdrive = drive_id
+        drives_list.append(drive_name)
+    drive_response = drive_service.files().list(
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        orderBy="name",
+        q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
+        supportsAllDrives=True,
+    ).execute()
+    all_folders = drive_response.get('files')
+    folders_list_A = []
+    folders_list_B = []
+    folders_list_C = []
+    folders_list_D = []
+    folders_list_E = []
+    folders_list_F = []
+    folders_list_G = []
+    folders_list_H = []
+    for folder in all_folders:
+        folder_id = folder['id']
+        folder_name = folder['name']
+        if re.match('A+\d+', folder_name):
+            folders_list_A.append(tuple((folder_id, folder_name)))
+        if re.match('B+\d+', folder_name):
+            folders_list_B.append(tuple((folder_id, folder_name)))
+        if re.match('C+\d+', folder_name):
+            folders_list_C.append(tuple((folder_id, folder_name)))
+        if re.match('D+\d+', folder_name):
+            folders_list_D.append(tuple((folder_id, folder_name)))
+        if re.match('E+\d+', folder_name):
+            folders_list_E.append(tuple((folder_id, folder_name)))
+        if re.match('F+\d+', folder_name):
+            folders_list_F.append(tuple((folder_id, folder_name)))
+        if re.match('G+\d+', folder_name):
+            folders_list_G.append(tuple((folder_id, folder_name)))
+        if re.match('H+\d+', folder_name):
+            folders_list_H.append(tuple((folder_id, folder_name)))
+    # Google Drive 공유 드라이브 폴더 불러오기 끝
+    # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
         team_id = 'T2EH6PN00'
@@ -36,7 +106,24 @@ def write(request):
         channels_name = channels_data.get('name')
         channels_list.append(tuple((channels_id, channels_name)))
     channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
-    return render(request, 'box/write.html', {'form': form, 'channels_list': channels_list})
+    # Slack 채널 불러오기 끝
+    return render(
+        request,
+        'box/write.html',
+        {
+            'form': form,
+            'drives_list': drives_list,
+            'folders_list_A': folders_list_A,
+            'folders_list_B': folders_list_B,
+            'folders_list_C': folders_list_C,
+            'folders_list_D': folders_list_D,
+            'folders_list_E': folders_list_E,
+            'folders_list_F': folders_list_F,
+            'folders_list_G': folders_list_G,
+            'folders_list_H': folders_list_H,
+            'channels_list': channels_list,
+        }
+    )
 
 
 @login_required
@@ -46,24 +133,27 @@ def create(request):
         form = BoxContentForm(request.POST, request.FILES)
         if form.is_valid() and request.POST.get('category') == 'bluemover':
             box_category = request.POST.get('category')
-            box_prefix = request.POST.get('prefix')
+            box_drive_name = request.POST.get('drive_id')
+            box_folder_id = request.POST.get('folder_id').split('#')[0]
+            box_folder_name = request.POST.get('folder_id').split('#')[1]
             box_title = request.POST.get('title')
             box_writer = request.user
             box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
-            box_folder_id = request.POST.get('folder_id').replace("https://drive.google.com/drive/folders/","")[0:33]
-            box_channel_id = request.POST.get('channel_id')
+            box_channel_id = request.POST.get('channel_id').split('#')[0]
+            box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, prefix=box_prefix, title=box_title, writer=box_writer, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image)
         elif form.is_valid() and request.POST.get('category') == 'guest':
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
             box_writer = request.user
             box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
-            box_channel_id = request.POST.get('channel_id')
+            box_channel_id = request.POST.get('channel_id').split('#')[0]
+            box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -100,7 +190,7 @@ def create_doc(request, id):
             drive_response = drive_service.files().copy(
                 fileId = application_id,
                 body = {
-                    'name': box.prefix + '_' + ##### 파일 프리픽스 INPUT #####
+                    'name': box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                             box.title.replace(" ","") + ##### 문서명 INPUT #####
                             request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                             '_' + datetime.date.today().strftime('%y%m%d'),
@@ -411,6 +501,76 @@ def box_favorite(request, id):
 def update(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
+    # Google Drive 공유 드라이브 폴더 불러오기 시작
+    token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+    credentials = Credentials(
+        client_id=client_id,
+        client_secret=client_secret,
+        token_uri='https://oauth2.googleapis.com/token',
+        token=token.token,
+        refresh_token=token.token_secret,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+    drive_response = drive_service.drives().list().execute()
+    all_drives = drive_response.get('drives')
+    drives_list = []
+    for drive in all_drives:
+        drive_id = drive['id']
+        drive_name = drive['name']
+        if 'A' in drive_name:
+            Adrive = drive_id
+        if 'B' in drive_name:
+            Bdrive = drive_id
+        if 'C' in drive_name:
+            Cdrive = drive_id
+        if 'D' in drive_name:
+            Ddrive = drive_id
+        if 'E' in drive_name:
+            Edrive = drive_id
+        if 'F' in drive_name:
+            Fdrive = drive_id
+        if 'G' in drive_name:
+            Gdrive = drive_id
+        if 'H' in drive_name:
+            Hdrive = drive_id
+        drives_list.append(drive_name)
+    drive_response = drive_service.files().list(
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        orderBy="name",
+        q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
+        supportsAllDrives=True,
+    ).execute()
+    all_folders = drive_response.get('files')
+    folders_list_A = []
+    folders_list_B = []
+    folders_list_C = []
+    folders_list_D = []
+    folders_list_E = []
+    folders_list_F = []
+    folders_list_G = []
+    folders_list_H = []
+    for folder in all_folders:
+        folder_id = folder['id']
+        folder_name = folder['name']
+        if re.match('A+\d+', folder_name):
+            folders_list_A.append(tuple((folder_id, folder_name)))
+        if re.match('B+\d+', folder_name):
+            folders_list_B.append(tuple((folder_id, folder_name)))
+        if re.match('C+\d+', folder_name):
+            folders_list_C.append(tuple((folder_id, folder_name)))
+        if re.match('D+\d+', folder_name):
+            folders_list_D.append(tuple((folder_id, folder_name)))
+        if re.match('E+\d+', folder_name):
+            folders_list_E.append(tuple((folder_id, folder_name)))
+        if re.match('F+\d+', folder_name):
+            folders_list_F.append(tuple((folder_id, folder_name)))
+        if re.match('G+\d+', folder_name):
+            folders_list_G.append(tuple((folder_id, folder_name)))
+        if re.match('H+\d+', folder_name):
+            folders_list_H.append(tuple((folder_id, folder_name)))
+    # Google Drive 공유 드라이브 폴더 불러오기 끝
+    # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
         team_id = 'T2EH6PN00'
@@ -422,24 +582,45 @@ def update(request, id):
         channels_name = channels_data.get('name')
         channels_list.append(tuple((channels_id, channels_name)))
     channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
+    # Slack 채널 불러오기 끝
     if request.method == "POST":
         form = BoxContentForm(request.POST, instance=box)
         if form.is_valid() and box.category == 'bluemover':
-            box_prefix = request.POST.get('prefix')
+            box_folder_id = request.POST.get('folder_id').split('#')[0]
+            box_folder_name = request.POST.get('folder_id').split('#')[1]
+            box_drive_name = request.POST.get('drive_id')
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
-            box_folder_id = request.POST.get('folder_id').replace("https://drive.google.com/drive/folders/","")[0:33]
-            box_channel_id = request.POST.get('channel_id')
+            box_channel_id = request.POST.get('channel_id').split('#')[0]
+            box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(prefix=box_prefix, title=box_title, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, deadline=box_deadline)
+            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline)
         elif form.is_valid() and box.category == 'guest':
             box_title = request.POST.get('title')
             box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
-            box_channel_id = request.POST.get('channel_id')
+            box_channel_id = request.POST.get('channel_id').split('#')[0]
+            box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(title=box_title, document_id=box_document_id, channel_id=box_channel_id, deadline=box_deadline)
+            form.update(title=box_title, document_id=box_document_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline)
         return redirect('box:read', box.id)
-    return render(request, 'box/update.html', {'box': box, 'form': form, 'channels_list': channels_list})
+    return render(
+        request,
+        'box/update.html',
+        {
+            'box': box,
+            'form': form,
+            'drives_list': drives_list,
+            'folders_list_A': folders_list_A,
+            'folders_list_B': folders_list_B,
+            'folders_list_C': folders_list_C,
+            'folders_list_D': folders_list_D,
+            'folders_list_E': folders_list_E,
+            'folders_list_F': folders_list_F,
+            'folders_list_G': folders_list_G,
+            'folders_list_H': folders_list_H,
+            'channels_list': channels_list
+        }
+    )
 
 
 @login_required
@@ -447,6 +628,76 @@ def update(request, id):
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
+    # Google Drive 공유 드라이브 폴더 불러오기 시작
+    token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+    credentials = Credentials(
+        client_id=client_id,
+        client_secret=client_secret,
+        token_uri='https://oauth2.googleapis.com/token',
+        token=token.token,
+        refresh_token=token.token_secret,
+    )
+    drive_service = build('drive', 'v3', credentials=credentials)
+    drive_response = drive_service.drives().list().execute()
+    all_drives = drive_response.get('drives')
+    drives_list = []
+    for drive in all_drives:
+        drive_id = drive['id']
+        drive_name = drive['name']
+        if 'A' in drive_name:
+            Adrive = drive_id
+        if 'B' in drive_name:
+            Bdrive = drive_id
+        if 'C' in drive_name:
+            Cdrive = drive_id
+        if 'D' in drive_name:
+            Ddrive = drive_id
+        if 'E' in drive_name:
+            Edrive = drive_id
+        if 'F' in drive_name:
+            Fdrive = drive_id
+        if 'G' in drive_name:
+            Gdrive = drive_id
+        if 'H' in drive_name:
+            Hdrive = drive_id
+        drives_list.append(drive_name)
+    drive_response = drive_service.files().list(
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        orderBy="name",
+        q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
+        supportsAllDrives=True,
+    ).execute()
+    all_folders = drive_response.get('files')
+    folders_list_A = []
+    folders_list_B = []
+    folders_list_C = []
+    folders_list_D = []
+    folders_list_E = []
+    folders_list_F = []
+    folders_list_G = []
+    folders_list_H = []
+    for folder in all_folders:
+        folder_id = folder['id']
+        folder_name = folder['name']
+        if re.match('A+\d+', folder_name):
+            folders_list_A.append(tuple((folder_id, folder_name)))
+        if re.match('B+\d+', folder_name):
+            folders_list_B.append(tuple((folder_id, folder_name)))
+        if re.match('C+\d+', folder_name):
+            folders_list_C.append(tuple((folder_id, folder_name)))
+        if re.match('D+\d+', folder_name):
+            folders_list_D.append(tuple((folder_id, folder_name)))
+        if re.match('E+\d+', folder_name):
+            folders_list_E.append(tuple((folder_id, folder_name)))
+        if re.match('F+\d+', folder_name):
+            folders_list_F.append(tuple((folder_id, folder_name)))
+        if re.match('G+\d+', folder_name):
+            folders_list_G.append(tuple((folder_id, folder_name)))
+        if re.match('H+\d+', folder_name):
+            folders_list_H.append(tuple((folder_id, folder_name)))
+    # Google Drive 공유 드라이브 폴더 불러오기 끝
+    # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
         team_id = 'T2EH6PN00'
@@ -458,11 +709,29 @@ def updateimage(request, id):
         channels_name = channels_data.get('name')
         channels_list.append(tuple((channels_id, channels_name)))
     channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
+    # Slack 채널 불러오기 끝
     if request.method == "POST":
         box.image = request.FILES.get('image')
         box.save(update_fields=['image'])
         return redirect('box:read', box.id)
-    return render(request, 'box/updateimage.html', {'box': box, 'form': form, 'channels_list': channels_list})
+    return render(
+        request,
+        'box/updateimage.html',
+        {
+            'box': box,
+            'form': form,
+            'drives_list': drives_list,
+            'folders_list_A': folders_list_A,
+            'folders_list_B': folders_list_B,
+            'folders_list_C': folders_list_C,
+            'folders_list_D': folders_list_D,
+            'folders_list_E': folders_list_E,
+            'folders_list_F': folders_list_F,
+            'folders_list_G': folders_list_G,
+            'folders_list_H': folders_list_H,
+            'channels_list': channels_list
+        }
+    )
 
 
 @login_required
@@ -1045,7 +1314,7 @@ def submit_doc(request, doc_id):
         drive_response = drive_service.files().update(
             fileId = file_id,
             body = {
-                'name': doc.box.prefix + '_' + ##### 파일 프리픽스 INPUT #####
+                'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                         doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
                         doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),
@@ -2114,7 +2383,7 @@ def reject_doc(request, doc_id):
         drive_response = drive_service.files().update(
             fileId = file_id,
             body = {
-                'name': doc.box.prefix + '_' + ##### 파일 프리픽스 INPUT #####
+                'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                         doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
                         doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),
@@ -3175,7 +3444,7 @@ def return_doc(request, doc_id):
         drive_response = drive_service.files().update(
             fileId = file_id,
             body = {
-                'name': doc.box.prefix + '_' + ##### 파일 프리픽스 INPUT #####
+                'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                         doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
                         doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),

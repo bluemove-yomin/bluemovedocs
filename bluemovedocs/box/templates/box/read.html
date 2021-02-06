@@ -119,13 +119,16 @@
             <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
             <small style="color: #6C757D;">
                 {% if box.category == 'bluemover' %}
-                    ⊙ 프리픽스: <mark><strong>{{ box.prefix }}</strong></mark><br>
-                    ⊙ 보관 폴더 ID: <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_id }}</a><br>
+                    ⊙ 최종 디렉토리: <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_name }}</a><br>
                     ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-                    ⊙ 연동 Slack 채널 ID: <a href="https://slack.com/app_redirect?channel={{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                    {% if box.channel_id == request.user.profile.slack_user_id %}
+                        ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/D01KX51277X" target="_blank">블루무브 닥스 DM</a><br>
+                    {% else %}
+                        ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
+                    {% endif %}
                 {% else %}
                     ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-                    ⊙ 연동 Slack 채널 ID: <a href="https://slack.com/app_redirect?channel={{ box.channel_id }}" target="_blank">{{ box.channel_id }}</a><br>
+                    ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                 {% endif %}
                 이 콜아웃은 문서함 생성자에게만 표시됩니다.
             </small>

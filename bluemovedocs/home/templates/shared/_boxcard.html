@@ -32,10 +32,31 @@
         </div>
         <!-- 열린 문서함 탭 내부 생성하기 버튼 -->
         {% if user.profile.level == 'bluemover' %}
-        <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
-            <a href="{% url 'box:write' %}" class="btn btn-outline-primary">생성하기</a>
+        <div class="container-md d-grid gap-2 d-sm-flex justify-content-sm-end mt-5 p-0">
+            <button onclick="wait()" id="wait" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#boxReadyModal">생성하기</button>
+            <!-- boxReadyModal -->
+            <div class="modal fade" id="boxReadyModal" tabindex="-1" aria-labelledby="boxReadyModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="boxReadyModalLabel" style="font-weight: 600;">⏳ 작업 중</h5>
+                        </div>
+                        <div class="modal-body">
+                            문서함 생성을 준비하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
+                            <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        {% else %}
+        <script>
+            function wait() {
+                var wait = document.querySelector("#wait");
+                wait.innerText = "생성 준비 중"
+                wait.disabled = true;
+                location.href='{% url 'box:write' %}'
+            }
+        </script>
         {% endif %}
         <!-- 열린 문서함 탭 내부 페이지네이션 -->
         {% if opened_boxes.has_other_pages %}

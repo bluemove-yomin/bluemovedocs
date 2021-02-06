@@ -5,7 +5,7 @@
 <main class="px-2 px-md-5">
     <div class="container-md mt-5 table-responsive">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📁 문서함 생성</h1>
-        <form action="{% url 'box:create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'box:create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" id="boxForm" novalidate>
             {% csrf_token %}
             <div class="form-group mb-3">
                 <label for="category" class="form-label">대상<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -15,35 +15,67 @@
                     <option value="guest">게스트</option>
                 </select>
                 <div class="invalid-feedback">대상을 선택하세요.</div>
-                <div id="prefixHelp" class="form-text">대상은 문서함 생성 이후 수정할 수 없습니다.</div>
+                <div class="form-text">대상은 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
-            <div class="form-group mb-3" style="display: none;">
-                <label for="prefix" class="form-label">프리픽스<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <select class="form-select" name="prefix" id="prefix" placeholder="프리픽스를 선택하세요." disabled>
-                    <option value="" selected disabled>프리픽스를 선택하세요.</option>
-                    <option value="파란물결블루무브">파란물결블루무브</option>
-                    <option value="교육">교육</option>
-                    <option value="콘텐츠">콘텐츠</option>
-                    <option value="매뉴얼">매뉴얼</option>
-                    <option value="운영">운영</option>
-                    <option value="행사">행사</option>
-                    <option value="비주얼에셋">비주얼에셋</option>
-                    <option value="임원">임원</option>
+            <div class="form-group mb-3" id="drive_id_DIV" style="display: none;">
+                <label for="drive_id" class="form-label">공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="공유 드라이브를 선택하세요." disabled>
+                    <option value="" selected disabled>공유 드라이브를 선택하세요.</option>
+                    {% for drive_name in drives_list %}
+                        <option value="{{ drive_name }}">{{ drive_name }}</option>
+                    {% empty %}
+                        <option value="" disabled>Google 공유 드라이브를 불러올 수 없습니다.</option>
+                    {% endfor %}
                 </select>
-                <div class="invalid-feedback">프리픽스를 선택하세요.</div>
-                <div id="prefixHelp" class="form-text">
-                    <p class="mb-2">프리픽스란 효율적인 파일 관리를 위하여 문서명 앞에 붙이는 분류용 키워드입니다.</p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: <mark><strong>교육</strong></mark>_2021공항중교재_210201</span>
-                </div>
+                <div class="invalid-feedback">공유 드라이브를 선택하세요.</div>
             </div>
-            <div class="form-group mb-3" style="display: none;">
-                <label for="folder_id" class="form-label">보관 폴더 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="text" class="form-control" name="folder_id" id="folder_id" minlength="72" placeholder="보관 폴더 링크를 입력하세요." aria-describedby="folder_idHelp" disabled>
-                <div class="invalid-feedback">유효한 보관 폴더 링크를 입력하세요.</div>
-                <div id="folder_idHelp" class="form-text">
-                    <p class="mb-2">보관 폴더는 공유 드라이브 안에 위치하고 있어야 합니다.</p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://drive.google.com/drive/folders/13o3t-Ig-OKzNpmXi-QCF7S88p2KXaHhQ</span>
-                </div>
+            <div class="form-group mb-3" id="folder_id_DIV" style="display: none;">
+                <label for="folder_id" class="form-label">최종 디렉토리<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <select class="form-select" name="folder_id" id="folder_id" placeholder="최종 디렉토리를 선택하세요." disabled>
+                    <option value="" selected disabled>최종 디렉토리를 선택하세요.</option>
+                    {% for folder_id, folder_name in folders_list_A %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_A{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_A_empty" disabled>A 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_B{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_B_empty" disabled>B 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_C{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_C_empty" disabled>C 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_D{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_D_empty" disabled>D 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_E{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_E_empty" disabled>E 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_F{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_F_empty" disabled>F 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_G{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_G_empty" disabled>G 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        <option value="{{ folder_id }}#{{ folder_name }}" id="option_H{{ folder_id }}">{{ folder_name }}</option>
+                    {% empty %}
+                        <option value="" id="option_H_empty" disabled>H 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">최종 디렉토리를 선택하세요.</div>
+                <div class="form-text">최종 디렉토리에 승인 문서가 저장됩니다.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="title" class="form-label">문서명<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -65,11 +97,11 @@
                 <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." required>
                     <option value="" selected disabled>연동 Slack 채널을 선택하세요.</option>
                     {% for channel_id, channel_name in channels_list %}
-                        <option value="{{ channel_id }}">#{{ channel_name }}</option>
+                        <option value="{{ channel_id }}#{{ channel_name }}">#{{ channel_name }}</option>
                     {% empty %}
-                        <option value="" disabled>공개 채널을 불러올 수 없습니다.</option>
+                        <option value="" disabled>Slack 공개 채널을 불러올 수 없습니다.</option>
                     {% endfor %}
-                    <option value="{{ request.user.profile.slack_user_id }}" id='option_dm'>블루무브 닥스 DM</option>
+                    <option value="{{ request.user.profile.slack_user_id }}#블루무브 닥스 DM" id='option_dm'>블루무브 닥스 DM</option>
                 </select>
                 <div class="invalid-feedback">연동 Slack 채널을 입력하세요.</div>
             </div>
@@ -150,25 +182,26 @@
         <!-- 대상에 따라 일부 input field의 display, required 변경 -->
         <script>
             function categoryChange(obj) {
-                var prefixDiv = document.querySelector("body > main > div > form > div:nth-child(3)")
-                var prefix = document.querySelector("#prefix")
-                var folder_idDiv = document.querySelector("body > main > div > form > div:nth-child(4)")
+                var drive_idDiv = document.querySelector("#drive_id_DIV")
+                var drive_id = document.querySelector("#drive_id")
+                var folder_idDiv = document.querySelector("#folder_id_DIV")
                 var folder_id = document.querySelector("#folder_id")
                 var channel_id = document.querySelector("#channel_id")
                 var option_dm = document.querySelector("#option_dm")
                 if ($(obj).val() == "bluemover") {
-                    prefixDiv.setAttribute("style", "");
-                    prefix.required = true;
-                    prefix.disabled = false;
-                    folder_idDiv.setAttribute("style", "");
-                    folder_id.required = true;
-                    folder_id.disabled = false;
+                    drive_idDiv.setAttribute("style", "");
+                    drive_id.required = true;
+                    drive_id.disabled = false;
+                    // folder_idDiv.setAttribute("style", "");
+                    // folder_id.required = true;
+                    // folder_id.disabled = false;
                     option_dm.setAttribute("style", "");
                     option_dm.disabled = false;
-                } else if ($(obj).val() == "guest" && channel_id.value == "{{ request.user.profile.slack_user_id }}") {
-                    prefixDiv.setAttribute("style", "display:none;");
-                    prefix.required = false;
-                    prefix.value = "";
+                }
+                if ($(obj).val() == "guest" && channel_id.value == "{{ request.user.profile.slack_user_id }}") {
+                    drive_idDiv.setAttribute("style", "display:none;");
+                    drive_id.required = false;
+                    drive_id.value = "";
                     folder_idDiv.setAttribute("style", "display:none;");
                     folder_id.required = false;
                     folder_id.value = "";
@@ -176,10 +209,11 @@
                     option_dm.disabled = true;
                     option_dm.selected = false;
                     channel_id.value = "";
-                } else if ($(obj).val() == "guest") {
-                    prefixDiv.setAttribute("style", "display:none;");
-                    prefix.required = false;
-                    prefix.value = "";
+                }
+                if ($(obj).val() == "guest") {
+                    drive_idDiv.setAttribute("style", "display:none;");
+                    drive_id.required = false;
+                    drive_id.value = "";
                     folder_idDiv.setAttribute("style", "display:none;");
                     folder_id.required = false;
                     folder_id.value = "";
@@ -188,6 +222,470 @@
                     option_dm.selected = false;
                 }
             }
+        </script>
+
+        <script>
+            function drive_idChange(obj) {
+                var drive_id = document.querySelector("#drive_id")
+                var folder_idDiv = document.querySelector("#folder_id_DIV")
+                var folder_id = document.querySelector("#folder_id")
+                {% for folder_id, folder_name in folders_list_A %}
+                    var option_A{{ folder_id|cut:"-" }} = document.querySelector("#option_A{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_B %}
+                    var option_B{{ folder_id|cut:"-" }} = document.querySelector("#option_B{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_C %}
+                    var option_C{{ folder_id|cut:"-" }} = document.querySelector("#option_C{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_D %}
+                    var option_D{{ folder_id|cut:"-" }} = document.querySelector("#option_D{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_E %}
+                    var option_E{{ folder_id|cut:"-" }} = document.querySelector("#option_E{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_F %}
+                    var option_F{{ folder_id|cut:"-" }} = document.querySelector("#option_F{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_G %}
+                    var option_G{{ folder_id|cut:"-" }} = document.querySelector("#option_G{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                {% for folder_id, folder_name in folders_list_H %}
+                    var option_H{{ folder_id|cut:"-" }} = document.querySelector("#option_H{{ folder_id }}")
+                {% empty %}
+                {% endfor %}
+                if ($(obj).val().indexOf("A") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("B") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("C") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("D") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("E") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("F") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("G") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_H{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+                if ($(obj).val().indexOf("H") !== -1) {
+                    folder_idDiv.setAttribute("style", "");
+                    folder_id.required = true;
+                    folder_id.disabled = false;
+                    folder_id.value = "";
+                    {% for folder_id, folder_name in folders_list_H %}
+                        option_H{{ folder_id|cut:"-" }}.setAttribute("style", "");
+                    {% empty %}
+                        document.querySelector("#option_H_empty").setAttribute("style", "");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_A %}
+                        option_A{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_A{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_A_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_B %}
+                        option_B{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_B{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_B_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_C %}
+                        option_C{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_C{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_C_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_D %}
+                        option_D{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_D{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_D_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_E %}
+                        option_E{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_E{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_E_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_F %}
+                        option_F{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_F{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_F_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                    {% for folder_id, folder_name in folders_list_G %}
+                        option_G{{ folder_id|cut:"-" }}.setAttribute("style", "display:none;");
+                        option_G{{ folder_id|cut:"-" }}.selected = false;
+                    {% empty %}
+                        document.querySelector("#option_G_empty").setAttribute("style", "display:none;");
+                    {% endfor %}
+                }
+            };
         </script>
 
         <!-- Forms Validation -->
@@ -235,15 +733,12 @@
             // }
 
             var _URL = window.URL || window.webkitURL;
-            $("form").submit( function( e ) {
+            $("#boxForm").submit( function( e ) {
                 var form = this;
                 e.preventDefault(); // Stop the submit for now
                 // Replace with your selector to find the file input in your form
                 var fileInput = $(this).find("input[type=file]")[0],
                     file = fileInput.files && fileInput.files[0];
-                var timezoneOffset = new Date().getTimezoneOffset() * 60000;
-                    var timezoneDate = new Date(Date.now() - timezoneOffset);
-                    var today = timezoneDate.toISOString().split('T')[0];
                 // 유저가 파일을 첨부했을 경우
                 if( file ) {
                     var img = new Image();
@@ -263,14 +758,11 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
-                            else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("프리픽스를 선택하세요.")
+                            else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                                alert("공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("보관 폴더 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("유효한 보관 폴더 링크를 입력하세요.")
+                                alert("최종 디렉토리를 선택하세요.")
                             }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
@@ -310,14 +802,11 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
-                            else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("프리픽스를 선택하세요.")
+                            else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                                alert("공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("보관 폴더 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("유효한 보관 폴더 링크를 입력하세요.")
+                                alert("최종 디렉토리를 선택하세요.")
                             }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
@@ -372,14 +861,11 @@
                     if ( !document.querySelector("#category").value ) {
                         alert("대상을 선택하세요.")
                     }
-                    else if ( !document.querySelector("#prefix").value && document.querySelector("#category").value == 'bluemover' ) {
-                        alert("프리픽스를 선택하세요.")
+                    else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                        alert("공유 드라이브를 선택하세요.")
                     }
                     else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                        alert("보관 폴더 링크를 입력하세요.")
-                    }
-                    else if ( document.querySelector("#folder_id").value.length < 72 && document.querySelector("#category").value == 'bluemover' ) {
-                        alert("유효한 보관 폴더 링크를 입력하세요.")
+                        alert("최종 디렉토리를 선택하세요.")
                     }
                     else if ( !document.querySelector("#title").value ) {
                         alert("문서명을 입력하세요.")
