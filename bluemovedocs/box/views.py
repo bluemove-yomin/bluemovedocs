@@ -1591,8 +1591,7 @@ def submit_doc(request, doc_id):
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
                                                                                 블루무브 닥스 문서함에서 문서를 조회할 수 있습니다.<br>
-                                                                                문서 검토가 완료되면 다시 연락드리겠습니다.<br>
-                                                                                감사합니다.<br><br>
+                                                                                문서 검토가 완료되면 다시 연락드리겠습니다.<br><br>
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>
@@ -2657,8 +2656,7 @@ def reject_doc(request, doc_id):
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
                                                                                 블루무브 닥스 문서함에서 문서를 수정하거나 삭제할 수 있습니다.<br>
-                                                                                반려 사유를 해소하여 """ + doc.box.deadline.strftime('%Y-%m-%d') + """ 이내에 다시 제출해주시기 바랍니다.<br>
-                                                                                감사합니다.<br><br>
+                                                                                반려 사유를 해소하여 """ + doc.box.deadline.strftime('%Y-%m-%d') + """ 이내에 다시 제출해주시기 바랍니다.<br><br>
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>
@@ -3710,8 +3708,8 @@ def return_doc(request, doc_id):
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
-                                                                                문서가 승인되어 보관 폴더로 이동되었으며 문서에 대한 권한은 보관 폴더 설정에 따릅니다.<br>
-                                                                                감사합니다.<br><br>
+                                                                                문서가 승인되어 최종 디렉토리로 이동되었습니다.<br>
+                                                                                문서에 대한 권한은 관련 공유 드라이브 또는 최종 디렉토리의 설정에 따릅니다.<br><br>
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>

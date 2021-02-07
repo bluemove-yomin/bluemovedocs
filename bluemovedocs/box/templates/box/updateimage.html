@@ -33,27 +33,110 @@
                 <div id="categoryHelp" class="form-text">대상은 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
             {% if box.category == 'bluemover' %}
-                <div class="form-group mb-3">
-                    <label for="prefix" class="form-label">프리픽스</label>
-                    <select class="form-select" name="prefix" id="prefix" placeholder="프리픽스를 선택하세요." disabled>
-                        <option value="{{ box.prefix }}" selected hidden>{{ box.prefix }}</option>
-                        <option value="파란물결블루무브">파란물결블루무브</option>
-                        <option value="교육">교육</option>
-                        <option value="콘텐츠">콘텐츠</option>
-                        <option value="매뉴얼">매뉴얼</option>
-                        <option value="운영">운영</option>
-                        <option value="행사">행사</option>
-                        <option value="비주얼에셋">비주얼에셋</option>
-                        <option value="임원">임원</option>
+                <div class="form-group mb-3" id="drive_id_DIV">
+                    <label for="drive_id" class="form-label">관련 공유 드라이브</label>
+                    <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="관련 공유 드라이브를 선택하세요." disabled>
+                        <option value="{{ box.drive_name }}" selected hidden>{{ box.drive_name }}</option>
+                        <option value="" disabled>관련 공유 드라이브를 선택하세요.</option>
+                        {% for drive_name in drives_list %}
+                            <option value="{{ drive_name }}">{{ drive_name }}</option>
+                        {% empty %}
+                            <option value="" disabled>Google 공유 드라이브를 불러올 수 없습니다.</option>
+                        {% endfor %}
                     </select>
-                    <div class="invalid-feedback">프리픽스를 선택하세요.</div>
-                    <div id="prefixHelp" class="form-text">프리픽스를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                    <div class="invalid-feedback">관련 공유 드라이브를 선택하세요.</div>
+                    <div class="form-text">관련 공유 드라이브를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
                 </div>
-                <div class="form-group mb-3">
-                    <label for="folder_id" class="form-label">보관 폴더 링크</label>
-                    <input type="text" class="form-control" name="folder_id" id="folder_id" minlength="72" placeholder="보관 폴더 링크를 입력하세요." aria-describedby="folder_idHelp" value="https://drive.google.com/drive/folders/{{ box.folder_id }}" disabled>
-                    <div class="invalid-feedback">유효한 보관 폴더 링크를 입력하세요.</div>
-                    <div id="folder_idHelp" class="form-text">보관 폴더 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <div class="form-group mb-3" id="folder_id_DIV">
+                    <label for="folder_id" class="form-label">최종 디렉토리</label>
+                    <select class="form-select" name="folder_id" id="folder_id" placeholder="최종 디렉토리를 선택하세요." disabled>
+                        <option value="{{ box.folder_id }}#{{ box.folder_name }}" selected hidden>
+                            {% for folder_id, folder_name in folders_list_A %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_B %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_C %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_D %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_E %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_F %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_G %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                            {% for folder_id, folder_name in folders_list_H %}
+                                {% if box.folder_id == folder_id %}
+                                    {{ folder_name }}
+                                {% endif %}
+                            {% endfor %}
+                        </option>
+                        <option value="" id="placeholder" style="display: none;" disabled>최종 디렉토리를 선택하세요.</option>
+                        <option value="" id="hint01" disabled>관련 공유 드라이브를 먼저 선택하세요.</option>
+                        {% for folder_id, folder_name in folders_list_A %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_A{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_A_empty" style="display: none;" disabled>A 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_B %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_B{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_B_empty" style="display: none;" disabled>B 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_C %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_C{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_C_empty" style="display: none;" disabled>C 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_D %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_D{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_D_empty" style="display: none;" disabled>D 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_E %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_E{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_E_empty" style="display: none;" disabled>E 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_F %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_F{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_F_empty" style="display: none;" disabled>F 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_G %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_G{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_G_empty" style="display: none;" disabled>G 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                        {% for folder_id, folder_name in folders_list_H %}
+                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_H{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
+                        {% empty %}
+                            <option value="" id="option_H_empty" style="display: none;" disabled>H 드라이브 디렉토리를 불러올 수 없습니다.</option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback">최종 디렉토리를 선택하세요.</div>
+                    <div class="form-text">최종 디렉토리를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
                 </div>
             {% endif %}
             <div class="form-group mb-3">
@@ -70,7 +153,6 @@
             </div>
             <div class="form-group mb-3">
                 <label for="channel_id" class="form-label">연동 Slack 채널</label>
-                <!-- <input type="text" class="form-control" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 입력하세요." aria-describedby="channel_idHelp" value="{{ box.channel_id }}" disabled> -->
                 <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." disabled>
                     <option value="{{ box.channel_id }}" selected hidden>
                         {% if box.channel_id == box.writer.profile.slack_user_id %}
@@ -180,9 +262,9 @@
                     </div>
                 </div>
                 {% if box.image %}
-                <input type="submit" value="이미지 변경 등록하기" class="btn btn-outline-primary">
+                    <button type="submit" id="wait_imageChange" class="btn btn-outline-primary">이미지 변경 등록하기</button>
                 {% else %}
-                <input type="submit" value="이미지 추가 등록하기" class="btn btn-outline-primary">
+                    <button type="submit" id="wait_imageAdd" class="btn btn-outline-primary">이미지 추가 등록하기</button>
                 {% endif %}
             </div>
         </form>
@@ -255,6 +337,9 @@
                         // 유저가 첨부한 이미지가 1800 x 900일 경우
                         if( width == 1800 && height == 900 ) {
                             form.submit();
+                            var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
+                            wait.innerText = "⏳ 작업 중..."
+                            wait.disabled = true;
                         }
                         // 유저가 첨부한 이미지가 1800 x 900이 아닐 경우
                         else {
@@ -262,6 +347,9 @@
                             if ( ratio !== 2 ) {
                                 if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 권장 크기: 1800 x 900 (2:1)"  + "\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." +  "\n\n계속하시겠어요?") ) {
                                     form.submit();
+                                    var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
+                                    wait.innerText = "⏳ 작업 중..."
+                                    wait.disabled = true;
                                 }
                                 else {
                                     document.querySelector("#image").value = '';
@@ -270,6 +358,9 @@
                             // 유저가 첨부한 이미지 가로세로비가 2:1일 경우
                             else {
                                 form.submit();
+                                var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
+                                wait.innerText = "⏳ 작업 중..."
+                                wait.disabled = true;
                             }
                         }
                     };
@@ -280,6 +371,9 @@
                     if ( document.querySelector("body > main > div > form > div.form-group.mb-5 > div.mb-4.d-flex.justify-content-center > img") ) {
                         if ( confirm("이미지 삭제를 선택하셨습니다.\n\n▶ 이미지 변경: 새로운 이미지 첨부 후 등록\n▶ 이미지 삭제: 미첨부 상태로 등록 → 선택된 옵션입니다.\n\n계속하시겠어요?") ) {
                             form.submit();
+                            var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
+                            wait.innerText = "⏳ 작업 중..."
+                            wait.disabled = true;
                         }
                         else {
                             return false;

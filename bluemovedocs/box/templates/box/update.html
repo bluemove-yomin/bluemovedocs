@@ -28,17 +28,17 @@
             </div>
             {% if box.category == 'bluemover' %}
                 <div class="form-group mb-3" id="drive_id_DIV">
-                    <label for="drive_id" class="form-label">공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                    <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="공유 드라이브를 선택하세요." required>
+                    <label for="drive_id" class="form-label">관련 공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                    <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="관련 공유 드라이브를 선택하세요." required>
                         <option value="{{ box.drive_name }}" selected hidden>{{ box.drive_name }}</option>
-                        <option value="" disabled>공유 드라이브를 선택하세요.</option>
+                        <option value="" disabled>관련 공유 드라이브를 선택하세요.</option>
                         {% for drive_name in drives_list %}
                             <option value="{{ drive_name }}">{{ drive_name }}</option>
                         {% empty %}
                             <option value="" disabled>Google 공유 드라이브를 불러올 수 없습니다.</option>
                         {% endfor %}
                     </select>
-                    <div class="invalid-feedback">공유 드라이브를 선택하세요.</div>
+                    <div class="invalid-feedback">관련 공유 드라이브를 선택하세요.</div>
                 </div>
                 <div class="form-group mb-3" id="folder_id_DIV">
                     <label for="folder_id" class="form-label">최종 디렉토리<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -86,7 +86,7 @@
                             {% endfor %}
                         </option>
                         <option value="" id="placeholder" style="display: none;" disabled>최종 디렉토리를 선택하세요.</option>
-                        <option value="" id="hint01" disabled>공유 드라이브를 먼저 선택하세요.</option>
+                        <option value="" id="hint01" disabled>관련 공유 드라이브를 먼저 선택하세요.</option>
                         {% for folder_id, folder_name in folders_list_A %}
                             <option value="{{ folder_id }}#{{ folder_name }}" id="option_A{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
                         {% empty %}
@@ -259,7 +259,7 @@
                     </div>
                     </div>
                 </div>
-                <input type="submit" value="수정 등록하기" class="btn btn-outline-primary">
+                <button type="submit" id="wait" class="btn btn-outline-primary">수정 등록하기</button>
             </div>
         </form>
 
@@ -843,7 +843,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("공유 드라이브를 선택하세요.")
+                                alert("관련 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -879,6 +879,9 @@
                             }
                             else {
                                 form.submit();
+                                var wait = document.querySelector("#wait");
+                                wait.innerText = "⏳ 작업 중..."
+                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -887,7 +890,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("공유 드라이브를 선택하세요.")
+                                alert("관련 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -924,6 +927,9 @@
                             else {
                                 if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                                     form.submit();
+                                    var wait = document.querySelector("#wait");
+                                    wait.innerText = "⏳ 작업 중..."
+                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;
@@ -976,6 +982,9 @@
                             }
                             else {
                                 form.submit();
+                                var wait = document.querySelector("#wait");
+                                wait.innerText = "⏳ 작업 중..."
+                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -1015,6 +1024,9 @@
                             else {
                                 if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
                                     form.submit();
+                                    var wait = document.querySelector("#wait");
+                                    wait.innerText = "⏳ 작업 중..."
+                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;
@@ -1039,7 +1051,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("공유 드라이브를 선택하세요.")
+                                alert("관련 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -1075,6 +1087,9 @@
                             }
                             else {
                                 form.submit();
+                                var wait = document.querySelector("#wait");
+                                wait.innerText = "⏳ 작업 중..."
+                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -1083,7 +1098,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("공유 드라이브를 선택하세요.")
+                                alert("관련 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -1120,6 +1135,9 @@
                             else {
                                 if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                                     form.submit();
+                                    var wait = document.querySelector("#wait");
+                                    wait.innerText = "⏳ 작업 중..."
+                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;
@@ -1172,6 +1190,9 @@
                             }
                             else {
                                 form.submit();
+                                var wait = document.querySelector("#wait");
+                                wait.innerText = "⏳ 작업 중..."
+                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -1211,6 +1232,9 @@
                             else {
                                 if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
                                     form.submit();
+                                    var wait = document.querySelector("#wait");
+                                    wait.innerText = "⏳ 작업 중..."
+                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;

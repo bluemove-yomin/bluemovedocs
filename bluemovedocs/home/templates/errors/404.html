@@ -32,7 +32,7 @@
             <strong>PREVIOUS_URI:</strong> {% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}Unknown{% endif %}<br>
             <strong>CURRENT_URI:</strong> {{ request.build_absolute_uri }}
         </small>
-        <div class="d-grid gap-2 sm-flex justify-content-sm-end mt-5">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-5">
             <a type="button" class="btn btn-outline-secondary" onclick="goBack()">뒤로 가기</a>
             <a type="button" class="btn btn-outline-primary" href="{% url 'home:home' %}">메인 페이지로 가기</a>
             <!-- goBack Script -->

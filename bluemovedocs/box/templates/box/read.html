@@ -115,29 +115,29 @@
 
         <hr class="text-black-50">
         {% if user == box.writer %}
-        <div class="callout" style="word-break: break-word;">
-            <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
-            <small style="color: #6C757D;">
-                {% if box.category == 'bluemover' %}
-                    ⊙ 최종 디렉토리: <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_name }}</a><br>
-                    ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-                    {% if box.channel_id == request.user.profile.slack_user_id %}
-                        ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/D01KX51277X" target="_blank">블루무브 닥스 DM</a><br>
+            <div class="callout" style="word-break: break-word;">
+                <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
+                <small style="color: #6C757D;">
+                    {% if box.category == 'bluemover' %}
+                        ⊙ 최종 디렉토리: {{ box.drive_name }} > <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_name }}</a><br>
+                        ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
+                        {% if box.channel_id == request.user.profile.slack_user_id %}
+                            ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/D01KX51277X" target="_blank">블루무브 닥스 DM</a><br>
+                        {% else %}
+                            ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
+                        {% endif %}
                     {% else %}
+                        ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
                         ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                     {% endif %}
-                {% else %}
-                    ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
-                    ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
-                {% endif %}
-                이 콜아웃은 문서함 생성자에게만 표시됩니다.
-            </small>
-        </div>
+                    이 콜아웃은 문서함 생성자에게만 표시됩니다.
+                </small>
+            </div>
         {% endif %}
         {% if box.image %}
-        <div class="d-flex justify-content-center" style="margin-bottom: 2rem!important;">
-            <img src="{{ box.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
-        </div>
+            <div class="d-flex justify-content-center" style="margin-bottom: 2rem!important;">
+                <img src="{{ box.image.url }}" class="img-fluid" alt="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
+            </div>
         {% endif %}
         <div style="word-break: break-word;">{{ box.content|safe }}</div>
     </div>
@@ -163,14 +163,30 @@
             </div>
             </div>
         </div>
-        <a href="{% url 'box:updateimage' box.id %}#image" class="btn btn-outline-secondary">
+        <button onclick="wait_please()" id="wait_please" class="btn btn-outline-secondary">
             {% if box.image %}
             이미지 변경하기
             {% else %}
             이미지 추가하기
             {% endif %}
-        </a>
-        <a href="{% url 'box:update' box.id %}" class="btn btn-outline-secondary">수정하기</a>
+        </button>
+        <script>
+            function wait_please() {
+                var wait = document.querySelector("#wait_please");
+                wait.innerText = "⏳ 작업 중..."
+                wait.disabled = true;
+                location.href='{% url 'box:updateimage' box.id %}#image'
+            }
+        </script>
+        <button onclick="wait_bro()" id="wait_bro" class="btn btn-outline-secondary">수정하기</button>
+        <script>
+            function wait_bro() {
+                var wait = document.querySelector("#wait_bro");
+                wait.innerText = "⏳ 작업 중..."
+                wait.disabled = true;
+                location.href='{% url 'box:update' box.id %}'
+            }
+        </script>
     </div>
     {% endif %}
 
@@ -333,44 +349,6 @@
                     </form>
                     <!-- docReturnModal -->
                     {% if doc.user.profile.level == 'bluemover' %}
-                        <!-- <form action="{% url 'box:return_doc' doc.id %}#docPosition" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
-                            <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title hide010101" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
-                                            <h5 class="modal-title show010101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
-                                            <button type="button" class="btn-close hide020202" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <span class="hide030303">
-                                                {% csrf_token %}
-                                                <div class="form-group mb-3">
-                                                    <label for="folder" class="form-label">공유 드라이브 폴더<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                                                    <select class="form-select" name="folder" id="folder" placeholder="공유 드라이브 폴더를 선택하세요." required>
-                                                        <option value="" selected disabled>공유 드라이브 폴더를 선택하세요.</option>
-                                                        <option value="0ADF4LPECMczOUk9PVA">2 교육사업</option>
-                                                        <option value="0ADNIg7OWApdMUk9PVA">3 콘텐츠사업</option>
-                                                        <option value="0AIsg5YLQSTjaUk9PVA">5 운영</option>
-                                                    </select>
-                                                    <div class="invalid-feedback">공유 드라이브 폴더를 선택하세요.</div>
-                                                </div>
-                                                문서 승인 시<br>✔ 문서가 위에서 선택한 공유 드라이브 폴더로 이동되며<br>✔ 문서에 대한 권한은 해당 공유 드라이브 설정에 따르게 됩니다.<br>정말 승인하시겠습니까?<br><br>
-                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 승인하세요.</small>
-                                            </span>
-                                            <span class="show020202" style="display: none;">
-                                                {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 승인하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
-                                                <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
-                                            </span>
-                                        </div>
-                                        <div class="modal-footer hide040404">
-                                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                            <input type="submit" value="네, 승인할게요!" class="btn btn-outline-primary" onclick="doNotClose3();">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form> -->
                         <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
@@ -381,7 +359,12 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide030303">
-                                            문서 승인 시<br>✔ 문서가 이 문서함의 보관 폴더로 이동되며<br>✔ 문서에 대한 권한은 보관 폴더 설정에 따르게 됩니다.<br>정말 승인하시겠습니까?<br><br>
+                                            <strong>최종 디렉토리:</strong><br>
+                                            {{ box.drive_name }} > {{ box.folder_name }}<br><br>
+                                            문서 승인 시<br>
+                                            ✔ 문서가 최종 디렉토리로 이동되며<br>
+                                            ✔ 문서에 대한 권한은 관련 공유 드라이브 또는 최종 디렉토리의 설정에 따르게 됩니다.
+                                            <br>정말 승인하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 승인하세요.</small>
                                         </span>
                                         <span class="show020202" style="display: none;">
@@ -391,7 +374,7 @@
                                     </div>
                                     <div class="modal-footer hide040404">
                                         <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose3();">네, 승인할게요!</a>
+                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary">네, 승인할게요!</a>
                                     </div>
                                 </div>
                             </div>
@@ -889,37 +872,6 @@
             document.querySelector(".hide0404").setAttribute("style", "display:none");
             document.querySelector(".show0101").setAttribute("style", "font-weight: 600; display:inline");
             document.querySelector(".show0202").setAttribute("style", "display:inline");
-        };
-    </script>
-
-    <!-- doNotClose3 -->
-    <script>
-        window.onerror = function(){
-            return true;
-        }
-        var folder = document.querySelector("#folder");
-        function doNotClose3() {
-            if ( folder ) {
-                if ( folder.value ) {
-                    document.querySelector(".hide010101").setAttribute("style", "display:none");
-                    document.querySelector(".hide020202").setAttribute("style", "display:none");
-                    document.querySelector(".hide030303").setAttribute("style", "display:none");
-                    document.querySelector(".hide040404").setAttribute("style", "display:none");
-                    document.querySelector(".show010101").setAttribute("style", "font-weight: 600; display:inline");
-                    document.querySelector(".show020202").setAttribute("style", "display:inline");
-                }
-                else {
-                    return alert('공유 드라이브 폴더를 선택하세요.')
-                }
-            }
-            else {
-                document.querySelector(".hide010101").setAttribute("style", "display:none");
-                document.querySelector(".hide020202").setAttribute("style", "display:none");
-                document.querySelector(".hide030303").setAttribute("style", "display:none");
-                document.querySelector(".hide040404").setAttribute("style", "display:none");
-                document.querySelector(".show010101").setAttribute("style", "font-weight: 600; display:inline");
-                document.querySelector(".show020202").setAttribute("style", "display:inline");
-            }
         };
     </script>
 

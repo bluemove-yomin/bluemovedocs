@@ -10,7 +10,14 @@
         <h2 class="mb-4 pb-2" id="errorPageSmall" style="font-weight: 600; color: #58595B;">👀 앗, 서버가 이상합니다!</h2>
         <div class="callout callout-warning" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 문서함 관련 오류</span><br>
-            <small style="color: #6C757D;">Google 계정 토큰 갱신을 위해 재로그인 후 다시 시도해보세요.</small>
+            {% if request.user.profile.level == 'bluemover' %}
+                <small style="color: #6C757D;">
+                    ⊙ Google 계정 토큰 갱신을 위해 재로그인 후 다시 시도해보세요.<br>
+                    ⊙ '게스트 로그인'이 아닌 '블루무버 로그인'으로 재로그인 후 다시 시도해보세요.
+                </small>
+            {% else %}
+                <small style="color: #6C757D;">Google 계정 토큰 갱신을 위해 재로그인 후 다시 시도해보세요.</small>
+            {% endif %}
         </div>
         {% else %}
         <h1 class="mb-4" id="errorPageLarge" style="font-weight: 600; color: #58595B;">👀 앗, 서버가 이상합니다!</h1>
@@ -42,7 +49,7 @@
             <strong>PREVIOUS_URI:</strong> {% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}Unknown{% endif %}<br>
             <strong>CURRENT_URI:</strong> {{ request.build_absolute_uri }}
         </small>
-        <div class="d-grid gap-2 sm-flex justify-content-sm-end mt-5">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-end mt-5">
             <a type="button" class="btn btn-outline-secondary" onclick="goBack()">뒤로 가기</a>
             <a type="button" class="btn btn-outline-primary" href="{% url 'home:home' %}">메인 페이지로 가기</a>
             <!-- goBack Script -->
