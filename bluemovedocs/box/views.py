@@ -58,13 +58,24 @@ def write(request):
         if 'H' in drive_name:
             Hdrive = drive_id
         drives_list.append(drive_name)
-    drive_response = drive_service.files().list(
-        fields="files(id, name)",
-        includeItemsFromAllDrives=True,
-        orderBy="name",
-        q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
-        supportsAllDrives=True,
-    ).execute()
+    try:
+        drive_response = drive_service.files().list(
+            corpora='allDrives',
+            fields="files(id, name)",
+            includeItemsFromAllDrives=True,
+            orderBy="name",
+            q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
+            supportsAllDrives=True,
+        ).execute()
+    except:
+        drive_response = drive_service.files().list(
+            corpora='allDrives',
+            fields="files(id, name)",
+            includeItemsFromAllDrives=True,
+            orderBy="name",
+            q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
+            supportsAllDrives=True,
+        ).execute()
     all_folders = drive_response.get('files')
     folders_list_A = []
     folders_list_B = []

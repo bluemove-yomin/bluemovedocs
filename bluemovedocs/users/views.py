@@ -3,8 +3,10 @@ from django.contrib.auth.decorators import login_required
 from .models import *
 from notice.models import Notice
 from box.models import Box
+from google.oauth2.credentials import Credentials
 from django.contrib.auth.models import User
-from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialToken, SocialAccount
+from googleapiclient.discovery import build
 from slack_sdk import WebClient
 
 
@@ -34,6 +36,46 @@ def write_info(request, id):
     user = get_object_or_404(User, pk=id)
     profile = Profile.objects.get(user=user)
     if 'bluemove.or.kr' in user.email:
+        token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+        credentials = Credentials(
+            client_id=client_id,
+            client_secret=client_secret,
+            token_uri='https://oauth2.googleapis.com/token',
+            token=token.token,
+            refresh_token=token.token_secret,
+        )
+        drive_service = build('drive', 'v3', credentials=credentials)
+        drive_response = drive_service.drives().list().execute()
+        all_drives = drive_response.get('drives')
+        for drive in all_drives:
+            drive_id = drive['id']
+            drive_name = drive['name']
+            if 'A' in drive_name:
+                Adrive = drive_id
+            if 'B' in drive_name:
+                Bdrive = drive_id
+            if 'C' in drive_name:
+                Cdrive = drive_id
+            if 'D' in drive_name:
+                Ddrive = drive_id
+            if 'F' in drive_name:
+                Fdrive = drive_id
+            if 'G' in drive_name:
+                Gdrive = drive_id
+            if 'H' in drive_name:
+                Hdrive = drive_id
+        try:
+            drive_response = drive_service.files().list(
+                corpora='allDrives',
+                fields="files(id, name)",
+                includeItemsFromAllDrives=True,
+                orderBy="name",
+                q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
+                supportsAllDrives=True,
+            ).execute()
+        except:
+            user.delete()
+            return redirect('users:login_cancelled_no_drive')
         try:
             client = WebClient(token=slack_bot_token)
             slack_response = client.users_lookupByEmail(
@@ -74,6 +116,10 @@ def write_info(request, id):
 
 def login_cancelled(request):
     return render(request, 'users/login_cancelled.html')
+
+
+def login_cancelled_no_drive(request):
+    return render(request, 'users/login_cancelled_no_drive.html')
 
 
 def login_cancelled_no_slack(request):

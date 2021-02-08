@@ -8,7 +8,7 @@
         <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">🔐 로그인</h1>
         <div class="callout callout-dark hide01" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 회원 정보 등록</span><br>
-            <small style="color: #6C757D;"><span id="user_email">{{ user.email }}</span> 계정 정보가 블루무브 닥스에 저장되었습니다. 계속하려면 실명과 휴대전화 번호를 등록하세요.</small>
+            <small style="color: #6C757D;"><span id="user_email">{{ user.email }}</span> 계정 정보가 블루무브 닥스에 저장되었습니다. 계속하려면 실명과 휴대전화 번호를 등록하세요. 이 페이지는 첫 로그인 시에만 표시됩니다.</small>
         </div>
         <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
@@ -39,7 +39,8 @@
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <a type="button" class="btn btn-outline-secondary" href="{% url 'users:login_cancelled_delete' user.id %}">로그인 취소하기</a>
-                <input type="submit" value="등록하기" class="btn btn-outline-primary hide04">
+                <!-- <input type="submit" value="등록하기" class="btn btn-outline-primary hide04"> -->
+                <button type="submit" id="wait" class="btn btn-outline-primary hide04">등록하기</button>
             </div>
         </form>
 
@@ -126,6 +127,9 @@
                           (target3.value.indexOf('01') == 0) // 휴대전화 번호에 숫자 '01'이 맨 앞자리에 있을 경우
                 ) {
                     if ( confirm("블루무브 닥스에 등록될 회원 정보입니다.\n\n" + "▶ Google 계정: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n▶ 휴대전화 번호: " + target3.value + "\n\n모두 올바른 정보인가요?") ) {
+                        var wait = document.querySelector("#wait");
+                        wait.innerText = "⏳ 작업 중..."
+                        wait.disabled = true;
                         return form.submit();
                     }
                     else {}
