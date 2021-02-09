@@ -4,6 +4,7 @@ from .models import *
 from notice.models import Notice
 from box.models import Box
 from google.oauth2.credentials import Credentials
+from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from allauth.socialaccount.models import SocialToken, SocialAccount
 from googleapiclient.discovery import build
@@ -45,7 +46,11 @@ def write_info(request, id):
             refresh_token=token.token_secret,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
-        drive_response = drive_service.drives().list().execute()
+        try:
+            drive_response = drive_service.drives().list().execute()
+        except:
+            logout(request)
+            return redirect('users:login_cancelled_no_scopes')
         all_drives = drive_response.get('drives')
         for drive in all_drives:
             drive_id = drive['id']
@@ -116,6 +121,10 @@ def write_info(request, id):
 
 def login_cancelled(request):
     return render(request, 'users/login_cancelled.html')
+
+
+def login_cancelled_no_scopes(request):
+    return render(request, 'users/login_cancelled_no_scopes.html')
 
 
 def login_cancelled_no_drive(request):

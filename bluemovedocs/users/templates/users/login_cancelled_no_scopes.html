@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %} 로그인 | 블루무브 닥스 {% endblock %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block content %}
+{% include 'shared/_navbar4home.html' %}
+<main class="px-2 px-md-5">
+<div class="container-md mt-5">
+  <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">🔐 로그인</h1>
+
+  {% get_providers as socialaccount_providers %}
+  {% providers_media_js %}
+
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 블루무버 로그인 필요</span><br>
+    <small>로그인이 취소되었습니다. 블루무버라면 '게스트 로그인'이 아닌 '블루무버 로그인'으로 진행하세요.</small>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <div class="callout callout-dark" style="word-break: break-word;">
+    <span style="font-weight: 600; color: #58595B;"><i class="fab fa-google"></i> Google 계정 액세스 안내</span><br>
+    <small style="color: #6C757D;">블루무브 닥스를 이용하려면 Google 계정 액세스를 허용하세요. <a href="#">자세히 보기</a></small>
+  </div>
+
+  {% include 'shared/_loginbox.html' %}
+  
+</div>
+</main>
+{% endblock %}
