@@ -196,18 +196,26 @@ def create_doc(request, id):
             )
             drive_service = build('drive', 'v3', credentials=credentials)
             docs_service = build('docs', 'v1', credentials=credentials)
-            # 02. OUTSIDE 클라이언트 My Drive 내 템플릿 문서 생성(복사)
+            # 02. OUTSIDE 클라이언트 My Drive 내 블루무브 닥스 폴더 생성
+            folder = drive_service.files().create(
+                body = {
+                    'name': '블루무브 닥스', ##### 폴더 이름 INPUT #####
+                    'mimeType': 'application/vnd.google-apps.folder'
+                },
+                fields = 'id'
+            ).execute()
+            folder_id = folder.get('id') ##### 폴더 ID OUTPUT #####
+            # 03. OUTSIDE 클라이언트 Shared Drive 내 템플릿 문서 생성(복사)
             application_id = box.document_id ##### 템플릿 문서 ID INPUT #####
             drive_response = drive_service.files().copy(
                 fileId = application_id,
+                supportsAllDrives = True,
                 body = {
                     'name': box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                             box.title.replace(" ","") + ##### 문서명 INPUT #####
-                            request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                             '_' + datetime.date.today().strftime('%y%m%d'),
+                    'parents': [folder_id],
                     'description': '블루무브 닥스에서 생성된 ' +
-                                request.user.last_name + request.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
-                                '님의 ' +
                                 box.title ##### 문서명 INPUT #####
                                 + '입니다.\n\n' +
                                 '📧 생성일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
@@ -216,8 +224,17 @@ def create_doc(request, id):
             ).execute()
             file_id = drive_response.get('id') ##### 문서 ID OUTPUT #####
             name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
-            # 03. 문서 내 템플릿 태그 적용
-            docs_response = docs_service.documents().batchUpdate(
+            # 04. 문서 위치 OUTSIDE 클라이언트 My Drive 최상위 경로로 변경
+            drive_service.files().update(
+                fileId = file_id,
+                removeParents = folder_id,
+            ).execute()
+            # 05. OUTSIDE 클라이언트 My Drive 내 블루무브 닥스 폴더 삭제
+            drive_service.files().delete(
+                fileId = folder_id,
+            ).execute()
+            # 06. 문서 내 템플릿 태그 적용
+            docs_service.documents().batchUpdate(
                 documentId = file_id,
                 body = {
                     'requests': [
@@ -251,28 +268,29 @@ def create_doc(request, id):
                     ]
                 }
             ).execute()
-            # 04. OUTSIDE 클라이언트 권한 ID 조회
+            # 07. OUTSIDE 클라이언트 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId = file_id,
+                supportsAllDrives = True,
             ).execute()
             permissions_list = drive_response.get('permissions')
             for permissions_data in permissions_list:
                 outside_permission_id = permissions_data['id'] ##### OUTSIDE 클라이언트 권한 ID OUTPUT #####
-                # 05. 문서 데이터 DB 반영
-                doc_user = request.user
-                doc_name = name
-                doc_file_id = file_id
-                doc_outside_permission_id = outside_permission_id
-                doc_creation_date = datetime.date.today().strftime('%Y-%m-%d')
-                if SocialAccount.objects.filter(user=request.user):
-                    doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
-                else:
-                    doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
-                Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
-                if 'next' in request.GET:
-                    return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
-                else:
-                    return redirect('box:read', box.id)
+            # 08. 문서 데이터 DB 반영
+            doc_user = request.user
+            doc_name = name
+            doc_file_id = file_id
+            doc_outside_permission_id = outside_permission_id
+            doc_creation_date = datetime.date.today().strftime('%Y-%m-%d')
+            if SocialAccount.objects.filter(user=request.user):
+                doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
+            else:
+                doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
+            Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
+            if 'next' in request.GET:
+                return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
+            else:
+                return redirect('box:read', box.id)
         ###########################################
         ##### OUTSIDE 클라이언트가 guest일 경우 #####
         ###########################################
@@ -773,7 +791,7 @@ def delete_doc(request, doc_id):
         drive_service = build('drive', 'v3', credentials=credentials)
         # 02. 문서 삭제
         try:
-            drive_response = drive_service.files().delete(
+            drive_service.files().delete(
                 fileId = file_id,
             ).execute()
         except:
@@ -1327,11 +1345,8 @@ def submit_doc(request, doc_id):
             body = {
                 'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                         doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
-                        doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),
                 'description': '블루무브 닥스에서 생성된 ' +
-                            doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
-                            '님의 ' +
                             doc.box.title ##### 문서명 INPUT #####
                             + '입니다.\n\n' +
                             '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
@@ -2395,11 +2410,8 @@ def reject_doc(request, doc_id):
             body = {
                 'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                         doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
-                        doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),
                 'description': '블루무브 닥스에서 생성된 ' +
-                            doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
-                            '님의 ' +
                             doc.box.title ##### 문서명 INPUT #####
                             + '입니다.\n\n' +
                             '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
@@ -3455,11 +3467,8 @@ def return_doc(request, doc_id):
             body = {
                 'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
                         doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
-                        doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
                         '_' + datetime.date.today().strftime('%y%m%d'),
                 'description': '블루무브 닥스에서 생성된 ' +
-                            doc.user.last_name + doc.user.first_name + ##### OUTSIDE 클라이언트 성명 INPUT #####
-                            '님의 ' +
                             doc.box.title ##### 문서명 INPUT #####
                             + '입니다.\n\n' +
                             '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
@@ -3747,7 +3756,7 @@ def return_doc(request, doc_id):
                                                                 align="center"
                                                                 class="mcnButtonBlockInner">
                                                                 <a
-                                                                    href="https://drive.google.com/drive/search?q=""" + doc.box.title.replace(' ', '') + doc.user.last_name + doc.user.first_name + """"
+                                                                    href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
                                                                     target="_blank"
                                                                     style="text-decoration:none;">
                                                                     <table

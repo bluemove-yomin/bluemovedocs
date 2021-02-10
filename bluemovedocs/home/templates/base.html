@@ -329,10 +329,11 @@
         <script>
             var links = document.querySelectorAll('a');  
             for (var i = 0; i < links.length; i++) {
-              if (links[i].hostname != window.location.hostname) {
-                links[i].target = '_blank';
-                links[i].rel = 'noopener';
-              }
+                if (links[i].href == 'javascript:location.reload();') {
+                } else if (links[i].hostname != window.location.hostname) {
+                    links[i].target = '_blank';
+                    links[i].rel = 'noopener';
+                }
             }
         </script>
         <footer class="bd-footer px-2 py-3 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 70px;">

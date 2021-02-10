@@ -87,7 +87,7 @@
                 <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" required>
                 <div class="invalid-feedback">유효한 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_idHelp" class="form-text">
-                    <p class="mb-2">템플릿 문서는 '링크가 있는 모든 사용자에게 공개'되어 있어야 합니다.</p>
+                    <p id="document_idHelpText" class="mb-2"></p>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58</span>
                 </div>
             </div>
@@ -188,15 +188,14 @@
                 var folder_id = document.querySelector("#folder_id")
                 var channel_id = document.querySelector("#channel_id")
                 var option_dm = document.querySelector("#option_dm")
+                var helpText = document.querySelector("#document_idHelpText")
                 if ($(obj).val() == "bluemover") {
                     drive_idDiv.setAttribute("style", "");
                     drive_id.required = true;
                     drive_id.disabled = false;
-                    // folder_idDiv.setAttribute("style", "");
-                    // folder_id.required = true;
-                    // folder_id.disabled = false;
                     option_dm.setAttribute("style", "");
                     option_dm.disabled = false;
+                    helpText.innerText = "블루무버를 대상으로 할 경우 '파란물결 블루무브 링크가 있는 이 그룹의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다."
                 }
                 if ($(obj).val() == "guest" && channel_id.value == "{{ request.user.profile.slack_user_id }}") {
                     drive_idDiv.setAttribute("style", "display:none;");
@@ -209,6 +208,7 @@
                     option_dm.disabled = true;
                     option_dm.selected = false;
                     channel_id.value = "";
+                    helpText.innerText = "게스트를 대상으로 할 경우 '링크가 있는 인터넷상의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다.";
                 }
                 if ($(obj).val() == "guest") {
                     drive_idDiv.setAttribute("style", "display:none;");
@@ -220,6 +220,7 @@
                     option_dm.setAttribute("style", "display:none;");
                     option_dm.disabled = true;
                     option_dm.selected = false;
+                    helpText.innerText = "게스트를 대상으로 할 경우 '링크가 있는 인터넷상의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다.";
                 }
             }
         </script>
