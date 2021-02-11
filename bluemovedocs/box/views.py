@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import *
 from django.db.models import Q
+from django.contrib.auth import logout
 import datetime
 import base64
 import urllib
@@ -35,7 +36,11 @@ def write(request):
         refresh_token=token.token_secret,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    drive_response = drive_service.drives().list().execute()
+    try:
+        drive_response = drive_service.drives().list().execute()
+    except:
+        logout(request)
+        return redirect('users:login_cancelled_no_scopes')
     all_drives = drive_response.get('drives')
     drives_list = []
     for drive in all_drives:
@@ -196,6 +201,11 @@ def create_doc(request, id):
             )
             drive_service = build('drive', 'v3', credentials=credentials)
             docs_service = build('docs', 'v1', credentials=credentials)
+            try:
+                drive_response = drive_service.drives().list().execute()
+            except:
+                logout(request)
+                return redirect('users:login_cancelled_no_scopes')
             # 02. OUTSIDE 클라이언트 My Drive 내 블루무브 닥스 폴더 생성
             folder = drive_service.files().create(
                 body = {
@@ -540,7 +550,11 @@ def update(request, id):
         refresh_token=token.token_secret,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    drive_response = drive_service.drives().list().execute()
+    try:
+        drive_response = drive_service.drives().list().execute()
+    except:
+        logout(request)
+        return redirect('users:login_cancelled_no_scopes')
     all_drives = drive_response.get('drives')
     drives_list = []
     for drive in all_drives:
@@ -667,7 +681,11 @@ def updateimage(request, id):
         refresh_token=token.token_secret,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
-    drive_response = drive_service.drives().list().execute()
+    try:
+        drive_response = drive_service.drives().list().execute()
+    except:
+        logout(request)
+        return redirect('users:login_cancelled_no_scopes')
     all_drives = drive_response.get('drives')
     drives_list = []
     for drive in all_drives:
@@ -789,6 +807,11 @@ def delete_doc(request, doc_id):
             refresh_token=token.token_secret,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        try:
+            drive_response = drive_service.drives().list().execute()
+        except:
+            logout(request)
+            return redirect('users:login_cancelled_no_scopes')
         # 02. 문서 삭제
         try:
             drive_service.files().delete(
@@ -1319,6 +1342,11 @@ def submit_doc(request, doc_id):
             refresh_token=token.token_secret,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        try:
+            drive_response = drive_service.drives().list().execute()
+        except:
+            logout(request)
+            return redirect('users:login_cancelled_no_scopes')
         INSIDE_CLIENT = doc.box.writer.email
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -2384,6 +2412,11 @@ def reject_doc(request, doc_id):
             refresh_token=token.token_secret,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        try:
+            drive_response = drive_service.drives().list().execute()
+        except:
+            logout(request)
+            return redirect('users:login_cancelled_no_scopes')
         INSIDE_CLIENT = doc.box.writer.email
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -3441,6 +3474,11 @@ def return_doc(request, doc_id):
             refresh_token=token.token_secret,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        try:
+            drive_response = drive_service.drives().list().execute()
+        except:
+            logout(request)
+            return redirect('users:login_cancelled_no_scopes')
         INSIDE_CLIENT = doc.box.writer.email
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
