@@ -359,8 +359,11 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide030303">
-                                            <strong>최종 디렉토리:</strong><br>
-                                            {{ box.drive_name }} > {{ box.folder_name }}<br><br>
+                                            <div class="callout callout-info m-0">
+                                                <strong style="color: #58595B;"><i class="fas fa-location-arrow"></i> 최종 디렉토리</strong><br>
+                                                <small style="color: #6C757D;">{{ box.drive_name }} > {{ box.folder_name }}</small>
+                                            </div>
+                                            <br>
                                             문서 승인 시<br>
                                             ✔ 문서가 최종 디렉토리로 이동되며<br>
                                             ✔ 문서에 대한 권한은 관련 공유 드라이브 또는 최종 디렉토리의 설정에 따르게 됩니다.
