@@ -141,53 +141,53 @@
         {% endif %}
         <div style="word-break: break-word;">{{ box.content|safe }}</div>
     </div>
-    {% if user == box.writer or perms.auth %}
-    <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">
-        <!-- Button trigger modal -->
-        <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
-        <!-- Modal -->
-        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    {% if box.writer == request.user %}
+        <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">
+            <!-- Button trigger modal -->
+            <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
+            <!-- Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
+                    </div>
+                    <div class="modal-footer">
+                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                    <a type="button" href="{% url 'box:delete' box.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
-                </div>
-                <div class="modal-footer">
-                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                <a type="button" href="{% url 'box:delete' box.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
                 </div>
             </div>
-            </div>
+            <button onclick="wait_please()" id="wait_please" class="btn btn-outline-secondary">
+                {% if box.image %}
+                이미지 변경하기
+                {% else %}
+                이미지 추가하기
+                {% endif %}
+            </button>
+            <script>
+                function wait_please() {
+                    var wait = document.querySelector("#wait_please");
+                    wait.innerText = "⏳ 작업 중..."
+                    wait.disabled = true;
+                    location.href='{% url 'box:updateimage' box.id %}#image'
+                }
+            </script>
+            <button onclick="wait_bro()" id="wait_bro" class="btn btn-outline-secondary">수정하기</button>
+            <script>
+                function wait_bro() {
+                    var wait = document.querySelector("#wait_bro");
+                    wait.innerText = "⏳ 작업 중..."
+                    wait.disabled = true;
+                    location.href='{% url 'box:update' box.id %}'
+                }
+            </script>
         </div>
-        <button onclick="wait_please()" id="wait_please" class="btn btn-outline-secondary">
-            {% if box.image %}
-            이미지 변경하기
-            {% else %}
-            이미지 추가하기
-            {% endif %}
-        </button>
-        <script>
-            function wait_please() {
-                var wait = document.querySelector("#wait_please");
-                wait.innerText = "⏳ 작업 중..."
-                wait.disabled = true;
-                location.href='{% url 'box:updateimage' box.id %}#image'
-            }
-        </script>
-        <button onclick="wait_bro()" id="wait_bro" class="btn btn-outline-secondary">수정하기</button>
-        <script>
-            function wait_bro() {
-                var wait = document.querySelector("#wait_bro");
-                wait.innerText = "⏳ 작업 중..."
-                wait.disabled = true;
-                location.href='{% url 'box:update' box.id %}'
-            }
-        </script>
-    </div>
     {% endif %}
 
     <!-- #docPosition -->

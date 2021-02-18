@@ -7,15 +7,17 @@ from .forms import NoticeContentForm
 from users.models import Profile
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+# @permission_required('auth.add_permission', raise_exception=True)
+@login_required
 def write(request):
     form = NoticeContentForm()
     return render(request, 'notice/write.html', {'form': form})
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+# @permission_required('auth.add_permission', raise_exception=True)
+@login_required
 def create(request):
-    if request.method == "POST":
+    if request.method == "POST" and request.user.profile.level == 'bluemover':
         form = NoticeContentForm(request.POST, request.FILES)
         if form.is_valid():
             notice_category = request.POST.get('category')
@@ -104,7 +106,8 @@ def notice_favorite(request, id):
         return redirect('notice:main')
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+# @permission_required('auth.add_permission', raise_exception=True)
+@login_required
 def update(request, id):
     notice = get_object_or_404(Notice, pk=id)
     form = NoticeContentForm(instance=notice)
@@ -118,7 +121,8 @@ def update(request, id):
     return render(request, 'notice/update.html', {'notice': notice, 'form': form})
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+# @permission_required('auth.add_permission', raise_exception=True)
+@login_required
 def updateimage(request, id):
     notice = get_object_or_404(Notice, pk=id)
     form = NoticeContentForm(instance=notice)
@@ -142,7 +146,8 @@ def updatecomment(request, comment_id):
     return render(request, 'notice/updatecomment.html', {'comment': comment, 'notice': notice, 'all_notices': all_notices, 'all_comments': all_comments})
 
 
-@permission_required('auth.add_permission', raise_exception=True)
+# @permission_required('auth.add_permission', raise_exception=True)
+@login_required
 def delete(request, id):
     notice = get_object_or_404(Notice, pk=id)
     notice.delete()

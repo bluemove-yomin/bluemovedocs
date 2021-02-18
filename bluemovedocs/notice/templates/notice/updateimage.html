@@ -11,7 +11,7 @@
             📢 공지사항 이미지 추가
             {% endif %}
         </h1>
-        <form action="{% url 'notice:updateimage' notice.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'notice:updateimage' notice.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" id="noticeForm" novalidate>
             {% csrf_token %}
             <div class="form-group mb-3">
                 <label for="category" class="form-label">대상</label>
@@ -164,7 +164,7 @@
             }
 
             var _URL = window.URL || window.webkitURL;
-            $("form").submit( function( e ) {
+            $("#noticeForm").submit( function( e ) {
                 var form = this;
                 e.preventDefault(); // Stop the submit for now
                 // Replace with your selector to find the file input in your form

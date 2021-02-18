@@ -91,8 +91,8 @@
         </tbody>
     </table>
 
-    <!-- 스태프 권한 유저일 경우 작성하기 버튼 노출 -->
-    {% if perms.auth %}
+    <!-- 블루무버일 경우 작성하기 버튼 노출 -->
+    {% if user.profile.level == 'bluemover' %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
         <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
     </div>
@@ -216,8 +216,8 @@
     </div>
     {% endfor %}
 
-    <!-- 스태프 권한 유저일 경우 작성하기 버튼 노출 -->
-    {% if perms.auth %}
+    <!-- 블루무버일 경우 작성하기 버튼 노출 -->
+    {% if user.profile.level == 'bluemover' %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
         <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
     </div>
