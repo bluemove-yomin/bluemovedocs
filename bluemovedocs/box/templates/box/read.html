@@ -353,12 +353,12 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title hide010101" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
-                                        <h5 class="modal-title show010101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
-                                        <button type="button" class="btn-close hide020202" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <h5 class="modal-title hide0101" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
+                                        <h5 class="modal-title show0101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                        <button type="button" class="btn-close hide0202" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <span class="hide030303">
+                                        <span class="hide0303">
                                             <div class="callout callout-info m-0">
                                                 <strong style="color: #58595B;"><i class="fas fa-location-arrow"></i> 최종 디렉토리</strong><br>
                                                 <small style="color: #6C757D;">{{ box.drive_name }} > {{ box.folder_name }}</small>
@@ -370,14 +370,14 @@
                                             <br>정말 승인하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 승인하세요.</small>
                                         </span>
-                                        <span class="show020202" style="display: none;">
+                                        <span class="show0202" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 승인하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
-                                    <div class="modal-footer hide040404">
+                                    <div class="modal-footer hide0404">
                                         <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary">네, 승인할게요!</a>
+                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose2();">네, 승인할게요!</a>
                                     </div>
                                 </div>
                             </div>
