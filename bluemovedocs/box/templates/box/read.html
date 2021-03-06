@@ -130,6 +130,7 @@
                         ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
                         ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                     {% endif %}
+                        ⊙ 생성된 문서 수: {{ created_docs | length }}<br>
                     이 콜아웃은 문서함 생성자에게만 표시됩니다.
                 </small>
             </div>

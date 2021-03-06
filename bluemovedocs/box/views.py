@@ -308,7 +308,7 @@ def create_doc(request, id):
             # 01. 서비스 계정 Google Drive, Google Docs API 호출
             SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
             credentials = ServiceAccountCredentials.from_json_keyfile_name (
-                'bluemove-docs-6a11a86cda0e.json',
+                service_account_creds,
                 SERVICE_ACCOUNT_SCOPES,
             )
             drive_service = build('drive', 'v3', credentials=credentials)
@@ -463,6 +463,7 @@ def read(request, id):
         ##### INSIDE 클라이언트일 경우 #####
         ###################################
         if request.user == box.writer:
+            created_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=False) & Q(return_flag=False))
             all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False)).order_by('-id')
             for doc in all_docs:
                 if doc.user.profile.level == 'bluemover':
@@ -484,6 +485,7 @@ def read(request, id):
         ##### OUTSIDE 클라이언트가 bluemover일 경우 #####
         ###############################################
         elif request.user.profile.level == 'bluemover':
+            created_docs = None
             all_docs = box.docs.filter(user=request.user)
             for doc in all_docs:
                 if doc.delete_flag == True:
@@ -515,10 +517,12 @@ def read(request, id):
         ##### OUTSIDE 클라이언트가 guest일 경우 #####
         ###########################################
         else:
+            created_docs = None
             all_docs = box.docs.filter(user=request.user)
     else:
+        created_docs = None
         all_docs = None
-    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'all_docs': all_docs})
+    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'created_docs': created_docs, 'all_docs': all_docs})
 
 
 @login_required
@@ -830,7 +834,7 @@ def delete_doc(request, doc_id):
         # 01. 서비스 계정 Google Drive, Gmail API 호출
         SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
         credentials = ServiceAccountCredentials.from_json_keyfile_name (
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             SERVICE_ACCOUNT_SCOPES,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
@@ -838,7 +842,7 @@ def delete_doc(request, doc_id):
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
         )
         credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
@@ -1893,7 +1897,7 @@ def submit_doc(request, doc_id):
         # 01. 서비스 계정 Google Drive, Gmail API 호출
         SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
         credentials = ServiceAccountCredentials.from_json_keyfile_name (
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             SERVICE_ACCOUNT_SCOPES,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
@@ -1901,7 +1905,7 @@ def submit_doc(request, doc_id):
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
         )
         credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
@@ -2958,7 +2962,7 @@ def reject_doc(request, doc_id):
         # 01. 서비스 계정 Google Drive, Gmail API 호출
         SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
         credentials = ServiceAccountCredentials.from_json_keyfile_name (
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             SERVICE_ACCOUNT_SCOPES,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
@@ -2966,7 +2970,7 @@ def reject_doc(request, doc_id):
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
         )
         credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
@@ -4013,7 +4017,7 @@ def return_doc(request, doc_id):
         # 01. 서비스 계정 Google Drive, Gmail API 호출
         SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
         credentials = ServiceAccountCredentials.from_json_keyfile_name (
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             SERVICE_ACCOUNT_SCOPES,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
@@ -4021,7 +4025,7 @@ def return_doc(request, doc_id):
         user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
-            'bluemove-docs-6a11a86cda0e.json',
+            service_account_creds,
             scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
         )
         credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
@@ -4523,7 +4527,7 @@ def return_doc_before_submit(request, doc_id):
     # 01. 서비스 계정 Google Drive, Gmail API 호출
     SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = ServiceAccountCredentials.from_json_keyfile_name (
-        'bluemove-docs-6a11a86cda0e.json',
+        service_account_creds,
         SERVICE_ACCOUNT_SCOPES,
     )
     drive_service = build('drive', 'v3', credentials=credentials)
@@ -4531,7 +4535,7 @@ def return_doc_before_submit(request, doc_id):
     user_id = doc.box.writer.email
     SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
     gmail_credentials = service_account.Credentials.from_service_account_file(
-        'bluemove-docs-6a11a86cda0e.json',
+        service_account_creds,
         scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
     )
     credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
