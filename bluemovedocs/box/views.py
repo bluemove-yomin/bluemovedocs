@@ -19,9 +19,7 @@ from users.models import Profile
 from slack_sdk import WebClient
 
 
-client_id = "54744281802-ccr39h4ohfts06d55oat9m8u6asud66r.apps.googleusercontent.com"
-client_secret="6a11a86cda0e6fe100bfa8fb36482d572883580e"
-slack_bot_token = "xoxb-82584804000-1692877306865-rrjWHyUITjGybuelohHlT2Xk"
+
 
 
 @login_required
