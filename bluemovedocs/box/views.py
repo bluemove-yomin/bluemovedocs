@@ -19,7 +19,9 @@ from users.models import Profile
 from slack_sdk import WebClient
 
 
-
+client_id = "54744281802-ccr39h4ohfts06d55oat9m8u6asud66r.apps.googleusercontent.com"
+client_secret="6a11a86cda0e6fe100bfa8fb36482d572883580e"
+slack_bot_token = "xoxb-82584804000-1692877306865-rrjWHyUITjGybuelohHlT2Xk"
 
 
 @login_required
@@ -3767,7 +3769,7 @@ def return_doc(request, doc_id):
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
                                                                                 문서가 승인되어 최종 디렉토리로 이동되었습니다.<br>
-                                                                                문서에 대한 권한은 관련 공유 드라이브 또는 최종 디렉토리의 설정에 따릅니다.<br><br>
+                                                                                문서에 대한 권한은 해당 공유 드라이브 또는 최종 디렉토리의 설정에 따릅니다.<br><br>
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>
