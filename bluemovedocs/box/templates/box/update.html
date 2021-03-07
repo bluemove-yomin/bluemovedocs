@@ -28,17 +28,17 @@
             </div>
             {% if box.category == 'bluemover' %}
                 <div class="form-group mb-3" id="drive_id_DIV">
-                    <label for="drive_id" class="form-label">관련 공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                    <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="관련 공유 드라이브를 선택하세요." required>
+                    <label for="drive_id" class="form-label">해당 공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                    <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="해당 공유 드라이브를 선택하세요." required>
                         <option value="{{ box.drive_name }}" selected hidden>{{ box.drive_name }}</option>
-                        <option value="" disabled>관련 공유 드라이브를 선택하세요.</option>
+                        <option value="" disabled>해당 공유 드라이브를 선택하세요.</option>
                         {% for drive_name in drives_list %}
                             <option value="{{ drive_name }}">{{ drive_name }}</option>
                         {% empty %}
                             <option value="" disabled>Google 공유 드라이브를 불러올 수 없습니다.</option>
                         {% endfor %}
                     </select>
-                    <div class="invalid-feedback">관련 공유 드라이브를 선택하세요.</div>
+                    <div class="invalid-feedback">해당 공유 드라이브를 선택하세요.</div>
                 </div>
                 <div class="form-group mb-3" id="folder_id_DIV">
                     <label for="folder_id" class="form-label">최종 디렉토리<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -86,7 +86,7 @@
                             {% endfor %}
                         </option>
                         <option value="" id="placeholder" style="display: none;" disabled>최종 디렉토리를 선택하세요.</option>
-                        <option value="" id="hint01" disabled>관련 공유 드라이브를 먼저 선택하세요.</option>
+                        <option value="" id="hint01" disabled>해당 공유 드라이브를 먼저 선택하세요.</option>
                         {% for folder_id, folder_name in folders_list_A %}
                             <option value="{{ folder_id }}#{{ folder_name }}" id="option_A{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
                         {% empty %}
@@ -847,7 +847,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("관련 공유 드라이브를 선택하세요.")
+                                alert("해당 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -894,7 +894,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("관련 공유 드라이브를 선택하세요.")
+                                alert("해당 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -1055,7 +1055,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("관련 공유 드라이브를 선택하세요.")
+                                alert("해당 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")
@@ -1102,7 +1102,7 @@
                                 alert("대상을 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("관련 공유 드라이브를 선택하세요.")
+                                alert("해당 공유 드라이브를 선택하세요.")
                             }
                             else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("최종 디렉토리를 선택하세요.")

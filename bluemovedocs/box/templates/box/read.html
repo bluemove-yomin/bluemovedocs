@@ -122,7 +122,7 @@
                         ⊙ 최종 디렉토리: {{ box.drive_name }} > <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_name }}</a><br>
                         ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
                         {% if box.channel_id == request.user.profile.slack_user_id %}
-                            ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/D01KX51277X" target="_blank">블루무브 닥스 DM</a><br>
+                            ⊙ 연동 Slack 채널: <a href="https://slack.com/app_redirect?app=A01LQ17SFQ8" target="_blank">블루무브 닥스 DM</a><br>
                         {% else %}
                             ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                         {% endif %}
@@ -130,7 +130,14 @@
                         ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
                         ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                     {% endif %}
-                        ⊙ 생성된 문서 수: {{ created_docs | length }}<br>
+                        ⊙ 총 문서 수: {{ valid_docs | length }}<br>
+                        ⊙ 생성된 유효 문서 수: {{ created_valid_docs | length }}<br>
+                        ⊙ 반려된 유효 문서 수: {{ rejected_valid_docs | length }}<br>
+                        {% if box.category == 'bluemover' %}
+                            ⊙ 승인된 문서 수: {{ returned_valid_docs | length }}<br>
+                        {% else %}
+                            ⊙ 반환된 문서 수: {{ returned_valid_docs | length }}<br>
+                        {% endif %}
                     이 콜아웃은 문서함 생성자에게만 표시됩니다.
                 </small>
             </div>
@@ -217,11 +224,19 @@
     <div class="container-md">
         <div class="container-md border rounded px-sm-4 px-3 pt-4 pb-2">
             <div class="d-flex justify-content-between align-items-center">
-                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">접수된 문서</h3>
-                <p class="mb-2 text-muted"><i class="fas fa-sync-alt"></i> <a href="javascript:location.reload();" target="_self" style="font-weight: 300; color:#58595B;">{{ all_docs|length }}명 제출함</a></p>
+                <h3 class="mb-3" style="font-weight: 600; color: #58595B;">미결재 문서</h3>
+                <p class="mb-2 text-muted"><i class="fas fa-sync-alt"></i> <a onclick="wait_count()" id="wait_count" href="javascript:location.reload();" target="_self" style="font-weight: 300; color:#58595B;">{{ all_docs|length }}명 제출함</a></p>
+                <script>
+                    function wait_count() {
+                        var wait = document.querySelector("#wait_count");
+                        wait.innerText = "⏳ 작업 중..."
+                        wait.disabled = true;
+                        location.href='javascript:location.reload()'
+                    }
+                </script>
             </div>
             <div class="list-group list-group-flush mt-1" id="refresh_submitted">
-                <!-- 접수된 문서 있을 경우 -->
+                <!-- 미결재 문서 있을 경우 -->
                 {% for doc in all_docs %}
                 <div class="list-group-item px-0 py-3">
                     <!-- PC 환경 -->
@@ -248,20 +263,23 @@
                             </table>
                         </a>
                         <table class="container m-0 p-0 d-flex justify-content-end" style="border: none;">
-                            <tr>
-                                <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
-                                    <small>
-                                        <a href="#" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
-                                    </small>
-                                </td>
-                            </tr>
+                            {% if box.deadline_is_over %}
+                            {% else %}
+                                <tr>
+                                    <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
+                                        <small>
+                                            <a href="#" class="modalFreezing00" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
+                                        </small>
+                                    </td>
+                                </tr>
+                            {% endif %}
                             <tr>
                                 <td class="p-0 m-0" rowspan="1">
                                     <small>
                                         {% if doc.user.profile.level == 'bluemover' %}
-                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
+                                            <a href="#" class="modalFreezing" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
                                         {% else %}
-                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                            <a href="#" class="modalFreezing" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
                                         {% endif %}
                                     </small>
                                 </td>
@@ -290,20 +308,23 @@
                             </tr>
                         </table>
                         <table class="d-flex justify-content-end" style="border: none;">
-                            <tr>
-                                <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
-                                    <small>
-                                        <a href="#" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
-                                    </small>
-                                </td>
-                            </tr>
+                            {% if box.deadline_is_over %}
+                            {% else %}
+                                <tr>
+                                    <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
+                                        <small>
+                                            <a href="#" class="modalFreezing00MB" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
+                                        </small>
+                                    </td>
+                                </tr>
+                            {% endif %}
                             <tr>
                                 <td class="p-0 m-0">
                                     <small>
                                         {% if doc.user.profile.level == 'bluemover' %}
-                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
+                                            <a href="#" class="modalFreezingMB" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
                                         {% else %}
-                                            <a href="#" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                            <a href="#" class="modalFreezingMB" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
                                         {% endif %}
                                     </small>
                                 </td>
@@ -411,9 +432,9 @@
                         </div>
                     {% endif %}
                 </div>
-                <!-- 접수된 문서 없을 경우 -->
+                <!-- 미결재 문서 없을 경우 -->
                 {% empty %}
-                <div class="text-center mt-2 pb-2"><p style="color: #CCCCCC;"><i class="far fa-copy"></i> 접수된 문서가 없습니다.</p></div>
+                <div class="text-center mt-2 pb-2"><p style="color: #CCCCCC;"><i class="far fa-copy"></i> 미결재 문서가 없습니다.</p></div>
                 {% endfor %}
             </div>
         </div>
@@ -504,7 +525,7 @@
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.rejection_date }} 반려<br>(사유: {{ doc.reject_reason }})</small>
                             </a>
-                            <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                            <button type="button" class="btn-close float-end freezing" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
                     {% if box.deadline_is_over and doc.user.profile.level == 'guest' %}
@@ -517,7 +538,7 @@
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
-                            <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</a>
+                            <a type="button" class="container btn btn-primary modalFreezing" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</a>
                         </div>
                     {% endif %}
                     <!-- docSubmitModal -->
@@ -613,12 +634,12 @@
                                     <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                     <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
                                 </a>
-                                <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                                <button type="button" class="btn-close float-end freezing" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                             </div>
                         {% endif %}
                     </div>
                     <div class="container-md d-flex p-0 my-2">
-                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary" disabled>제출 완료</button>
+                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary modalFreezing" disabled>제출 완료</button>
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
@@ -667,7 +688,7 @@
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.creation_date }} 생성</small>
                             </a>
-                            <button type="button" class="btn-close float-end" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                            <button type="button" class="btn-close float-end freezing" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
                     {% if box.deadline_is_over and doc.user.profile.level == 'guest' %}
@@ -680,7 +701,7 @@
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
-                            <a type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
+                            <a type="button" class="container btn btn-primary modalFreezing" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
                         </div>
                     {% endif %}
                     <!-- docSubmitModal -->
@@ -789,10 +810,21 @@
                         </div>
                         <form id="docForm" name="docForm" action="{% url 'box:create_doc' box.id %}#docPosition" method="POST">
                             {% csrf_token %}
-                            <button class="container btn shadow-sm border rounded text-center mb-2" id="docButton" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
+                            <button onclick="wait_doc()" class="container btn shadow-sm border rounded text-center mb-2" id="docButton" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
                                 <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
-                                <span style="color: #58595B;">새 문서를 생성하려면 누르세요.</span>
+                                <span id="waitDocText" style="color: #58595B;">새 문서를 생성하려면 누르세요.</span>
                             </button>
+                            <script>
+                                function wait_doc() {
+                                    function wait_doc_real() {
+                                        var wait = document.querySelector("#docButton");
+                                        wait.disabled = true;
+                                        var waitDocText = document.querySelector("#waitDocText");
+                                        waitDocText.innerText = "⏳ 작업 중..."
+                                    }
+                                    setTimeout(wait_doc_real, 0);
+                                };
+                            </script>
                             <!-- docCreateModal -->
                             <div class="modal fade" id="docCreateModal" tabindex="-1" aria-labelledby="docCreateModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -848,6 +880,17 @@
                     document.querySelector(".hide04").setAttribute("style", "display:none");
                     document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
                     document.querySelector(".show02").setAttribute("style", "display:inline");
+                    if (document.querySelector(".freezing")) {
+                        document.querySelector(".freezing").disabled = true;
+                    }
+                    document.querySelector(".modalFreezing").setAttribute("data-bs-target", "");
+                    document.querySelector(".modalFreezing").innerText = "⏳ 작업 중...";
+                    document.querySelector(".modalFreezing00").setAttribute("data-bs-target", "");
+                    document.querySelector(".modalFreezing00").innerText = "";
+                    document.querySelector(".modalFreezingMB").setAttribute("data-bs-target", "");
+                    document.querySelector(".modalFreezingMB").innerText = "⏳ 작업 중...";
+                    document.querySelector(".modalFreezing00MB").setAttribute("data-bs-target", "");
+                    document.querySelector(".modalFreezing00MB").innerText = "";
                 }
                 else {
                     return alert('반려 사유를 입력하세요.')
@@ -860,6 +903,17 @@
                 document.querySelector(".hide04").setAttribute("style", "display:none");
                 document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
                 document.querySelector(".show02").setAttribute("style", "display:inline");
+                if (document.querySelector(".freezing")) {
+                    document.querySelector(".freezing").disabled = true;
+                }
+                document.querySelector(".modalFreezing").setAttribute("data-bs-target", "");
+                document.querySelector(".modalFreezing").innerText = "⏳ 작업 중...";
+                document.querySelector(".modalFreezing00").setAttribute("data-bs-target", "");
+                document.querySelector(".modalFreezing00").innerText = "";
+                document.querySelector(".modalFreezingMB").setAttribute("data-bs-target", "");
+                document.querySelector(".modalFreezingMB").innerText = "⏳ 작업 중...";
+                document.querySelector(".modalFreezing00MB").setAttribute("data-bs-target", "");
+                document.querySelector(".modalFreezing00MB").innerText = "";
             }
         };
     </script>
@@ -876,6 +930,17 @@
             document.querySelector(".hide0404").setAttribute("style", "display:none");
             document.querySelector(".show0101").setAttribute("style", "font-weight: 600; display:inline");
             document.querySelector(".show0202").setAttribute("style", "display:inline");
+            if (document.querySelector(".freezing")) {
+                document.querySelector(".freezing").disabled = true;
+            }
+            document.querySelector(".modalFreezing").setAttribute("data-bs-target", "");
+            document.querySelector(".modalFreezing").innerText = "⏳ 작업 중...";
+            document.querySelector(".modalFreezing00").setAttribute("data-bs-target", "");
+            document.querySelector(".modalFreezing00").innerText = "";
+            document.querySelector(".modalFreezingMB").setAttribute("data-bs-target", "");
+            document.querySelector(".modalFreezingMB").innerText = "⏳ 작업 중...";
+            document.querySelector(".modalFreezing00MB").setAttribute("data-bs-target", "");
+            document.querySelector(".modalFreezing00MB").innerText = "";
         };
     </script>
 
