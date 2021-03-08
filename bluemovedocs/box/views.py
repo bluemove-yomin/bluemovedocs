@@ -488,7 +488,10 @@ def read(request, id):
         ##### OUTSIDE 클라이언트가 bluemover일 경우 #####
         ###############################################
         elif request.user.profile.level == 'bluemover':
-            created_docs = None
+            valid_docs = None
+            created_valid_docs = None
+            rejected_valid_docs = None
+            returned_valid_docs = None
             all_docs = box.docs.filter(user=request.user)
             for doc in all_docs:
                 if doc.delete_flag == True:
@@ -4358,6 +4361,16 @@ def reject_doc(request, doc_id):
                 {
                     "type": "actions",
                     "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Google 문서 열기"
+                            },
+                            "style": "primary",
+                            "value": "open_doc",
+                            "url": "https://docs.google.com/document/d/" + doc.file_id
+                        },
                         {
                             "type": "button",
                             "text": {
