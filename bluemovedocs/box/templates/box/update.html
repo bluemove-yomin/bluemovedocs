@@ -41,6 +41,13 @@
                     <div class="invalid-feedback">해당 공유 드라이브를 선택하세요.</div>
                 </div>
                 <div class="form-group mb-3" id="folder_id_DIV">
+                    <p>
+                        {{ drives_list }}
+                        {% for folder_id, folder_name in folders_list_E %}
+                            {{ folder_name }}
+                        {% endfor %}
+                        {{ folders_list_E }}
+                    </p>
                     <label for="folder_id" class="form-label">최종 디렉토리<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                     <select class="form-select" name="folder_id" id="folder_id" placeholder="최종 디렉토리를 선택하세요." required>
                         <option value="{{ box.folder_id }}#{{ box.folder_name }}" selected hidden>
