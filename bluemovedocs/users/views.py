@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import *
-from notice.models import Notice
+from django.db.models import Q
+from notice.models import Notice, Comment
+from box.models import Box, Doc
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from google.oauth2.credentials import Credentials
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
@@ -27,8 +30,28 @@ def myaccount(request, id):
     # 회원가입 정보등록 끝
     user = get_object_or_404(User, pk=id)
     my_notices = Notice.objects.filter(writer=user)
-    favorites = request.user.favorite_user_set.all()
-    return render(request, 'users/myaccount.html', {'my_notices': my_notices, 'favorites': favorites})
+    my_comments = Comment.objects.filter(writer=user)
+    my_boxes = Box.objects.filter(writer=user)
+    my_docs = Doc.objects.filter(user=user)
+    favorites = request.user.favorite_user_set.all().order_by('-id')
+    box_favorites = request.user.box_favorite_user_set.all().order_by('-id')
+    page = request.GET.get('page', 1)
+    paginator = Paginator(favorites, 5)
+    try:
+        favorites = paginator.page(page)
+    except PageNotAnInteger:
+        favorites = paginator.page(1)
+    except EmptyPage:
+        favorites = paginator.page(paginator.num_pages)
+    box_page = request.GET.get('box_page', 1)
+    box_paginator = Paginator(box_favorites, 5)
+    try:
+        box_favorites = box_paginator.page(box_page)
+    except PageNotAnInteger:
+        box_favorites = box_paginator.page(1)
+    except EmptyPage:
+        box_favorites = box_paginator.page(box_paginator.num_pages)
+    return render(request, 'users/myaccount.html', {'my_notices': my_notices, 'my_comments': my_comments, 'my_boxes': my_boxes, 'my_docs': my_docs, 'favorites': favorites, 'box_favorites': box_favorites})
 
 
 @login_required
@@ -117,6 +140,24 @@ def write_info(request, id):
         return redirect('users:login_cancelled')
     return render(request, 'users/write_info.html')
 
+
+@login_required
+def edit_info(request, id):
+    user = get_object_or_404(User, pk=id)
+    profile = Profile.objects.get(user=user)
+    if request.method == "POST":
+        user.last_name = request.POST.get("last_name")
+        user.first_name = request.POST.get("first_name")
+        profile.phone = request.POST.get("phone")
+        user.save(update_fields=['last_name', 'first_name'])
+        profile.save(update_fields=['phone'])
+    return render(request, 'users/edit_info.html')
+
+
+def delete(request, id):
+    # user = get_object_or_404(User, pk=id)
+    # user.delete()
+    return redirect('home:home')
 
 def login_cancelled(request):
     return render(request, 'users/login_cancelled.html')

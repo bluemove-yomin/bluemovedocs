@@ -102,7 +102,7 @@
                 }
             }
 
-            /* 공지사항 모바일 최적화 */
+            /* 공지사항, 내 계정 공지사항 북마크 모바일 최적화 */
             @media screen and (max-width: 991px) {
                 #noticetable-table {
                     display: none;
@@ -110,6 +110,18 @@
             }
             @media screen and (min-width: 992px) {
                 #noticetable-list {
+                    display: none;
+                }
+            }
+
+            /* 내 계정 문서함 북마크 모바일 최적화 */
+            @media screen and (max-width: 991px) {
+                #box_noticetable-table {
+                    display: none;
+                }
+            }
+            @media screen and (min-width: 992px) {
+                #box_noticetable-list {
                     display: none;
                 }
             }
@@ -316,6 +328,12 @@
             /* docButton CSS */
             #docButton.btn:hover, #docButton.btn:focus {
                 font-weight: 300;
+            }
+
+            /* toggle color */
+            .form-check-input:checked {
+                background-color: #007DC5;
+                border-color: #007DC5;
             }
         </style>
         <title>{% block title %} Override Here {% endblock %}</title>
