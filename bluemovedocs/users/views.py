@@ -150,6 +150,7 @@ def edit_info(request, id):
     return render(request, 'users/edit_info.html')
 
 
+@login_required
 def delete(request, id):
     user = get_object_or_404(User, pk=id)
     my_notices = Notice.objects.filter(writer=user)

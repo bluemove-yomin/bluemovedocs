@@ -161,7 +161,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            유효 문서가 있는 문서함은 삭제할 수 없습니다.<br>강제 삭제가 필요한 경우 테크 매니저에게 문의하세요.
+                            <mark style="background-color: #f8d7da; font-weight: 600;">유효(미제출, 제출, 반려) 문서</mark>가 있는 문서함은 삭제할 수 없습니다.<br>강제 삭제가 필요한 경우 테크 매니저에게 문의하세요.
                         </div>
                         <div class="modal-footer">
                         <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 알겠습니다.</a>
@@ -283,7 +283,7 @@
                             {% if box.deadline_is_over %}
                             {% else %}
                                 <tr>
-                                    <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
+                                    <td class="ps-0 pe-3 py-0 m-0" rowspan="2">
                                         <small>
                                             <a href="#" class="modalFreezing00" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
                                         </small>
@@ -328,7 +328,7 @@
                             {% if box.deadline_is_over %}
                             {% else %}
                                 <tr>
-                                    <td class="ps-0 pe-2 py-0 m-0" rowspan="2">
+                                    <td class="ps-0 pe-3 py-0 m-0" rowspan="2">
                                         <small>
                                             <a href="#" class="modalFreezing00MB" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
                                         </small>

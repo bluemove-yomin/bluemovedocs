@@ -75,7 +75,6 @@
                                     <div class="card-body">
                                         <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 삭제될 문서</h5>
                                         <p class="card-text">
-                                            없습니다!
                                             {% if user.profile.level == 'bluemover' %}
                                                 승인된 문서는
                                             {% else %}
@@ -153,7 +152,6 @@
                                     <div class="card-body">
                                         <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 삭제될 문서</h5>
                                         <p class="card-text">
-                                            없습니다!
                                             {% if user.profile.level == 'bluemover' %}
                                                 승인된 문서는
                                             {% else %}
@@ -209,17 +207,65 @@
         {% endif %}
 
         {% for account in user.socialaccount_set.all %}
-            <form action="{% url 'users:delete' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            <form id="deleteLast" action="{% url 'users:delete' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                 {% csrf_token %}
+                {% if my_boxes|length > 0 or my_docs_create or my_docs_submit or my_docs_reject %}
+                {% else %}
+                    <div class="form-group mt-4">
+                        <label for="confirm" class="form-label">영구 삭제 확인<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                        <input type="text" class="form-control" name="confirm" id="confirm" placeholder="'영구 삭제 확인'이라고 입력하세요." required>
+                        <div class="invalid-feedback">그대로 입력하세요.</div>
+                    </div>
+                {% endif %}
                 <div class="container-md mt-5 p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
                     {% if my_boxes|length > 0 or my_docs_create or my_docs_submit or my_docs_reject %}
                         <button type="button" class="btn btn-outline-danger" disabled>삭제하기</button>
                     {% else %}
-                        <button type="submit" class="btn btn-outline-danger">삭제하기</button>
+                        <button id="waitLast" type="submit" class="btn btn-outline-danger">삭제하기</button>
                     {% endif %}
                     <a href="{% url 'users:myaccount' user.id %}" class="btn btn-outline-secondary">취소하기</a>
                 </div>
             </form>
+            <!-- Forms Validation -->
+            <script>
+                // Disable form submissions if there are invalid fields
+                (function() {
+                    'use strict';
+                    window.addEventListener('load', function() {
+                    // Get the forms we want to add validation styles to
+                    var forms = document.getElementsByClassName('needs-validation');
+                    // Loop over them and prevent submission
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                        }, false);
+                    });
+                    }, false);
+                })();
+            </script>
+            <!-- Image Validation -->
+            <script>
+                window.onerror = function(){
+                    return true;
+                }
+                var _URL = window.URL || window.webkitURL;
+                $("#deleteLast").submit( function( e ) {
+                    var form = this;
+                    e.preventDefault();
+                    if ( document.querySelector("#confirm").value == '영구 삭제 확인' ) {
+                        $("#waitLast").attr("disabled", true);
+                        return form.submit();
+                    } else {
+                        alert("'영구 삭제 확인'이라고 입력하세요.")
+                        document.querySelector("#confirm").value = '';
+                        return false;
+                    }
+                });
+            </script>
         {% empty %}
         {% endfor %}
 
