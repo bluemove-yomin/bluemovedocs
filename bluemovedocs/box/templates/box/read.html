@@ -130,13 +130,11 @@
                         ⊙ 템플릿 문서 ID: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_id }}</a><br>
                         ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                     {% endif %}
-                        ⊙ 총 문서 수: {{ valid_docs | length }}<br>
-                        ⊙ 생성된 유효 문서 수: {{ created_valid_docs | length }}<br>
-                        ⊙ 반려된 유효 문서 수: {{ rejected_valid_docs | length }}<br>
+                        ⊙ 문서 수: 총 {{ valid_docs | length }}부 = 미제출 {{ created_valid_docs | length }}부 + 제출 {{ all_docs|length }}부 + 반려 {{ rejected_valid_docs | length }}부 +
                         {% if box.category == 'bluemover' %}
-                            ⊙ 승인된 문서 수: {{ returned_valid_docs | length }}<br>
+                            승인 {{ returned_valid_docs | length }}부<br>
                         {% else %}
-                            ⊙ 반환된 문서 수: {{ returned_valid_docs | length }}<br>
+                            반환 {{ returned_valid_docs | length }}부<br>
                         {% endif %}
                     이 콜아웃은 문서함 생성자에게만 표시됩니다.
                 </small>
@@ -154,23 +152,42 @@
             <!-- Button trigger modal -->
             <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
             <!-- Modal -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            {% if created_valid_docs or rejected_valid_docs %}
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">😓 삭제 불가</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            유효 문서가 있는 문서함은 삭제할 수 없습니다.<br>강제 삭제가 필요한 경우 테크 매니저에게 문의하세요.
+                        </div>
+                        <div class="modal-footer">
+                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 알겠습니다.</a>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
-                    </div>
-                    <div class="modal-footer">
-                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                    <a type="button" href="{% url 'box:delete' box.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
                     </div>
                 </div>
+            {% else %}
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
+                        </div>
+                        <div class="modal-footer">
+                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
+                        <a type="button" href="{% url 'box:delete' box.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                        </div>
+                    </div>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
             <button onclick="wait_please()" id="wait_please" class="btn btn-outline-secondary">
                 {% if box.image %}
                 이미지 변경하기

@@ -6,7 +6,7 @@
     <div class="container-md mt-5">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">💙 내 계정</h1>
 
-        <div class="container-md mb-5 px-0">
+        <div class="container-md px-0">
             <div class="text-center">
                 {% for account in user.socialaccount_set.all %}
                     <img height="96" class="rounded-circle" src="{{ account.get_avatar_url }}"/>
@@ -40,7 +40,7 @@
                                             {{ user.first_name }}님은 <b>게스트</b>입니다.
                                         {% endif %}
                                     {% empty %}
-                                        {{ user.last_name }}{{ user.first_name }}님은 <b>매니저</b>입니다.
+                                        <b>사무국 매니저</b>입니다.
                                     {% endfor %}
                                 </p>
                             </div>
@@ -52,7 +52,7 @@
                                 <div class="d-flex justify-content-between">
                                     <h5 class="card-title" style="font-weight: 600; color: #58595B;">📧 이메일 주소</h5>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="emailSwitch" onclick="emailSwitch(this)">
+                                        <input class="form-check-input mx-0" type="checkbox" id="emailSwitch" onclick="emailSwitch(this)">
                                     </div>
                                 </div>
                                 <p class="card-text">
@@ -82,7 +82,7 @@
                                 <div class="d-flex justify-content-between">
                                     <h5 class="card-title" style="font-weight: 600; color: #58595B;">📱 휴대전화 번호</h5>
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input" type="checkbox" id="phoneSwitch" onclick="phoneSwitch(this)">
+                                        <input class="form-check-input mx-0" type="checkbox" id="phoneSwitch" onclick="phoneSwitch(this)">
                                     </div>
                                 </div>
                                 <p class="card-text">
@@ -561,10 +561,14 @@
                 </div>
             </div>
         </div>
-        <div class="container-md p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
-            <a href="{% url 'users:delete' user.id %}" class="btn btn-outline-danger">삭제하기</a>
-            <a href="{% url 'users:edit_info' user.id %}" class="btn btn-outline-secondary">수정하기</a>
-        </div>
+        {% for account in user.socialaccount_set.all %}
+            <div class="container-md mt-5 p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
+                <a href="{% url 'users:delete' user.id %}" class="btn btn-outline-danger">삭제하기</a>
+                <a href="{% url 'users:edit_info' user.id %}" class="btn btn-outline-secondary">수정하기</a>
+            </div>
+        {% empty %}
+        {% endfor %}
+        
 
         <!-- {% if user.is_authenticated %}
         <span>{{ user }}님이 로그인중입니다.</span>

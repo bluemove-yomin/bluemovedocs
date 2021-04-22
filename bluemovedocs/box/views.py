@@ -819,6 +819,10 @@ def updateimage(request, id):
 # @permission_required('auth.add_permission', raise_exception=True)
 def delete(request, id):
     box = get_object_or_404(Box, pk=id)
+    created_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=False) & Q(return_flag=False))
+    rejected_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=True) & Q(return_flag=False))
+    if created_valid_docs or rejected_valid_docs:
+        return redirect('box:read', id=box.id)
     box.delete()
     return redirect('box:main')
 

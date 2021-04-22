@@ -29,10 +29,6 @@ def myaccount(request, id):
         None
     # 회원가입 정보등록 끝
     user = get_object_or_404(User, pk=id)
-    my_notices = Notice.objects.filter(writer=user)
-    my_comments = Comment.objects.filter(writer=user)
-    my_boxes = Box.objects.filter(writer=user)
-    my_docs = Doc.objects.filter(user=user)
     favorites = request.user.favorite_user_set.all().order_by('-id')
     box_favorites = request.user.box_favorite_user_set.all().order_by('-id')
     page = request.GET.get('page', 1)
@@ -51,7 +47,7 @@ def myaccount(request, id):
         box_favorites = box_paginator.page(1)
     except EmptyPage:
         box_favorites = box_paginator.page(box_paginator.num_pages)
-    return render(request, 'users/myaccount.html', {'my_notices': my_notices, 'my_comments': my_comments, 'my_boxes': my_boxes, 'my_docs': my_docs, 'favorites': favorites, 'box_favorites': box_favorites})
+    return render(request, 'users/myaccount.html', {'favorites': favorites, 'box_favorites': box_favorites})
 
 
 @login_required
@@ -155,9 +151,30 @@ def edit_info(request, id):
 
 
 def delete(request, id):
-    # user = get_object_or_404(User, pk=id)
-    # user.delete()
-    return redirect('home:home')
+    user = get_object_or_404(User, pk=id)
+    my_notices = Notice.objects.filter(writer=user)
+    my_comments = Comment.objects.filter(writer=user)
+    my_boxes = Box.objects.filter(writer=user)
+    my_docs = Doc.objects.filter(user=user)
+    my_docs_create = Doc.objects.filter(user=user, submit_flag=False, reject_flag=False, return_flag=False)
+    my_docs_submit = Doc.objects.filter(user=user, submit_flag=True)
+    my_docs_reject = Doc.objects.filter(user=user, reject_flag=True)
+    my_docs_return = Doc.objects.filter(user=user, return_flag=True)
+    my_docs_delete = Doc.objects.filter(user=user, delete_flag=True)
+    if request.method == "POST":
+        user.delete()
+        return render(request, 'users/login_deleted.html')
+    return render(request, 'users/delete.html', {
+        'my_notices': my_notices,
+        'my_comments': my_comments,
+        'my_boxes': my_boxes,
+        'my_docs': my_docs,
+        'my_docs_create': my_docs_create,
+        'my_docs_submit': my_docs_submit,
+        'my_docs_reject': my_docs_reject,
+        'my_docs_return': my_docs_return,
+        'my_docs_delete': my_docs_delete
+        })
 
 def login_cancelled(request):
     return render(request, 'users/login_cancelled.html')

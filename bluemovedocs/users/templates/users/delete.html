@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} 내 계정 | 블루무브 닥스 {% endblock %}
+{% block content %}
+{% include 'shared/_navbar4home.html' %}
+<main class="px-2 px-md-5">
+    <div class="container-md mt-5 table-responsive">
+        <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">💙 내 계정</h1>
+        <div class="callout callout-dark" style="word-break: break-word;">
+            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-times"></i> 회원 정보 삭제</span><br>
+            <small style="color: #6C757D;">회원 정보 삭제 시 블루무브 닥스에 저장된 {{ user.email }} 계정 정보와 아래 안내된 자료가 모두 삭제됩니다.</small>
+        </div>
+
+        <!-- 블루무버일 경우 -->
+        {% if user.profile.level == 'bluemover' %}
+            <div class="container-md px-0">
+                <div class="mt-4">
+                    <div class="row row-cols-1 row-cols-lg-2 g-4">
+                        <div class="col">
+                            <div class="shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-weight: 600; color: #58595B;">📢 삭제될 공지사항</h5>
+                                    <p class="card-text">
+                                        {% if my_notices %}
+                                            {{ user.first_name }}님이 작성하신 <b>공지사항 {{ my_notices|length }}개</b>가 삭제될 예정입니다.
+                                        {% else %}
+                                            {{ user.first_name }}님이 작성하신 공지사항이 없습니다.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-weight: 600; color: #58595B;">💬 삭제될 댓글</h5>
+                                    <p class="card-text">
+                                        {% if my_comments %}
+                                            {{ user.first_name }}님이 작성하신 <b>댓글 {{ my_comments|length }}개</b>가 삭제될 예정입니다.
+                                        {% else %}
+                                            {{ user.first_name }}님이 작성하신 댓글이 없습니다.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% if my_boxes|length > 0 %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body" style="background-color: #f8d7da;">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📁 문서함 삭제 필요</h5>
+                                        <p class="card-text">
+                                            회원 정보를 삭제하시려면
+                                            {{ user.first_name }}님이 생성하신 <b>문서함 {{ my_boxes|length }}개</b>를
+                                            먼저 삭제해주세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📁 삭제될 문서함</h5>
+                                        <p class="card-text">
+                                            {{ user.first_name }}님이 생성하신 문서함이 없습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if my_docs_return %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 삭제될 문서</h5>
+                                        <p class="card-text">
+                                            없습니다!
+                                            {% if user.profile.level == 'bluemover' %}
+                                                승인된 문서는
+                                            {% else %}
+                                                반환된 문서는
+                                            {% endif %}
+                                            회원 정보 삭제의 영향을 받지 않습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif my_docs_create or my_docs_submit or my_docs_reject %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body" style="background-color: #f8d7da;">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 문서 처리 필요</h5>
+                                        <p class="card-text">
+                                            회원 정보를 삭제하시려면 {{ user.first_name }}님의
+                                            {% if my_docs_create %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부</b>를
+                                            {% elif my_docs_submit %}
+                                                <b>제출된 문서 {{ my_docs_submit|length }}부</b>를
+                                            {% elif my_docs_reject %}
+                                                <b>반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% elif my_docs_create and my_docs_submit %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부, 제출된 문서 {{ my_docs_submit|length }}부</b>를
+                                            {% elif my_docs_create and my_docs_reject %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부, 반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% elif my_docs_submit and my_docs_reject %}
+                                                <b>제출된 문서 {{ my_docs_submit|length }}부, 반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% elif my_docs_create and my_docs_submit and my_docs_reject %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부, 제출된 문서 {{ my_docs_submit|length }}부, 반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% endif %}
+                                            먼저 처리해주세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 삭제될 문서</h5>
+                                        <p class="card-text">
+                                            {{ user.first_name }}님이 생성하신 문서가 없습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        <!-- 게스트일 경우 -->
+        {% elif user.profile.level == 'guest' %}
+            <div class="container-md mb-1 px-0">
+                <div class="mt-4">
+                    <div class="row row-cols-1 row-cols-lg-2 g-4">
+                        <div class="col">
+                            <div class="shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title" style="font-weight: 600; color: #58595B;">💬 삭제될 댓글</h5>
+                                    <p class="card-text">
+                                        {% if my_comments %}
+                                            {{ user.first_name }}님이 작성하신 <b>댓글 {{ my_comments|length }}개</b>가 삭제될 예정입니다.
+                                        {% else %}
+                                            {{ user.first_name }}님이 작성하신 댓글이 없습니다.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% if my_docs_return %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 삭제될 문서</h5>
+                                        <p class="card-text">
+                                            없습니다!
+                                            {% if user.profile.level == 'bluemover' %}
+                                                승인된 문서는
+                                            {% else %}
+                                                반환된 문서는
+                                            {% endif %}
+                                            회원 정보 삭제의 영향을 받지 않습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% elif my_docs_create or my_docs_submit or my_docs_reject %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body" style="background-color: #f8d7da;">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 문서 처리 필요</h5>
+                                        <p class="card-text">
+                                            회원 정보를 삭제하시려면 {{ user.first_name }}님의
+                                            {% if my_docs_create %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부</b>를
+                                            {% elif my_docs_submit %}
+                                                <b>제출된 문서 {{ my_docs_submit|length }}부</b>를
+                                            {% elif my_docs_reject %}
+                                                <b>반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% elif my_docs_create and my_docs_submit %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부, 제출된 문서 {{ my_docs_submit|length }}부</b>를
+                                            {% elif my_docs_create and my_docs_reject %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부, 반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% elif my_docs_submit and my_docs_reject %}
+                                                <b>제출된 문서 {{ my_docs_submit|length }}부, 반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% elif my_docs_create and my_docs_submit and my_docs_reject %}
+                                                <b>미제출 문서 {{ my_docs_create|length }}부, 제출된 문서 {{ my_docs_submit|length }}부, 반려된 문서 {{ my_docs_reject|length }}부</b>를
+                                            {% endif %}
+                                            먼저 처리해주세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col">
+                                <div class="shadow-sm h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title" style="font-weight: 600; color: #58595B;">📄 삭제될 문서</h5>
+                                        <p class="card-text">
+                                            {{ user.first_name }}님이 생성하신 문서가 없습니다.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% for account in user.socialaccount_set.all %}
+            <form action="{% url 'users:delete' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="container-md mt-5 p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
+                    {% if my_boxes|length > 0 or my_docs_create or my_docs_submit or my_docs_reject %}
+                        <button type="button" class="btn btn-outline-danger" disabled>삭제하기</button>
+                    {% else %}
+                        <button type="submit" class="btn btn-outline-danger">삭제하기</button>
+                    {% endif %}
+                    <a href="{% url 'users:myaccount' user.id %}" class="btn btn-outline-secondary">취소하기</a>
+                </div>
+            </form>
+        {% empty %}
+        {% endfor %}
+
+    </div>
+
+    </div>
+</main>
+{% endblock %}
