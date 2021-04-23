@@ -63,22 +63,24 @@
                             <script>
                                 (function () {
                                     var hideEmail = document.querySelector("#hideEmail")
-                                    var maskEmail = hideEmail.innerText.replace(/[A-Za-z0-9]/g,"*")
+                                    hideEmailFront = hideEmail.innerText.split('@')[0]
+                                    hideEmailBack = hideEmail.innerText.split('@')[1]
+                                    starEmailFront = hideEmailFront.replace(/[A-Za-z0-9]/g,"*")
+                                    starEmailBack = hideEmailBack.replace(/[A-Za-z0-9]/g,"*")
+                                    maskEmailFront = starEmailFront.replace(starEmailFront.substring(0,2), hideEmailFront.substring(0,2))
+                                    maskEmailBack = starEmailBack.replace(starEmailBack.substring(0,2), hideEmailBack.substring(0,2))
+                                    maskEmail = maskEmailFront + "@" + maskEmailBack
                                     hideEmail.innerText = maskEmail
                                 })()
                             </script>
                             <script>
                                 function emailSwitch(obj) {
-                                    var hideEmail = document.querySelector("#hideEmail")
-                                    var maskEmail = hideEmail.innerText.replace(/[A-Za-z0-9]/g,"*")
-                                    var showEmail = document.querySelector("#showEmail")
                                     if (obj.checked) {
                                         hideEmail.setAttribute("style", "display: none;")
                                         showEmail.setAttribute("style", "")
                                     }
                                     if (obj.checked == false) {
                                         hideEmail.setAttribute("style", "")
-                                        hideEmail.innerText = maskEmail
                                         showEmail.setAttribute("style", "display: none;")
                                     }
                                 }
@@ -114,22 +116,24 @@
                             <script>
                                 (function () {
                                     var hidePhone = document.querySelector("#hidePhone")
-                                    var maskPhone = hidePhone.innerText.replace(/[0-9]/g,"*")
+                                    hidePhoneFront = hidePhone.innerText.split('-')[1]
+                                    hidePhoneBack = hidePhone.innerText.split('-')[2]
+                                    starPhoneFront = hidePhoneFront.replace(/[0-9]/g,"*")
+                                    starPhoneBack = hidePhoneBack.replace(/[0-9]/g,"*")
+                                    maskPhoneFront = starPhoneFront.replace(starPhoneFront.substring(0,1), hidePhoneFront.substring(0,1))
+                                    maskPhoneBack = starPhoneBack.replace(starPhoneBack.substring(0,1), hidePhoneBack.substring(0,1))
+                                    maskPhone = hidePhone.innerText.split('-')[0] + "-" + maskPhoneFront + "-" + maskPhoneBack
                                     hidePhone.innerText = maskPhone
                                 })()
                             </script>
                             <script>
                                 function phoneSwitch(obj) {
-                                    var hidePhone = document.querySelector("#hidePhone")
-                                    var maskPhone = hidePhone.innerText.replace(/[0-9]/g,"*")
-                                    var showPhone = document.querySelector("#showPhone")
                                     if (obj.checked) {
                                         hidePhone.setAttribute("style", "display: none;")
                                         showPhone.setAttribute("style", "")
                                     }
                                     if (obj.checked == false) {
                                         hidePhone.setAttribute("style", "")
-                                        hidePhone.innerText = maskPhone
                                         showPhone.setAttribute("style", "display: none;")
                                     }
                                 }

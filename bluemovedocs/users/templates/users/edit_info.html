@@ -8,13 +8,9 @@
         <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">💙 내 계정</h1>
         <div class="callout callout-dark hide01" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 회원 정보 수정</span><br>
-            <small style="color: #6C757D;"><span id="user_email" hidden>{{ user.email }}</span>실명과 휴대전화 번호를 수정하세요.</small>
+            <small style="color: #6C757D;"><span id="user_email" hidden>{{ user.email }}</span>실명과 휴대전화 번호를 수정하세요. 이메일 주소는 수정하실 수 없습니다.</small>
         </div>
-        <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
-            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
-            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace(구 G Suite) 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
-        </div>
-        <form action="{% url 'users:write_info' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <form action="{% url 'users:edit_info' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
             <div class="row g-2 mb-3 hide02">
                 <div class="col-md">
@@ -33,9 +29,9 @@
                 </div>
             </div>
             <div class="form-floating mb-5 hide03">
-                <input type="tel" class="form-control" name="phone" id="phone" placeholder="010-1234-5678" value="{{ user.profile.phone }}" minlength="12" maxlength="13" required>
+                <input type="tel" class="form-control" name="phone" id="phone" placeholder="010-1234-5678" value="{{ user.profile.phone }}" minlength="13" maxlength="13" required>
                 <label for="phone">휴대전화 번호</label>
-                <div class="invalid-feedback">휴대전화 번호 10자리 또는 11자리를 입력하세요. 숫자만 입력할 수 있습니다.</div>
+                <div class="invalid-feedback">휴대전화 번호 11자리를 입력하세요. 숫자만 입력할 수 있습니다.</div>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <a type="button" class="btn btn-outline-secondary" href="{% url 'users:myaccount' user.id %}">수정 취소하기</a>
@@ -120,11 +116,10 @@
                           !(pattern_eng.test(target3.value)) &&
                           !(pattern_spc.test(target3.value)) &&
                           !(pattern_kor.test(target3.value)) &&
-                          (12 <= target3.value.length) && // 휴대전화 번호 10자리일 경우
-                          (target3.value.length <= 13) && // 휴대전화 번호 11자리일 경우
+                          (target3.value.length == 13) && // 휴대전화 번호 11자리일 경우
                           (target3.value.indexOf('-') == 3) && // 휴대전화 번호에 자동 입력되는 dash가 네 번재 자리에 있을 경우
                           (target3.value.match(/-/g).length == 2) && // 휴대전화 번호에 자동 입력되는 dash가 두 개일 경우
-                          (target3.value.indexOf('01') == 0) // 휴대전화 번호에 숫자 '01'이 맨 앞자리에 있을 경우
+                          (target3.value.indexOf('010') == 0) // 휴대전화 번호에 숫자 '010'이 맨 앞자리에 있을 경우
                 ) {
                     if ( confirm("블루무브 닥스에 등록될 회원 정보입니다.\n\n" + "▶ Google 계정: " + email.innerText + "\n▶ 실명: " + target1.value + target2.value + "\n▶ 휴대전화 번호: " + target3.value + "\n\n모두 올바른 정보인가요?") ) {
                         var wait = document.querySelector("#wait");
@@ -151,16 +146,16 @@
                     alert("휴대전화 번호는 숫자만 허용됩니다.")
                     target3.value = '';
                 }
-                else if ( !(12 <= target3.value.length) || !(target3.value.length <= 13) ){
-                    alert("휴대전화 번호는 10자리 또는 11자리 숫자만 허용됩니다.")
+                else if ( !(target3.value.length == 13) ){
+                    alert("휴대전화 번호는 11자리 숫자만 허용됩니다.")
                     target3.value = '';
                 }
                 else if ( !(target3.value.indexOf('-') == 3) ){
                     alert("유효한 휴대전화 번호를 입력하세요.")
                     target3.value = '';
                 }
-                else if ( !(target3.value.match(/-/g).length == 2) || !(target3.value.indexOf('01') == 0) ){
-                    alert("유효한 휴대전화 번호를 입력하세요.")
+                else if ( !(target3.value.match(/-/g).length == 2) || !(target3.value.indexOf('010') == 0) ){
+                    alert("유효한 휴대전화 번호를 입력하세요.\n휴대전화 번호는 '010'으로 시작해야 합니다.")
                     target3.value = '';
                 }
                 else {

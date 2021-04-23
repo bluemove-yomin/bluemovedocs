@@ -7,6 +7,7 @@ urlpatterns = [
     path('<int:id>/write_info/', write_info, name="write_info"),
     path('<int:id>/edit_info/', edit_info, name="edit_info"),
     path('<int:id>/delete/', delete, name="delete"),
+    path('login_deleted/', login_deleted, name="login_deleted"),
     path('login_cancelled/', login_cancelled, name="login_cancelled"),
     path('login_cancelled_no_scopes/', login_cancelled_no_scopes, name="login_cancelled_no_scopes"),
     path('login_cancelled_no_drive/', login_cancelled_no_drive, name="login_cancelled_no_drive"),
