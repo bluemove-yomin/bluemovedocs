@@ -56,13 +56,21 @@
                                     </div>
                                 </div>
                                 <p class="card-text">
-                                    <span id="hideEmail">토글 스위치를 움직여 표시하세요.</span>
+                                    <span id="hideEmail">{{ user.email }}</span>
                                     <span id="showEmail" style="display: none;">{{ user.email }}</span>
                                 </p>
                             </div>
                             <script>
+                                (function () {
+                                    var hideEmail = document.querySelector("#hideEmail")
+                                    var maskEmail = hideEmail.innerText.replace(/[A-Za-z0-9]/g,"*")
+                                    hideEmail.innerText = maskEmail
+                                })()
+                            </script>
+                            <script>
                                 function emailSwitch(obj) {
                                     var hideEmail = document.querySelector("#hideEmail")
+                                    var maskEmail = hideEmail.innerText.replace(/[A-Za-z0-9]/g,"*")
                                     var showEmail = document.querySelector("#showEmail")
                                     if (obj.checked) {
                                         hideEmail.setAttribute("style", "display: none;")
@@ -70,6 +78,7 @@
                                     }
                                     if (obj.checked == false) {
                                         hideEmail.setAttribute("style", "")
+                                        hideEmail.innerText = maskEmail
                                         showEmail.setAttribute("style", "display: none;")
                                     }
                                 }
@@ -86,7 +95,13 @@
                                     </div>
                                 </div>
                                 <p class="card-text">
-                                    <span id="hidePhone">토글 스위치를 움직여 표시하세요.</span>
+                                    <span id="hidePhone">
+                                        {% for account in user.socialaccount_set.all %}
+                                            {{ user.profile.phone }}
+                                        {% empty %}
+                                            02-3296-0613
+                                        {% endfor %}
+                                    </span>
                                     <span id="showPhone" style="display: none;">
                                         {% for account in user.socialaccount_set.all %}
                                             {{ user.profile.phone }}
@@ -97,8 +112,16 @@
                                 </p>
                             </div>
                             <script>
+                                (function () {
+                                    var hidePhone = document.querySelector("#hidePhone")
+                                    var maskPhone = hidePhone.innerText.replace(/[0-9]/g,"*")
+                                    hidePhone.innerText = maskPhone
+                                })()
+                            </script>
+                            <script>
                                 function phoneSwitch(obj) {
                                     var hidePhone = document.querySelector("#hidePhone")
+                                    var maskPhone = hidePhone.innerText.replace(/[0-9]/g,"*")
                                     var showPhone = document.querySelector("#showPhone")
                                     if (obj.checked) {
                                         hidePhone.setAttribute("style", "display: none;")
@@ -106,6 +129,7 @@
                                     }
                                     if (obj.checked == false) {
                                         hidePhone.setAttribute("style", "")
+                                        hidePhone.innerText = maskPhone
                                         showPhone.setAttribute("style", "display: none;")
                                     }
                                 }
