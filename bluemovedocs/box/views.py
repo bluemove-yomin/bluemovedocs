@@ -26,7 +26,7 @@ from slack_sdk import WebClient
 # @permission_required('auth.add_permission', raise_exception=True)
 def write(request):
     form = BoxContentForm()
-    # Google Drive 공유 드라이브 폴더 불러오기 시작
+    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 시작
     token = SocialToken.objects.get(account__user=request.user, account__provider='google')
     credentials = Credentials(
         client_id=client_id,
@@ -109,7 +109,21 @@ def write(request):
             folders_list_G.append(tuple((folder_id, folder_name)))
         if re.match('H+\d+', folder_name):
             folders_list_H.append(tuple((folder_id, folder_name)))
-    # Google Drive 공유 드라이브 폴더 불러오기 끝
+    drive_response = drive_service.files().list(
+        corpora='allDrives',
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        orderBy="name",
+        q="mimeType='application/vnd.google-apps.document' and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
+        supportsAllDrives=True,
+    ).execute()
+    all_templates = drive_response.get('files')
+    templates_list = []
+    for template in all_templates:
+        template_id = template['id']
+        template_name = template['name']
+        templates_list.append(tuple((template_id, template_name)))
+    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
@@ -129,6 +143,7 @@ def write(request):
         {
             'form': form,
             'drives_list': drives_list,
+            'templates_list': templates_list,
             'folders_list_A': folders_list_A,
             'folders_list_B': folders_list_B,
             'folders_list_C': folders_list_C,
@@ -154,22 +169,36 @@ def create(request):
             box_folder_name = request.POST.get('folder_id').split('#')[1]
             box_title = request.POST.get('title')
             box_writer = request.user
-            box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
+            if request.POST.get('document_etcid') == None:
+                box_document_id = request.POST.get('document_id').split('#')[0]
+                box_document_name = request.POST.get('document_id').split('#')[1]
+                official_template_flag = True
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
         elif form.is_valid() and request.POST.get('category') == 'guest':
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
             box_writer = request.user
-            box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
+            if request.POST.get('document_etcid') == None:
+                box_document_id = request.POST.get('document_id').split('#')[0]
+                box_document_name = request.POST.get('document_id').split('#')[1]
+                official_template_flag = True
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image)
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, document_name=box_document_name, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -556,7 +585,7 @@ def box_favorite(request, id):
 def update(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
-    # Google Drive 공유 드라이브 폴더 불러오기 시작
+    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 시작
     token = SocialToken.objects.get(account__user=request.user, account__provider='google')
     credentials = Credentials(
         client_id=client_id,
@@ -593,13 +622,6 @@ def update(request, id):
         if 'H' in drive_name:
             Hdrive = drive_id
         drives_list.append(drive_name)
-    # drive_response = drive_service.files().list(
-    #     fields="files(id, name)",
-    #     includeItemsFromAllDrives=True,
-    #     orderBy="name",
-    #     q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
-    #     supportsAllDrives=True,
-    # ).execute()
     try:
         drive_response = drive_service.files().list(
             corpora='allDrives',
@@ -646,7 +668,21 @@ def update(request, id):
             folders_list_G.append(tuple((folder_id, folder_name)))
         if re.match('H+\d+', folder_name):
             folders_list_H.append(tuple((folder_id, folder_name)))
-    # Google Drive 공유 드라이브 폴더 불러오기 끝
+    drive_response = drive_service.files().list(
+        corpora='allDrives',
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        orderBy="name",
+        q="mimeType='application/vnd.google-apps.document' and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
+        supportsAllDrives=True,
+    ).execute()
+    all_templates = drive_response.get('files')
+    templates_list = []
+    for template in all_templates:
+        template_id = template['id']
+        template_name = template['name']
+        templates_list.append(tuple((template_id, template_name)))
+    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
@@ -667,18 +703,32 @@ def update(request, id):
             box_folder_name = request.POST.get('folder_id').split('#')[1]
             box_drive_name = request.POST.get('drive_id')
             box_title = request.POST.get('title')
-            box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
+            if request.POST.get('document_etcid') == None:
+                box_document_id = request.POST.get('document_id').split('#')[0]
+                box_document_name = request.POST.get('document_id').split('#')[1]
+                official_template_flag = True
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline)
+            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         elif form.is_valid() and box.category == 'guest':
             box_title = request.POST.get('title')
-            box_document_id = request.POST.get('document_id').replace("https://docs.google.com/document/d/","")[0:44]
+            if request.POST.get('document_etcid') == None:
+                box_document_id = request.POST.get('document_id').split('#')[0]
+                box_document_name = request.POST.get('document_id').split('#')[1]
+                official_template_flag = True
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(title=box_title, document_id=box_document_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline)
+            form.update(title=box_title, document_id=box_document_id, document_name=box_document_name, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         return redirect('box:read', box.id)
     return render(
         request,
@@ -687,6 +737,7 @@ def update(request, id):
             'box': box,
             'form': form,
             'drives_list': drives_list,
+            'templates_list': templates_list,
             'folders_list_A': folders_list_A,
             'folders_list_B': folders_list_B,
             'folders_list_C': folders_list_C,
@@ -705,7 +756,7 @@ def update(request, id):
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
-    # Google Drive 공유 드라이브 폴더 불러오기 시작
+    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 시작
     token = SocialToken.objects.get(account__user=request.user, account__provider='google')
     credentials = Credentials(
         client_id=client_id,
@@ -777,7 +828,21 @@ def updateimage(request, id):
             folders_list_G.append(tuple((folder_id, folder_name)))
         if re.match('H+\d+', folder_name):
             folders_list_H.append(tuple((folder_id, folder_name)))
-    # Google Drive 공유 드라이브 폴더 불러오기 끝
+    drive_response = drive_service.files().list(
+        corpora='allDrives',
+        fields="files(id, name)",
+        includeItemsFromAllDrives=True,
+        orderBy="name",
+        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.google-apps.spreadsheet') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
+        supportsAllDrives=True,
+    ).execute()
+    all_templates = drive_response.get('files')
+    templates_list = []
+    for template in all_templates:
+        template_id = template['id']
+        template_name = template['name']
+        templates_list.append(tuple((template_id, template_name)))
+    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
@@ -802,6 +867,7 @@ def updateimage(request, id):
             'box': box,
             'form': form,
             'drives_list': drives_list,
+            'templates_list': templates_list,
             'folders_list_A': folders_list_A,
             'folders_list_B': folders_list_B,
             'folders_list_C': folders_list_C,
@@ -5302,21 +5368,51 @@ def return_doc(request, doc_id):
             }
         ).execute()
         # 03. 문서명 및 설명 변경
-        drive_response = drive_service.files().update(
-            fileId = file_id,
-            body = {
-                'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
-                        doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
-                        '_' + datetime.date.today().strftime('%y%m%d'),
-                'description': '블루무브 닥스에서 생성된 ' +
-                            doc.box.title ##### 문서명 INPUT #####
-                            + '입니다.\n\n' +
-                            '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
-                            '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
-                            '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
-            },
-            fields = 'name'
+        drive_response = drive_service.files().list(
+            corpora='allDrives',
+            fields="files(name)",
+            includeItemsFromAllDrives=True,
+            orderBy="createdTime",
+            q="mimeType='application/vnd.google-apps.document' and trashed = false and '" + doc.box.folder_id + "' in parents and name contains '" + doc.box.folder_name[0:3] + "_" + doc.box.title.replace(" ","") + "'",
+            supportsAllDrives=True,
         ).execute()
+        all_before_files = drive_response.get('files')
+        for before_file in all_before_files:
+            before_file_name = before_file['name']
+            now_file_name_some = doc.box.folder_name[0:3] + '_' + doc.box.title.replace(" ","")
+            now_version = str(int(before_file_name[-1]) + 1)
+            if now_file_name_some in before_file_name and '_v' in before_file_name:
+                drive_response = drive_service.files().update(
+                    fileId = file_id,
+                    body = {
+                        'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
+                                doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
+                                '_' + datetime.date.today().strftime('%y%m%d') + '_v' + now_version,
+                        'description': '블루무브 닥스에서 생성된 ' +
+                                    doc.box.title ##### 문서명 INPUT #####
+                                    + '입니다.\n\n' +
+                                    '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
+                                    '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
+                                    '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
+                    },
+                    fields = 'name'
+                ).execute()
+            else:
+                drive_response = drive_service.files().update(
+                    fileId = file_id,
+                    body = {
+                        'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
+                                doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
+                                '_' + datetime.date.today().strftime('%y%m%d') + '_v2',
+                        'description': '블루무브 닥스에서 생성된 ' +
+                                    doc.box.title ##### 문서명 INPUT #####
+                                    + '입니다.\n\n' +
+                                    '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
+                                    '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
+                                    '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
+                    },
+                    fields = 'name'
+                ).execute()
         name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
         # 04. 문서 잠금
         drive_response = drive_service.files().update(

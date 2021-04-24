@@ -52,7 +52,7 @@ def myaccount(request, id):
         box_favorites = box_paginator.page(1)
     except EmptyPage:
         box_favorites = box_paginator.page(box_paginator.num_pages)
-    return render(request, 'users/myaccount.html', {'favorites': favorites, 'box_favorites': box_favorites})
+    return render(request, 'users/myaccount.html', {'user': user, 'favorites': favorites, 'box_favorites': box_favorites})
 
 
 @login_required

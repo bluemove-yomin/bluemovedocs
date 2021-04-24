@@ -15,6 +15,7 @@ class BoxAdmin(admin.ModelAdmin):
         'deadline',
         'deadline_update_flag',
         'updated_at',
+        'official_template_flag',
     )
     search_fields = (
         'category',

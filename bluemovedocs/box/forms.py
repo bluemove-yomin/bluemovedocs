@@ -20,11 +20,13 @@ class BoxContentForm(forms.ModelForm):
         box.drive_name = kwargs.get('drive_name', None)
         box.folder_name = kwargs.get('folder_name', None)
         box.document_id = kwargs.get('document_id', None)
+        box.document_name = kwargs.get('document_name', None)
         box.folder_id = kwargs.get('folder_id', None)
         box.channel_id = kwargs.get('channel_id', None)
         box.channel_name = kwargs.get('channel_name', None)
         box.deadline = kwargs.get('deadline', None)
         box.image = kwargs.get('image', None)
+        box.official_template_flag = kwargs.get('official_template_flag', None)
         box.save()
         return box
 
@@ -36,9 +38,11 @@ class BoxContentForm(forms.ModelForm):
         box.drive_name = kwargs.get('drive_name', None)
         box.folder_name = kwargs.get('folder_name', None)
         box.document_id = kwargs.get('document_id', None)
+        box.document_name = kwargs.get('document_name', None)
         box.folder_id = kwargs.get('folder_id', None)
         box.channel_id = kwargs.get('channel_id', None)
         box.channel_name = kwargs.get('channel_name', None)
         box.deadline = kwargs.get('deadline', None)
+        box.official_template_flag = kwargs.get('official_template_flag', None)
         box.save()
         return box

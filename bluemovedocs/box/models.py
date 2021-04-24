@@ -19,6 +19,8 @@ class Box(models.Model):
     drive_name = models.CharField(max_length = 50, null = True, blank = True)
     folder_name = models.CharField(max_length = 50, null = True, blank = True)
     folder_id = models.CharField(max_length = 100, null = True, blank = True)
+    official_template_flag = models.BooleanField(default = False)
+    document_name = models.CharField(max_length = 50, null = True, blank = True)
     document_id = models.CharField(max_length = 300)
     channel_id = models.CharField(max_length = 50)
     channel_name = models.CharField(max_length = 50)
