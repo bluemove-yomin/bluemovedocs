@@ -152,7 +152,7 @@
             <!-- Button trigger modal -->
             <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
             <!-- Modal -->
-            {% if created_valid_docs or rejected_valid_docs %}
+            {% if created_valid_docs or submitted_valid_docs or rejected_valid_docs %}
                 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                     <div class="modal-content">

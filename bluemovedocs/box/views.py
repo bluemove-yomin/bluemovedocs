@@ -494,6 +494,7 @@ def read(request, id):
         if request.user == box.writer:
             valid_docs = box.docs.all()
             created_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=False) & Q(return_flag=False))
+            submitted_valid_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False))
             rejected_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=True) & Q(return_flag=False))
             returned_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=False) & Q(return_flag=True))
             all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False)).order_by('-id')
@@ -519,6 +520,7 @@ def read(request, id):
         elif request.user.profile.level == 'bluemover':
             valid_docs = None
             created_valid_docs = None
+            submitted_valid_docs = None
             rejected_valid_docs = None
             returned_valid_docs = None
             all_docs = box.docs.filter(user=request.user)
@@ -554,16 +556,18 @@ def read(request, id):
         else:
             valid_docs = None
             created_valid_docs = None
+            submitted_valid_docs = None
             rejected_valid_docs = None
             returned_valid_docs = None
             all_docs = box.docs.filter(user=request.user)
     else:
         valid_docs = None
         created_valid_docs = None
+        submitted_valid_docs = None
         rejected_valid_docs = None
         returned_valid_docs = None
         all_docs = None
-    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'valid_docs': valid_docs, 'created_valid_docs': created_valid_docs, 'rejected_valid_docs': rejected_valid_docs, 'returned_valid_docs': returned_valid_docs, 'all_docs': all_docs})
+    return render(request, 'box/read.html', {'box': box, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes, 'valid_docs': valid_docs, 'created_valid_docs': created_valid_docs, 'submitted_valid_docs': submitted_valid_docs, 'rejected_valid_docs': rejected_valid_docs, 'returned_valid_docs': returned_valid_docs, 'all_docs': all_docs})
 
 
 @login_required
@@ -886,8 +890,9 @@ def updateimage(request, id):
 def delete(request, id):
     box = get_object_or_404(Box, pk=id)
     created_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=False) & Q(return_flag=False))
+    submitted_valid_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False))
     rejected_valid_docs = box.docs.filter(Q(submit_flag=False) & Q(reject_flag=True) & Q(return_flag=False))
-    if created_valid_docs or rejected_valid_docs:
+    if created_valid_docs or submitted_valid_docs or rejected_valid_docs:
         return redirect('box:read', id=box.id)
     box.delete()
     return redirect('box:main')
@@ -5372,47 +5377,50 @@ def return_doc(request, doc_id):
             corpora='allDrives',
             fields="files(name)",
             includeItemsFromAllDrives=True,
-            orderBy="createdTime",
+            orderBy="createdTime desc",
             q="mimeType='application/vnd.google-apps.document' and trashed = false and '" + doc.box.folder_id + "' in parents and name contains '" + doc.box.folder_name[0:3] + "_" + doc.box.title.replace(" ","") + "'",
             supportsAllDrives=True,
         ).execute()
         all_before_files = drive_response.get('files')
+        before_file_name_list = []
         for before_file in all_before_files:
             before_file_name = before_file['name']
-            now_file_name_some = doc.box.folder_name[0:3] + '_' + doc.box.title.replace(" ","")
-            now_version = str(int(before_file_name[-1]) + 1)
-            if now_file_name_some in before_file_name and '_v' in before_file_name:
+            before_file_name_list.append(before_file_name)
+        now_file_name_some = doc.box.folder_name[0:3] + '_' + doc.box.title.replace(" ","") ##### 파일 프리픽스 INPUT + 문서명 INPUT #####
+        try: 
+            if now_file_name_some in before_file_name_list[0]:
+                new_version = str(int(before_file_name[-1]) + 1)
                 drive_response = drive_service.files().update(
                     fileId = file_id,
                     body = {
-                        'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
-                                doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
-                                '_' + datetime.date.today().strftime('%y%m%d') + '_v' + now_version,
+                        'name': now_file_name_some +
+                                '_' + datetime.date.today().strftime('%y%m%d') + '_v' + new_version, ##### 현재 일자 INPUT + 버전 INPUT #####
                         'description': '블루무브 닥스에서 생성된 ' +
-                                    doc.box.title ##### 문서명 INPUT #####
-                                    + '입니다.\n\n' +
+                                    doc.box.title + ' ' + ##### 문서명 INPUT #####
+                                    new_version + ' 번째 버전입니다.\n\n' +
                                     '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
                                     '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
                                     '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
                     },
                     fields = 'name'
                 ).execute()
-            else:
-                drive_response = drive_service.files().update(
-                    fileId = file_id,
-                    body = {
-                        'name': doc.box.folder_name[0:3] + '_' + ##### 파일 프리픽스 INPUT #####
-                                doc.box.title.replace(" ","") + ##### 문서명 INPUT #####
-                                '_' + datetime.date.today().strftime('%y%m%d') + '_v2',
-                        'description': '블루무브 닥스에서 생성된 ' +
-                                    doc.box.title ##### 문서명 INPUT #####
-                                    + '입니다.\n\n' +
-                                    '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
-                                    '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
-                                    '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
-                    },
-                    fields = 'name'
-                ).execute()
+                file_version = new_version
+        except:
+            drive_response = drive_service.files().update(
+                fileId = file_id,
+                body = {
+                    'name': now_file_name_some +
+                            '_' + datetime.date.today().strftime('%y%m%d') + '_v1', ##### 현재 일자 INPUT + 첫 버전 INPUT #####
+                    'description': '블루무브 닥스에서 생성된 ' +
+                                doc.box.title + ##### 문서명 INPUT #####
+                                ' 1 번째 버전입니다.\n\n' +
+                                '📧 생성일자: ' + doc.creation_date + '\n' + ##### 문서 생성일자 INPUT #####
+                                '📨 제출일자: ' + doc.submission_date + '\n' + ##### 문서 제출일자 INPUT #####
+                                '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'), ##### 현재 일자 INPUT #####
+                },
+                fields = 'name'
+            ).execute()
+            file_version = '1'
         name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
         # 04. 문서 잠금
         drive_response = drive_service.files().update(
@@ -5434,6 +5442,7 @@ def return_doc(request, doc_id):
             useContentAsIndexableText = True,
         ).execute()
         # 06. 문서 데이터 DB 반영
+        doc.name = name
         doc.submit_flag = False
         doc.return_flag = True
         doc.return_date = datetime.date.today().strftime('%Y-%m-%d')
@@ -5615,7 +5624,7 @@ def return_doc(request, doc_id):
                                                                                                     valign="top"
                                                                                                     class="mcnTextContent"
                                                                                                     style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
-                                                                                                    <strong style="color:#222222;">문서명</strong>: """ + doc.box.title + """<br>
+                                                                                                    <strong style="color:#222222;">문서명 및 버전</strong>: """ + doc.box.title + """ """ + file_version + """ 번째 버전<br>
                                                                                                     <strong style="color:#222222;">블루무버 계정</strong>: """ + doc.user.email + """<br>
                                                                                                     <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
                                                                                                     <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """<br>
@@ -5957,7 +5966,7 @@ def return_doc(request, doc_id):
                                                                                                     valign="top"
                                                                                                     class="mcnTextContent"
                                                                                                     style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
-                                                                                                    <strong style="color:#222222;">문서명</strong>: """ + doc.box.title + """<br>
+                                                                                                    <strong style="color:#222222;">문서명 및 버전</strong>: """ + doc.box.title + """ """ + file_version + """ 번째 버전<br>
                                                                                                     <strong style="color:#222222;">블루무버 계정</strong>: """ + doc.user.email + """<br>
                                                                                                     <strong style="color:#222222;">생성일자</strong>: """ + doc.creation_date + """<br>
                                                                                                     <strong style="color:#222222;">제출일자</strong>: """ + doc.submission_date + """<br>
@@ -6331,7 +6340,7 @@ def return_doc(request, doc_id):
             },
             fields = 'name'
         ).execute()
-        drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
+        name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
         # 06. 문서 잠금
         drive_response = drive_service.files().update(
             fileId=file_id,
@@ -6350,6 +6359,7 @@ def return_doc(request, doc_id):
             permissionId = permission_id,
         ).execute()
         # 08. 문서 데이터 DB 반영
+        doc.name = name
         doc.submit_flag = False
         doc.return_flag = True
         doc.return_date = datetime.date.today().strftime('%Y-%m-%d')
@@ -7090,7 +7100,7 @@ def return_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "*Google 계정:*\n" +  doc.user.email + "\n*생성일자:* " + doc.creation_date + "\n*제출일자:* " + doc.submission_date + "\n*반환일자:* " + doc.return_date
+                        "text": "*Google 계정:*\n" +  doc.user.email + "\n*제출일자:* " + doc.submission_date + "\n*반환일자:* " + doc.return_date
                     },
                     "accessory": {
                         "type": "image",
