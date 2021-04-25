@@ -34,13 +34,15 @@
                                     {% for account in user.socialaccount_set.all %}
                                         {% if account.extra_data.hd == 'bluemove.or.kr' %}
                                             {{ user.first_name }}님은 <b>블루무버</b>입니다.
-                                        {% elif perms.auth %}
-                                            {{ user.first_name }}님은 <b>매니저</b>입니다.
                                         {% else %}
                                             {{ user.first_name }}님은 <b>게스트</b>입니다.
                                         {% endif %}
                                     {% empty %}
-                                        <b>사무국 매니저</b>입니다.
+                                        {% if perms.auth %}
+                                            <b>사무국 어드민</b>입니다.
+                                        {% else %}
+                                            오류가 발생했습니다. 테크 매니저에게 보고하세요.
+                                        {% endif %}
                                     {% endfor %}
                                 </p>
                             </div>

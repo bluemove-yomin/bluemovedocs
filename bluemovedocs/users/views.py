@@ -16,6 +16,8 @@ from google.oauth2 import service_account
 from email.mime.text import MIMEText
 import base64
 from slack_sdk import WebClient
+import string
+import random
 
 
 
@@ -59,6 +61,10 @@ def myaccount(request, id):
 def write_info(request, id):
     user = get_object_or_404(User, pk=id)
     profile = Profile.objects.get(user=user)
+    string_pool = string.ascii_letters + string.digits
+    random_sub_id = ''
+    for i in range(9):
+        random_sub_id += random.choice(string_pool)
     if 'bluemove.or.kr' in user.email:
         token = SocialToken.objects.get(account__user=request.user, account__provider='google')
         credentials = Credentials(
@@ -120,8 +126,9 @@ def write_info(request, id):
             user.first_name = request.POST.get("first_name")
             profile.phone = request.POST.get("phone")
             profile.info_update_flag = True
+            profile.sub_id = 'B' + random_sub_id
             user.save(update_fields=['last_name', 'first_name'])
-            profile.save(update_fields=['level', 'phone', 'slack_user_id', 'info_update_flag'])
+            profile.save(update_fields=['level', 'phone', 'slack_user_id', 'info_update_flag', 'sub_id'])
             # 슬랙 메시지 발신
             client = WebClient(token=slack_bot_token)
             client.chat_postMessage(
@@ -175,8 +182,9 @@ def write_info(request, id):
             user.first_name = request.POST.get("first_name")
             profile.phone = request.POST.get("phone")
             profile.info_update_flag = True
+            profile.sub_id = 'B' + random_sub_id
             user.save(update_fields=['last_name', 'first_name'])
-            profile.save(update_fields=['level', 'phone', 'info_update_flag'])
+            profile.save(update_fields=['level', 'phone', 'info_update_flag', 'sub_id'])
             # 01. 서비스 계정 Gmail API 호출
             INSIDE_CLIENT = 'docs@bluemove.or.kr'
             user_id = 'docs@bluemove.or.kr'
@@ -594,7 +602,7 @@ def delete(request, id):
                         "type": "header",
                         "text": {
                             "type": "plain_text",
-                            "text": "🙅 " + user.last_name + user.first_name + "님의 회원 정보 삭제됨",
+                            "text": "🗑 " + user.last_name + user.first_name + "님의 회원 정보 삭제됨",
                         }
                     },
                     {
@@ -626,7 +634,7 @@ def delete(request, id):
                         ]
                     }
                 ],
-                text = f"🙅 " + user.last_name + user.first_name + "님의 회원 정보 등록됨",
+                text = f"🗑 " + user.last_name + user.first_name + "님의 회원 정보 삭제됨",
             )
         ########################
         ##### guest일 경우 #####

@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    sub_id = models.CharField(max_length = 10, null=True)
     phone = models.CharField(max_length = 20, null=True)
     info_update_flag = models.BooleanField(default = False)
     level = models.CharField(max_length = 50, null=True)

@@ -29,6 +29,7 @@ class Comment(models.Model):
     avatar_src = models.TextField(null = True)
     writer = models.ForeignKey(User, on_delete = models.CASCADE)
     notice = models.ForeignKey(Notice, on_delete=models.CASCADE, related_name='comments')
+    mentioned_users = models.TextField(null=True, blank=True)
     created_at = models.DateField(auto_now_add = True)
     updated_at = models.DateField(auto_now = True)
 

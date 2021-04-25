@@ -106,25 +106,37 @@
             {% csrf_token %}
             <div class="card">
                 <div class="form-floating">
-                    <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" {% if not user.is_authenticated %}disabled{% endif %}></textarea>
-                    <label for="content">
-                        {% if user.is_authenticated %}
-                            {% if not user.first_name == '' %}
-                            {{ user.last_name }}{{ user.first_name }}님의 댓글 작성
-                            {% else %}
-                            {{ user }}님의 댓글 작성
-                            {% endif %}
-                        {% else %}
-                        댓글을 작성하려면 로그인하세요.
-                        {% endif %}
-                    </label>
+                    {% if user.is_authenticated %}
+                        {% for account in user.socialaccount_set.all %}
+                            <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;"></textarea>
+                        {% empty %}
+                            <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" disabled></textarea>
+                        {% endfor %}
+                        <label id="contentLabel" for="content">
+                            {% for account in user.socialaccount_set.all %}
+                                {{ user.last_name }}{{ user.first_name }}님의 댓글 작성
+                            {% empty %}
+                                {% if perms.auth %}
+                                    사무국 어드민은 댓글을 작성할 수 없습니다.
+                                {% else %}
+                                    댓글을 작성하려면 로그인하세요.
+                                {% endif %}
+                            {% endfor %}
+                        </label>
+                    {% endif %}
                 </div>
+                <input class="form-control" type="text" id="mention" name="mention" readOnly hidden>
+                <input class="form-control" type="text" id="mention_name" name="mention_name" readOnly hidden>
                 <div class="card-footer d-flex justify-content-between">
                     <div>
                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
                     </div>
                     <div>
-                        <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" {% if not user.is_authenticated %}disabled{% endif %}>등록</button>
+                        {% for account in user.socialaccount_set.all %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();">등록</button>
+                        {% empty %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" disabled>등록</button>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -150,7 +162,7 @@
     </div>
 
     <div class="container-md">
-        <div class="list-group list-group-flush mt-1">
+        <div class="list-group list-group-flush mt-2">
             {% for comment in all_comments %}
             <div class="list-group-item px-0 py-3">
                 <table style="border: none;">
@@ -163,8 +175,12 @@
                             {% endif %}
                         </td>
                         <td class="p-0">
-                            <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 10px;">
-                                {{ comment.writer.last_name }}{{ comment.writer.first_name }}
+                            <h6 id="commentWriter" class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 10px;">
+                                {% if comment.writer.profile.level == 'bluemover' %}
+                                    {{ comment.writer.last_name }}{{ comment.writer.first_name }} 🐳
+                                {% else %}
+                                    {{ comment.writer.last_name }}{{ comment.writer.first_name }}
+                                {% endif %}
                             </h6>
                         </td>
                     </tr>
@@ -172,23 +188,53 @@
                         <td class="p-0">
                             <small class="card-subtitle mb-2" style="margin-left: 10px;">
                                 {% if comment.created_at == comment.updated_at %}
-                                {{ comment.created_at }}
+                                    {{ comment.created_at }}
                                 {% else %}
-                                {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
+                                    {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
                                 {% endif %}
                             </small>
                         </td>
                     </tr>
                 </table>
-                <p class="card-text mt-1" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;">{{ comment.content }}</p>
-                {% if user == comment.writer or user == notice.writer or perms.auth %}
-                    <div class="d-grid justify-content-end">
-                        <small>
-                            <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" style="color: #dc3545;">삭제하기</a>
-                            <a href="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" class="card-link" style="color: #58595B;">수정하기</a>
-                        </small>
-                    </div>
+                {% if comment.mentioned_users %}
+                    <p class="card-text" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;"><code style="color: #007DC5; font-weight: 600;">{{ comment.mentioned_users }}</code> {{ comment.content }}</p>
+                {% else %}
+                    <p class="card-text" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;">{{ comment.content }}</p>
                 {% endif %}
+                <div class="d-grid justify-content-end">
+                    <small>
+                        {% if user.is_authenticated %}
+                            {% if user == comment.writer %}
+                                <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" style="color: #dc3545;">삭제하기</a>
+                                <a href="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" class="card-link" style="color: #58595B;">수정하기</a>
+                            {% elif user == notice.writer %}
+                                <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" style="color: #dc3545;">삭제하기</a>
+                                <a onclick="{{ comment.writer.profile.sub_id }}(this);" class="card-link {{ comment.writer.profile.sub_id }}" style="color: #58595B;">멘션하기</a>
+                            {% else %}
+                                <a onclick="{{ comment.writer.profile.sub_id }}(this);" class="card-link {{ comment.writer.profile.sub_id }}" style="color: #58595B;">멘션하기</a>
+                            {% endif %}
+                        {% endif %}
+                    </small>
+                </div>
+                <script>
+                    function {{ comment.writer.profile.sub_id }}(obj) {
+                        if ( document.querySelector("#mention").value == '' || document.querySelector("#mention").value.indexOf('{{ comment.writer.id }}') == -1 ) {
+                            document.querySelector("#mention").value = document.querySelector("#mention").value.concat("@{{ comment.writer.id }}")
+                            document.querySelector("#mention_name").value = document.querySelector("#mention_name").value.concat("@{{ comment.writer.last_name }}{{ comment.writer.first_name }} ")
+                            document.querySelector("#contentLabel").innerText = document.querySelector("#contentLabel").innerText.concat(' @{{ comment.writer.last_name }}{{ comment.writer.first_name }}')
+                            for (var i = 0; i < document.querySelectorAll(".{{ comment.writer.profile.sub_id }}").length; i++) {
+                                document.querySelectorAll(".{{ comment.writer.profile.sub_id }}")[i].innerText = '멘션 취소하기'
+                            }
+                        } else {
+                            document.querySelector("#mention").value = document.querySelector("#mention").value.replace("@{{ comment.writer.id }}", "")
+                            document.querySelector("#mention_name").value = document.querySelector("#mention_name").value.replace("@{{ comment.writer.last_name }}{{ comment.writer.first_name }} ", "")
+                            document.querySelector("#contentLabel").innerText = document.querySelector("#contentLabel").innerText.replace(' @{{ comment.writer.last_name }}{{ comment.writer.first_name }}', '')
+                            for (var i = 0; i < document.querySelectorAll(".{{ comment.writer.profile.sub_id }}").length; i++) {
+                                document.querySelectorAll(".{{ comment.writer.profile.sub_id }}")[i].innerText = '멘션하기'
+                            }
+                        }
+                    }
+                </script>
             </div>
             {% empty %}
             <div class="text-center"><br><br><p style="color: #CCCCCC;"><i class="far fa-comment-dots"></i> 댓글이 없습니다.</p></div>

@@ -6,6 +6,7 @@ from .models import *
 class ProfileAdmin(admin.ModelAdmin):
     list_display = (
         'id',
+        'sub_id',
         'user',
         'phone',
         'level',
@@ -15,4 +16,5 @@ class ProfileAdmin(admin.ModelAdmin):
         'user',
         'phone',
         'level',
+        'sub_id',
     )

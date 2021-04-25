@@ -39,28 +39,42 @@
             {% csrf_token %}
             <div class="card">
                 <div class="form-floating">
-                    <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" {% if not user.is_authenticated %}disabled{% endif %}>{{ comment.content }}</textarea>
-                    <label for="content">
-                        {% if user.is_authenticated %}
-                            {{ user.last_name }}{{ user.first_name }}님의 댓글 작성
-                        {% else %}
-                            댓글을 작성하려면 로그인하세요.
-                        {% endif %}
-                    </label>
+                    {% if user.is_authenticated %}
+                        {% for account in user.socialaccount_set.all %}
+                            <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;">{{ comment.content }}</textarea>
+                        {% empty %}
+                            <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" disabled>{{ comment.content }}</textarea>
+                        {% endfor %}
+                        <label for="content">
+                            {% for account in user.socialaccount_set.all %}
+                                {{ user.last_name }}{{ user.first_name }}님의 댓글 수정 {{ comment.mentioned_users }}
+                            {% empty %}
+                                {% if perms.auth %}
+                                    사무국 어드민은 댓글을 작성할 수 없습니다.
+                                {% else %}
+                                    댓글을 작성하려면 로그인하세요.
+                                {% endif %}
+                            {% endfor %}
+                        </label>
+                    {% endif %}
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <div>
                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
                     </div>
                     <div class="d-flex gap-2">
-                        <a type="button" class="btn btn-outline-danger btn-sm" onclick="goBack()">취소</a>
+                        <a type="button" href="{% url 'notice:read' notice.id %}?next={{ request.path }}#commentBoxPosition" class="btn btn-outline-danger btn-sm" onclick="goBack()">취소</a>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
                               window.history.back();
                             }
                         </script>
-                        <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" {% if not user.is_authenticated %}disabled{% endif %}>등록</button>
+                        {% for account in user.socialaccount_set.all %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();">등록</button>
+                        {% empty %}
+                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" disabled>등록</button>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -86,7 +100,7 @@
     </div>
 
     <div class="container-md">
-        <div class="list-group list-group-flush mt-1">
+        <div class="list-group list-group-flush mt-2">
             {% for comment in all_comments %}
             <div class="list-group-item px-0 py-3">
                 <table style="border: none;">
@@ -95,12 +109,16 @@
                             {% if comment.avatar_src == none or comment.avatar_src == '' %}
                             <img height="35" src="/static/images/favicons/favicon-96x96.png"/>
                             {% else %}
-                            <img height="35" src="{{ comment.avatar_src|add:'-rg-br100' }}"/>
+                            <img height="35" class="rounded-circle" src="{{ comment.avatar_src }}"/>
                             {% endif %}
                         </td>
                         <td class="p-0">
                             <h6 class="card-title my-0" style="font-weight: 600; color: #58595B; margin-left: 10px;">
-                                {{ comment.writer.last_name }}{{ comment.writer.first_name }}
+                                {% if comment.writer.profile.level == 'bluemover' %}
+                                    {{ comment.writer.last_name }}{{ comment.writer.first_name }} 🐳
+                                {% else %}
+                                    {{ comment.writer.last_name }}{{ comment.writer.first_name }}
+                                {% endif %}
                             </h6>
                         </td>
                     </tr>
@@ -108,15 +126,19 @@
                         <td class="p-0">
                             <small class="card-subtitle mb-2" style="margin-left: 10px;">
                                 {% if comment.created_at == comment.updated_at %}
-                                {{ comment.created_at }}
+                                    {{ comment.created_at }}
                                 {% else %}
-                                {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
+                                    {{ comment.created_at }} │ <span style="color: #6C757D;"><i class="fas fa-sync"></i> {{ comment.updated_at }} 수정</span>
                                 {% endif %}
                             </small>
                         </td>
                     </tr>
                 </table>
-                <p class="card-text mt-1" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;">{{ comment.content }}</p>
+                {% if comment.mentioned_users %}
+                    <p class="card-text" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;"><code style="color: #007DC5; font-weight: 600;">{{ comment.mentioned_users }}</code> {{ comment.content }}</p>
+                {% else %}
+                    <p class="card-text" style="white-space: pre-wrap; word-break: break-word; margin-left: 45px;">{{ comment.content }}</p>
+                {% endif %}
             </div>
             {% endfor %}
         </div>
@@ -143,6 +165,9 @@
             });
         </script>
     </div>
+
+    <!-- #noticeTablePosition은 _noticetable.html와 연결되어 있음 -->
+    <div id="noticeTablePosition"></div>
     
     <div class="container-md mt-5">
         <h1 class="mb-4" style="font-weight: 600; color: #58595B;">📢 공지사항</h1>
