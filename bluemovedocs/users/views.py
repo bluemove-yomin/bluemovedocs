@@ -516,7 +516,7 @@ def write_info(request, id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -870,7 +870,7 @@ def delete(request, id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>

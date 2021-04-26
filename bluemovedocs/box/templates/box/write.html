@@ -192,6 +192,15 @@
             </div>
         </form>
 
+        <!-- 문서명에 기호 input되지 않도록 -->
+        <script>
+            $(document).on("keyup", "#title", function() {
+                $(this).val(
+                    $(this).val().replace(/[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g, "")
+                );
+            });
+        </script>
+
         <!-- 대상에 따라 일부 input field의 display, required 변경 -->
         <script>
             function categoryChange(obj) {

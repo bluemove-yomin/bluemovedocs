@@ -104,14 +104,14 @@ def create_comment(request, id):
                                 "type": "section",
                                 "text": {
                                     "type": "mrkdwn",
-                                    "text": "```" + mentioned_users + " " + comment_content + "```"
+                                    "text": "```작성자 ID: " + comment_writer.profile.sub_id + "\n내용: " + mentioned_users + " " + comment_content + "```"
                                 }
                             },
                             {
                                 "type": "section",
                                 "text": {
                                     "type": "mrkdwn",
-                                    "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일자:* " + datetime.date.today().strftime('%Y-%m-%d')
+                                    "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일:* " + datetime.date.today().strftime('%Y-%m-%d')
                                 },
                                 "accessory": {
                                     "type": "image",
@@ -322,7 +322,7 @@ def create_comment(request, id):
                                                                                                             style="padding: 18px;color: #58595B;font-family: Helvetica;font-size: 14px;font-weight: normal;">
                                                                                                             <strong style="color:#222222;">작성자</strong>: """ + comment_writer.last_name + comment_writer.first_name + """<br>
                                                                                                             <strong style="color:#222222;">회원 구분</strong>: """ + comment_writer_level + """<br>
-                                                                                                            <strong style="color:#222222;">작성일자</strong>: """ + datetime.date.today().strftime('%Y-%m-%d') + """<br>
+                                                                                                            <strong style="color:#222222;">작성일</strong>: """ + datetime.date.today().strftime('%Y-%m-%d') + """<br>
                                                                                                             <strong style="color:#222222;">내용</strong>: """ + comment_content + """
                                                                                                         </td>
                                                                                                     </tr>
@@ -464,7 +464,7 @@ def create_comment(request, id):
                                                                                             style="padding: 0px 18px 9px; text-align: left;">
                                                                                             <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                             <small style="color: #58595B;">
-                                                                                                이 메일은 블루무브 닥스를 통해 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                                이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                                 ⓒ 파란물결 블루무브
                                                                                             </small>
                                                                                         </td>
@@ -504,7 +504,7 @@ def create_comment(request, id):
                     )
         # 연동 Slack 채널에 메시지 발신
         client = WebClient(token=slack_bot_token)
-        if mentioned_users != '':
+        if mentioned_users != '' and notice.writer != comment_writer:
             client.chat_postMessage(
                 channel = notice.channel_id,
                 link_names = True,
@@ -528,14 +528,70 @@ def create_comment(request, id):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "```" + mentioned_users + " " + comment_content + "```"
+                            "text": "```작성자 ID: " + comment_writer.profile.sub_id + "\n내용: " + mentioned_users + " " + comment_content + "```"
                         }
                     },
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일자:* " + datetime.date.today().strftime('%Y-%m-%d')
+                            "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일:* " + datetime.date.today().strftime('%Y-%m-%d')
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": comment_avatar_src,
+                            "alt_text": comment_writer.last_name + comment_writer.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "공지사항 열기"
+                                },
+                                "value": "open_notice",
+                                "url": "http://127.0.0.1:8000/notice/" + str(notice.id) + "/#commentBoxPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"💬 " + comment_writer.last_name + comment_writer.first_name + "님이 '" + notice.title + "'에 댓글 남김",
+            )
+        elif mentioned_users == '' and notice.writer != comment_writer:
+            client.chat_postMessage(
+                channel = notice.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "💬 " + comment_writer.last_name + comment_writer.first_name + "님이 '" + notice.title + "'에 댓글 남김",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + notice.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + comment_writer.last_name + comment_writer.first_name + "님이 남긴 댓글을 확인하세요."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```작성자 ID: " + comment_writer.profile.sub_id + "\n내용: " + comment_content + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일:* " + datetime.date.today().strftime('%Y-%m-%d')
                         },
                         "accessory": {
                             "type": "image",
@@ -577,21 +633,21 @@ def create_comment(request, id):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "<@" + notice.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + comment_writer.last_name + comment_writer.first_name + "님이 남긴 댓글을 확인하세요."
+                            "text": "<@" + notice.writer.email.replace('@bluemove.or.kr', '').lower() + ">님이 직접 댓글을 남겼습니다."
                         }
                     },
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "```" + comment_content + "```"
+                            "text": "```작성자 ID: " + comment_writer.profile.sub_id + "\n내용: " + comment_content + "```"
                         }
                     },
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일자:* " + datetime.date.today().strftime('%Y-%m-%d')
+                            "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일:* " + datetime.date.today().strftime('%Y-%m-%d')
                         },
                         "accessory": {
                             "type": "image",

@@ -965,7 +965,7 @@ def delete_doc(request, doc_id):
             sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
             to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
             if (ord(doc.box.title[-1]) - 44032) % 28 == 0: #### 문서명 마지막 글자에 받침이 없을 경우 ####
-                subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "가 삭제 및 접수 취소되었습니다." ##### 문서명 INPUT #####
+                subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'가 삭제 및 접수 취소되었습니다." ##### 문서명 INPUT #####
                 message_text = \
                     """
                     <!doctype html>
@@ -1308,7 +1308,7 @@ def delete_doc(request, doc_id):
                     </html>
                     """
             else: #### 문서명 마지막 글자에 받침이 있을 경우 ####
-                subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "이 삭제 및 접수 취소되었습니다." ##### 문서명 INPUT #####
+                subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'이 삭제 및 접수 취소되었습니다." ##### 문서명 INPUT #####
                 message_text = \
                     """
                     <!doctype html>
@@ -1689,7 +1689,7 @@ def delete_doc(request, doc_id):
                             "type": "section",
                             "text": {
                                 "type": "mrkdwn",
-                                "text": "```" + doc.name + "```"
+                                "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                             }
                         },
                         {
@@ -1753,7 +1753,7 @@ def delete_doc(request, doc_id):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "```" + doc.name + "```"
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                         }
                     },
                     {
@@ -1920,7 +1920,7 @@ def submit_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -1987,7 +1987,7 @@ def submit_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -2115,7 +2115,7 @@ def submit_doc(request, doc_id):
         sender = doc.box.writer.email.replace('@bluemove.or.kr', '').capitalize() + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
         to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
         if (ord(doc.box.title[-1]) - 44032) % 28 == 0: #### 문서명 마지막 글자에 받침이 없을 경우 ####
-            subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(" ","") + "가 접수되었습니다." ##### 문서명 INPUT #####
+            subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "'가 접수되었습니다." ##### 문서명 INPUT #####
             message_text = \
                 """
                 <!doctype html>
@@ -2457,7 +2457,7 @@ def submit_doc(request, doc_id):
                 </html>
                 """
         else: #### 문서명 마지막 글자에 받침이 있을 경우 ####
-            subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(" ","") + "이 접수되었습니다." ##### 문서명 INPUT #####
+            subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "'이 접수되었습니다." ##### 문서명 INPUT #####
             message_text = \
                 """
                 <!doctype html>
@@ -2841,7 +2841,7 @@ def submit_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -3015,7 +3015,7 @@ def reject_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -3071,7 +3071,7 @@ def reject_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -3194,7 +3194,7 @@ def reject_doc(request, doc_id):
         sender = doc.box.writer.email.replace('@bluemove.or.kr', '').capitalize() + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
         to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
         if (ord(doc.box.title[-1]) - 44032) % 28 == 0: #### 문서명 마지막 글자에 받침이 없을 경우 ####
-            subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "가 반려되었습니다." ##### 문서명 INPUT #####
+            subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'가 반려되었습니다." ##### 문서명 INPUT #####
             message_text = \
                 """
                 <!doctype html>
@@ -3538,7 +3538,7 @@ def reject_doc(request, doc_id):
                 </html>
                 """
         else: #### 문서명 마지막 글자에 받침이 있을 경우 ####
-            subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "이 반려되었습니다." ##### 문서명 INPUT #####
+            subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'이 반려되었습니다." ##### 문서명 INPUT #####
             message_text = \
                 """
                 <!doctype html>
@@ -3925,7 +3925,7 @@ def reject_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -4043,7 +4043,7 @@ def return_doc(request, doc_id):
                 fileId = file_id,
                 body = {
                     'name': now_file_name_some + '_' + datetime.date.today().strftime('%y%m%d') + '_v1',
-                    'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_perfix + '_' + doc.box.title.replace(' ','') + '입니다.\n' +
+                    'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + '입니다.\n' +
                                 doc.box.writer.last_name + doc.box.writer.first_name + '님의 검토 후 1 번째 버전으로 승인되었습니다.\n\n' +
                                 '📧 생성일자: ' + doc.creation_date + '\n' +
                                 '📨 제출일자: ' + doc.submission_date + '\n' +
@@ -4112,7 +4112,7 @@ def return_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -4178,7 +4178,7 @@ def return_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -4309,7 +4309,7 @@ def return_doc(request, doc_id):
         sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
         to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
         if (ord(doc.box.title[-1]) - 44032) % 28 == 0: #### 문서명 마지막 글자에 받침이 없을 경우 ####
-            subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "가 반환되었습니다." ##### 문서명 INPUT #####
+            subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'가 반환되었습니다." ##### 문서명 INPUT #####
             message_text = \
                 """
                 <!doctype html>
@@ -4652,7 +4652,7 @@ def return_doc(request, doc_id):
                 </html>
                 """
         else: #### 문서명 마지막 글자에 받침이 있을 경우 ####
-            subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "이 반환되었습니다." ##### 문서명 INPUT #####
+            subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'이 반환되었습니다." ##### 문서명 INPUT #####
             message_text = \
                 """
                 <!doctype html>
@@ -5038,7 +5038,7 @@ def return_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "```" + doc.name + "```"
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
                     }
                 },
                 {
@@ -5158,7 +5158,7 @@ def return_doc_before_submit(request, doc_id):
     sender = doc.box.writer.email.replace('@bluemove.or.kr', '') + ' at Bluemove ' + '<' + doc.box.writer.email + '>' ##### INSIDE 클라이언트 이메일 주소 INPUT #####
     to = doc.user.email ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
     if (ord(doc.box.title[-1]) - 44032) % 28 == 0: #### 문서명 마지막 글자에 받침이 없을 경우 ####
-        subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "가 반환되었습니다." ##### 문서명 INPUT #####
+        subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'가 반환되었습니다." ##### 문서명 INPUT #####
         message_text = \
             """
             <!doctype html>
@@ -5500,7 +5500,7 @@ def return_doc_before_submit(request, doc_id):
             </html>
             """
     else: #### 문서명 마지막 글자에 받침이 있을 경우 ####
-        subject = doc.user.last_name + doc.user.first_name + "님의 " + doc.box.title.replace(' ','') + "이 반환되었습니다." ##### 문서명 INPUT #####
+        subject = doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "'이 반환되었습니다." ##### 문서명 INPUT #####
         message_text = \
             """
             <!doctype html>
