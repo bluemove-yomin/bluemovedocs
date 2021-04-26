@@ -11,16 +11,31 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from email.mime.text import MIMEText
 import base64
+from django.conf import settings
 
 
-
+slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
+service_account_creds = "bluemove-docs-9f4ec6cf5006.json"
 
 
 # @permission_required('auth.add_permission', raise_exception=True)
 @login_required
 def write(request):
     form = NoticeContentForm()
-    return render(request, 'notice/write.html', {'form': form})
+    # Slack 채널 불러오기 시작
+    client = WebClient(token=slack_bot_token)
+    slack_response = client.conversations_list(
+        team_id = 'T2EH6PN00'
+    )
+    all_channels = slack_response.get('channels')
+    channels_list = []
+    for channels_data in all_channels:
+        channels_id = channels_data.get('id')
+        channels_name = channels_data.get('name')
+        channels_list.append(tuple((channels_id, channels_name)))
+    channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
+    # Slack 채널 불러오기 끝
+    return render(request, 'notice/write.html', {'form': form, 'channels_list': channels_list})
 
 
 # @permission_required('auth.add_permission', raise_exception=True)
@@ -31,9 +46,11 @@ def create(request):
         if form.is_valid():
             notice_category = request.POST.get('category')
             notice_title = request.POST.get('title')
+            notice_channel_id = request.POST.get('channel_id').split('#')[0]
+            notice_channel_name = request.POST.get('channel_id').split('#')[1]
             notice_writer = request.user
             notice_image = request.FILES.get('image')
-            form.save(category=notice_category, title=notice_title, writer = notice_writer, image=notice_image)
+            form.save(category=notice_category, title=notice_title, channel_id = notice_channel_id, channel_name = notice_channel_name, writer = notice_writer, image=notice_image)
     return redirect('notice:main') # POST와 GET 모두 notice:main으로 redirect
 
 
@@ -80,7 +97,7 @@ def create_comment(request, id):
                                 "type": "section",
                                 "text": {
                                     "type": "mrkdwn",
-                                    "text": "<@" + user.email.replace('@bluemove.or.kr', '').lower() + ">님, " + comment_writer.last_name + comment_writer.first_name + "님의 댓글에 멘션되셨습니다."
+                                    "text": "<@" + user.email.replace('@bluemove.or.kr', '').lower() + ">님, '" + notice.title + "'에서 " + comment_writer.last_name + comment_writer.first_name + "님의 댓글에 멘션되셨습니다."
                                 }
                             },
                             {
@@ -485,11 +502,11 @@ def create_comment(request, id):
                             body = message,
                         ).execute()
                     )
-        # 공지사항 작성한 블루무버에게 슬랙 메시지 발신
-        if SocialAccount.objects.filter(user=notice.writer):
-            client = WebClient(token=slack_bot_token)
+        # 연동 Slack 채널에 메시지 발신
+        client = WebClient(token=slack_bot_token)
+        if mentioned_users != '':
             client.chat_postMessage(
-                channel = notice.writer.profile.slack_user_id,
+                channel = notice.channel_id,
                 link_names = True,
                 as_user = True,
                 blocks = [
@@ -512,6 +529,62 @@ def create_comment(request, id):
                         "text": {
                             "type": "mrkdwn",
                             "text": "```" + mentioned_users + " " + comment_content + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*이메일 주소:*\n" +  comment_writer.email + "\n*작성일자:* " + datetime.date.today().strftime('%Y-%m-%d')
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": comment_avatar_src,
+                            "alt_text": comment_writer.last_name + comment_writer.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "공지사항 열기"
+                                },
+                                "value": "open_notice",
+                                "url": "http://127.0.0.1:8000/notice/" + str(notice.id) + "/#commentBoxPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"💬 " + comment_writer.last_name + comment_writer.first_name + "님이 '" + notice.title + "'에 댓글 남김",
+            )
+        else:
+            client.chat_postMessage(
+                channel = notice.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "💬 " + comment_writer.last_name + comment_writer.first_name + "님이 '" + notice.title + "'에 댓글 남김",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + notice.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + comment_writer.last_name + comment_writer.first_name + "님이 남긴 댓글을 확인하세요."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```" + comment_content + "```"
                         }
                     },
                     {
@@ -614,14 +687,29 @@ def notice_favorite(request, id):
 def update(request, id):
     notice = get_object_or_404(Notice, pk=id)
     form = NoticeContentForm(instance=notice)
+    # Slack 채널 불러오기 시작
+    client = WebClient(token=slack_bot_token)
+    slack_response = client.conversations_list(
+        team_id = 'T2EH6PN00'
+    )
+    all_channels = slack_response.get('channels')
+    channels_list = []
+    for channels_data in all_channels:
+        channels_id = channels_data.get('id')
+        channels_name = channels_data.get('name')
+        channels_list.append(tuple((channels_id, channels_name)))
+    channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
+    # Slack 채널 불러오기 끝
     if request.method == "POST":
         form = NoticeContentForm(request.POST, instance=notice)
         if form.is_valid():
             notice_category = request.POST.get('category')
             notice_title = request.POST.get('title')
-            form.update(category=notice_category, title=notice_title)
+            notice_channel_id = request.POST.get('channel_id').split('#')[0]
+            notice_channel_name = request.POST.get('channel_id').split('#')[1]
+            form.update(category=notice_category, title=notice_title, channel_id=notice_channel_id, channel_name=notice_channel_name)
         return redirect('notice:read', notice.id)
-    return render(request, 'notice/update.html', {'notice': notice, 'form': form})
+    return render(request, 'notice/update.html', {'notice': notice, 'form': form, 'channels_list': channels_list})
 
 
 # @permission_required('auth.add_permission', raise_exception=True)

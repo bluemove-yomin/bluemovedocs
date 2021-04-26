@@ -16,6 +16,8 @@ class NoticeContentForm(forms.ModelForm):
         notice.writer = kwargs.get('writer', None)
         notice.category = kwargs.get('category', None)
         notice.title = kwargs.get('title', None)
+        notice.channel_id = kwargs.get('channel_id', None)
+        notice.channel_name = kwargs.get('channel_name', None)
         notice.image = kwargs.get('image', None)
         notice.save()
         return notice
@@ -25,5 +27,7 @@ class NoticeContentForm(forms.ModelForm):
         notice = super().save(commit=False)
         notice.category = kwargs.get('category', None)
         notice.title = kwargs.get('title', None)
+        notice.channel_id = kwargs.get('channel_id', None)
+        notice.channel_name = kwargs.get('channel_name', None)
         notice.save()
         return notice

@@ -17,9 +17,13 @@ from allauth.socialaccount.models import SocialToken, SocialApp, SocialAccount
 from oauth2client.service_account import ServiceAccountCredentials
 from users.models import Profile
 from slack_sdk import WebClient
+from django.conf import settings
 
 
-
+client_id = getattr(settings, 'CLIENT_ID', 'CLIENT_ID')
+client_secret = getattr(settings, 'CLIENT_SECRET', 'CLIENT_SECRET')
+slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
+service_account_creds = "bluemove-docs-9f4ec6cf5006.json"
 
 
 @login_required
@@ -167,7 +171,8 @@ def create(request):
             box_drive_name = request.POST.get('drive_id')
             box_folder_id = request.POST.get('folder_id').split('#')[0]
             box_folder_name = request.POST.get('folder_id').split('#')[1]
-            box_title = request.POST.get('title')
+            box_folder_prefix = box_folder_name[0:3]
+            box_title = request.POST.get('title').replace(' ', '')
             box_writer = request.user
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
@@ -181,7 +186,7 @@ def create(request):
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
+            form.save(category=box_category, folder_name=box_folder_name, folder_prefix=box_folder_prefix, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
         elif form.is_valid() and request.POST.get('category') == 'guest':
             box_category = request.POST.get('category')
             box_title = request.POST.get('title')
@@ -705,8 +710,9 @@ def update(request, id):
         if form.is_valid() and box.category == 'bluemover':
             box_folder_id = request.POST.get('folder_id').split('#')[0]
             box_folder_name = request.POST.get('folder_id').split('#')[1]
+            box_folder_prefix = box_folder_name[0:3]
             box_drive_name = request.POST.get('drive_id')
-            box_title = request.POST.get('title')
+            box_title = request.POST.get('title').replace(' ', '')
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
                 box_document_name = request.POST.get('document_id').split('#')[1]
@@ -718,7 +724,7 @@ def update(request, id):
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         elif form.is_valid() and box.category == 'guest':
             box_title = request.POST.get('title')
             if request.POST.get('document_etcid') == None:
@@ -2600,7 +2606,14 @@ def submit_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.\n*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*"
+                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "```" + doc.name + "```"
                     }
                 },
                 {
@@ -2660,7 +2673,14 @@ def submit_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 제출되었습니다.\n*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*"
+                        "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 제출되었습니다."
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "```" + doc.name + "```"
                     }
                 },
                 {
@@ -3515,7 +3535,14 @@ def submit_doc(request, doc_id):
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요.\n*<https://docs.google.com/document/d/" + doc.file_id + "|" + doc.name + ">*"
+                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "```" + doc.name + "```"
                     }
                 },
                 {

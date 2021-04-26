@@ -12,6 +12,8 @@ class Notice(models.Model):
     title = models.CharField(max_length = 50)
     writer = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.CharField(max_length = 50, choices = CATEGORY_CHOICES)
+    channel_id = models.CharField(max_length = 50)
+    channel_name = models.CharField(max_length = 50)
     content = RichTextField()
     # content = models.TextField()
     image = models.ImageField(upload_to='images/', null=True, blank=True)

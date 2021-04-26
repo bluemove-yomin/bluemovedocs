@@ -39,24 +39,22 @@
             {% csrf_token %}
             <div class="card">
                 <div class="form-floating">
-                    {% if user.is_authenticated %}
+                    {% for account in user.socialaccount_set.all %}
+                        <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;">{{ comment.content }}</textarea>
+                    {% empty %}
+                        <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" disabled>{{ comment.content }}</textarea>
+                    {% endfor %}
+                    <label for="content">
                         {% for account in user.socialaccount_set.all %}
-                            <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;">{{ comment.content }}</textarea>
+                            {{ user.last_name }}{{ user.first_name }}님의 댓글 수정 {{ comment.mentioned_users }}
                         {% empty %}
-                            <textarea class="form-control" placeholder="댓글을 입력하세요." id="content" name="content" style="border: none; height: 100px; resize: none;" disabled>{{ comment.content }}</textarea>
+                            {% if perms.auth %}
+                                사무국 어드민은 댓글을 작성할 수 없습니다.
+                            {% else %}
+                                댓글을 작성하려면 로그인하세요.
+                            {% endif %}
                         {% endfor %}
-                        <label for="content">
-                            {% for account in user.socialaccount_set.all %}
-                                {{ user.last_name }}{{ user.first_name }}님의 댓글 수정 {{ comment.mentioned_users }}
-                            {% empty %}
-                                {% if perms.auth %}
-                                    사무국 어드민은 댓글을 작성할 수 없습니다.
-                                {% else %}
-                                    댓글을 작성하려면 로그인하세요.
-                                {% endif %}
-                            {% endfor %}
-                        </label>
-                    {% endif %}
+                    </label>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <div>
@@ -100,7 +98,7 @@
     </div>
 
     <div class="container-md">
-        <div class="list-group list-group-flush mt-2">
+        <div class="list-group list-group-flush mt-1">
             {% for comment in all_comments %}
             <div class="list-group-item px-0 py-3">
                 <table style="border: none;">

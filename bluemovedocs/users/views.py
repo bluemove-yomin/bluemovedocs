@@ -18,9 +18,13 @@ import base64
 from slack_sdk import WebClient
 import string
 import random
+from django.conf import settings
 
 
-
+client_id = getattr(settings, 'CLIENT_ID', 'CLIENT_ID')
+client_secret = getattr(settings, 'CLIENT_SECRET', 'CLIENT_SECRET')
+slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
+service_account_creds = "bluemove-docs-9f4ec6cf5006.json"
 
 
 @login_required
