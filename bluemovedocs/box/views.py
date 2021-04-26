@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from pyasn1.type.univ import Null
 from .models import *
 from django.db.models import Q
 from django.contrib.auth import logout
@@ -4012,7 +4013,7 @@ def return_doc(request, doc_id):
             corpora='allDrives',
             fields="files(name)",
             includeItemsFromAllDrives=True,
-            orderBy="createdTime desc",
+            orderBy="name desc",
             q="mimeType='application/vnd.google-apps.document' and trashed = false and '" + doc.box.folder_id + "' in parents and name contains '" + doc.box.folder_name[0:3] + "_" + doc.box.title.replace(" ","") + "'",
             supportsAllDrives=True,
         ).execute()
@@ -4022,36 +4023,32 @@ def return_doc(request, doc_id):
             before_file_name = before_file['name']
             before_file_name_list.append(before_file_name)
         now_file_name_some = doc.box.folder_name[0:3] + '_' + doc.box.title.replace(" ","") ##### 파일 프리픽스 INPUT + 문서명 INPUT #####
-        try: 
-            if now_file_name_some in before_file_name_list[0]:
-                new_version = str(int(before_file_name[-1]) + 1)
-                drive_response = drive_service.files().update(
-                    fileId = file_id,
-                    body = {
-                        'name': now_file_name_some + '_' + datetime.date.today().strftime('%y%m%d') + '_v' + new_version,
-                        'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_perfix + '_' + doc.box.title.replace(' ','') + '입니다.\n' +
-                                    doc.box.writer.last_name + doc.box.writer.first_name + '님의 검토 후 ' + new_version + ' 번째 버전으로 승인되었습니다.\n\n' +
-                                    '📧 생성일자: ' + doc.creation_date + '\n' +
-                                    '📨 제출일자: ' + doc.submission_date + '\n' +
-                                    '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'),
-                    },
-                    fields = 'name'
-                ).execute()
-                file_version = new_version
-        except:
+        try:
+            drive_response = drive_service.files().update(
+                fileId = file_id,
+                body = {
+                    'name': now_file_name_some + '_' + datetime.date.today().strftime('%y%m%d') + '_v' + str(int(before_file_name_list[0][-1]) + 1),
+                    'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + '입니다.\n' +
+                                doc.box.writer.last_name + doc.box.writer.first_name + '님의 검토 후 ' + str(int(before_file_name_list[0][-1]) + 1) + ' 번째 버전으로 승인되었습니다.\n\n' +
+                                '📧 생성일: ' + doc.creation_date + '\n' +
+                                '📨 제출일: ' + doc.submission_date + '\n' +
+                                '🙆 승인일: ' + datetime.date.today().strftime('%Y-%m-%d'),
+                },
+                fields = 'name'
+            ).execute()
+        except IndexError:
             drive_response = drive_service.files().update(
                 fileId = file_id,
                 body = {
                     'name': now_file_name_some + '_' + datetime.date.today().strftime('%y%m%d') + '_v1',
                     'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + '입니다.\n' +
                                 doc.box.writer.last_name + doc.box.writer.first_name + '님의 검토 후 1 번째 버전으로 승인되었습니다.\n\n' +
-                                '📧 생성일자: ' + doc.creation_date + '\n' +
-                                '📨 제출일자: ' + doc.submission_date + '\n' +
-                                '🙆 승인일자: ' + datetime.date.today().strftime('%Y-%m-%d'),
+                                '📧 생성일: ' + doc.creation_date + '\n' +
+                                '📨 제출일: ' + doc.submission_date + '\n' +
+                                '🙆 승인일: ' + datetime.date.today().strftime('%Y-%m-%d'),
                 },
                 fields = 'name'
             ).execute()
-            file_version = '1'
         name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
         # 04. 문서 잠금
         drive_response = drive_service.files().update(
