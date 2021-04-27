@@ -930,6 +930,10 @@ def login_cancelled_no_scopes(request):
     return render(request, 'users/login_cancelled_no_scopes.html')
 
 
+def login_cancelled_no_token(request):
+    return render(request, 'users/login_cancelled_no_token.html')
+
+
 def login_cancelled_no_drive(request):
     return render(request, 'users/login_cancelled_no_drive.html')
 
