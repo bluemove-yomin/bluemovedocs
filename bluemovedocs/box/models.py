@@ -165,7 +165,7 @@ def send_noti(sender, instance, **kwargs):
                                             "text": "문서함 열기"
                                         },
                                         "value": "open_notice",
-                                        "url": "http://127.0.0.1:8000/box/" + str(obj.id)
+                                        "url": "http://docs.bluemove.or.kr/box/" + str(obj.id)
                                     }
                                 ]
                             }
@@ -434,7 +434,7 @@ def send_noti(sender, instance, **kwargs):
                                                                             align="center"
                                                                             class="mcnButtonBlockInner">
                                                                             <a
-                                                                                href="http://127.0.0.1:8000/box/""" + str(obj.id) + """"
+                                                                                href="http://docs.bluemove.or.kr/box/""" + str(obj.id) + """"
                                                                                 target="_blank"
                                                                                 style="text-decoration:none;">
                                                                                 <table
@@ -454,7 +454,7 @@ def send_noti(sender, instance, **kwargs):
                                                                                                 <a
                                                                                                     class="mcnButton"
                                                                                                     title="블루무브 닥스 문서함 열기"
-                                                                                                    href="http://127.0.0.1:8000/box/""" + str(obj.id) + """"
+                                                                                                    href="http://docs.bluemove.or.kr/box/""" + str(obj.id) + """"
                                                                                                     target="_blank"
                                                                                                     style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                             </td>

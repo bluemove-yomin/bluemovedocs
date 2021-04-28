@@ -11,8 +11,6 @@ from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from email.mime.text import MIMEText
 import base64
-import textwrap
-import re
 from django.conf import settings
 
 
@@ -131,7 +129,7 @@ def create_comment(request, id):
                                             "text": "공지사항 열기"
                                         },
                                         "value": "open_notice",
-                                        "url": "http://127.0.0.1:8000/notice/" + str(notice.id) + "/#commentBoxPosition"
+                                        "url": "http://docs.bluemove.or.kr/notice/" + str(notice.id) + "/#commentBoxPosition"
                                     }
                                 ]
                             }
@@ -399,7 +397,7 @@ def create_comment(request, id):
                                                                             align="center"
                                                                             class="mcnButtonBlockInner">
                                                                             <a
-                                                                                href="http://127.0.0.1:8000/notice/""" + str(notice.id) + """/#commentBoxPosition"
+                                                                                href="http://docs.bluemove.or.kr/notice/""" + str(notice.id) + """/#commentBoxPosition"
                                                                                 target="_blank"
                                                                                 style="text-decoration:none;">
                                                                                 <table
@@ -419,7 +417,7 @@ def create_comment(request, id):
                                                                                                 <a
                                                                                                     class="mcnButton"
                                                                                                     title="블루무브 닥스 공지사항 열기"
-                                                                                                    href="http://127.0.0.1:8000/notice/""" + str(notice.id) + """/#commentBoxPosition"
+                                                                                                    href="http://docs.bluemove.or.kr/notice/""" + str(notice.id) + """/#commentBoxPosition"
                                                                                                     target="_blank"
                                                                                                     style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 공지사항 열기</a>
                                                                                             </td>
@@ -555,7 +553,7 @@ def create_comment(request, id):
                                     "text": "공지사항 열기"
                                 },
                                 "value": "open_notice",
-                                "url": "http://127.0.0.1:8000/notice/" + str(notice.id) + "/#commentBoxPosition"
+                                "url": "http://docs.bluemove.or.kr/notice/" + str(notice.id) + "/#commentBoxPosition"
                             }
                         ]
                     }
@@ -611,7 +609,7 @@ def create_comment(request, id):
                                     "text": "공지사항 열기"
                                 },
                                 "value": "open_notice",
-                                "url": "http://127.0.0.1:8000/notice/" + str(notice.id) + "/#commentBoxPosition"
+                                "url": "http://docs.bluemove.or.kr/notice/" + str(notice.id) + "/#commentBoxPosition"
                             }
                         ]
                     }
@@ -667,7 +665,7 @@ def create_comment(request, id):
                                     "text": "공지사항 열기"
                                 },
                                 "value": "open_notice",
-                                "url": "http://127.0.0.1:8000/notice/" + str(notice.id) + "/#commentBoxPosition"
+                                "url": "http://docs.bluemove.or.kr/notice/" + str(notice.id) + "/#commentBoxPosition"
                             }
                         ]
                     }

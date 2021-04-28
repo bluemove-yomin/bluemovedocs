@@ -1215,7 +1215,7 @@ def delete_doc(request, doc_id):
                                                                         align="center"
                                                                         class="mcnButtonBlockInner">
                                                                         <a
-                                                                            href="http://127.0.0.1:8000/"
+                                                                            href="http://docs.bluemove.or.kr/"
                                                                             target="_blank"
                                                                             style="text-decoration:none;">
                                                                             <table
@@ -1235,7 +1235,7 @@ def delete_doc(request, doc_id):
                                                                                             <a
                                                                                                 class="mcnButton"
                                                                                                 title="블루무브 닥스 열기"
-                                                                                                href="http://127.0.0.1:8000/"
+                                                                                                href="http://docs.bluemove.or.kr/"
                                                                                                 target="_blank"
                                                                                                 style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 열기</a>
                                                                                         </td>
@@ -1558,7 +1558,7 @@ def delete_doc(request, doc_id):
                                                                         align="center"
                                                                         class="mcnButtonBlockInner">
                                                                         <a
-                                                                            href="http://127.0.0.1:8000/"
+                                                                            href="http://docs.bluemove.or.kr/"
                                                                             target="_blank"
                                                                             style="text-decoration:none;">
                                                                             <table
@@ -1578,7 +1578,7 @@ def delete_doc(request, doc_id):
                                                                                             <a
                                                                                                 class="mcnButton"
                                                                                                 title="블루무브 닥스 열기"
-                                                                                                href="http://127.0.0.1:8000/"
+                                                                                                href="http://docs.bluemove.or.kr/"
                                                                                                 target="_blank"
                                                                                                 style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 열기</a>
                                                                                         </td>
@@ -1715,7 +1715,7 @@ def delete_doc(request, doc_id):
                                         "text": "문서함 열기"
                                     },
                                     "value": "open_box",
-                                    "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                                    "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                                 }
                             ]
                         }
@@ -1779,7 +1779,7 @@ def delete_doc(request, doc_id):
                                     "text": "문서함 열기"
                                 },
                                 "value": "open_box",
-                                "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                                "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                             }
                         ]
                     }
@@ -1956,7 +1956,7 @@ def submit_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -2023,7 +2023,7 @@ def submit_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -2364,7 +2364,7 @@ def submit_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -2384,7 +2384,7 @@ def submit_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -2706,7 +2706,7 @@ def submit_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -2726,7 +2726,7 @@ def submit_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -2877,7 +2877,7 @@ def submit_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -3041,7 +3041,7 @@ def reject_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -3107,7 +3107,7 @@ def reject_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -3445,7 +3445,7 @@ def reject_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -3465,7 +3465,7 @@ def reject_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -3789,7 +3789,7 @@ def reject_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -3809,7 +3809,7 @@ def reject_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://127.0.0.1:8000/box/""" + str(doc.box.id) + """/"
+                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -3951,7 +3951,7 @@ def reject_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -4144,7 +4144,7 @@ def return_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -4210,7 +4210,7 @@ def return_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -5060,7 +5060,7 @@ def return_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://127.0.0.1:8000/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
