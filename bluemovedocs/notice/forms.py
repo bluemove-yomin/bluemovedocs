@@ -27,6 +27,7 @@ class NoticeContentForm(forms.ModelForm):
         notice = super().save(commit=False)
         notice.category = kwargs.get('category', None)
         notice.title = kwargs.get('title', None)
+        notice.old_title = kwargs.get('old_title', None)
         notice.channel_id = kwargs.get('channel_id', None)
         notice.channel_name = kwargs.get('channel_name', None)
         notice.save()

@@ -7,6 +7,7 @@ class NoticeAdmin(admin.ModelAdmin):
         'id',
         'category',
         'title',
+        'old_title',
         'content',
         'image',
         'created_at',
