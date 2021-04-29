@@ -2076,7 +2076,7 @@ def submit_doc(request, doc_id):
             fileId = file_id,
             body = {
                 'name': '블루무브_' + doc.box.title.replace(" ","") + doc.user.last_name + doc.user.first_name + doc.user.profile.sub_id + '_' + datetime.date.today().strftime('%y%m%d'),
-                'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + '입니다.\n\n' +
+                'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.title.replace(" ","") + '입니다.\n\n' +
                             '📧 생성일: ' + doc.creation_date + '\n' +
                             '📨 제출일: ' + datetime.date.today().strftime('%Y-%m-%d'),
             },

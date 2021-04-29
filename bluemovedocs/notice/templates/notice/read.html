@@ -69,7 +69,7 @@
     {% if user == notice.writer %}
     <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">
         <!-- Button trigger modal -->
-        <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</button>
         <!-- Modal -->
         <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -82,20 +82,20 @@
                     삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
                 </div>
                 <div class="modal-footer">
-                <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                <a type="button" href="{% url 'notice:delete' notice.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                    <button type="button" class="btn btn-outline-danger" onclick="inProgress(); location.href='{% url 'notice:delete' notice.id %}';">네, 삭제할게요!</button>
                 </div>
             </div>
             </div>
         </div>
-        <a href="{% url 'notice:updateimage' notice.id %}#image" class="btn btn-outline-secondary">
+        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:updateimage' notice.id %}#image';">
             {% if notice.image %}
-            이미지 변경하기
+                이미지 변경하기
             {% else %}
-            이미지 추가하기
+                이미지 추가하기
             {% endif %}
-        </a>
-        <a href="{% url 'notice:update' notice.id %}" class="btn btn-outline-secondary">수정하기</a>
+        </button>
+        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:update' notice.id %}';">수정하기</button>
     </div>
     {% endif %}
 
@@ -204,10 +204,10 @@
                         <div class="d-grid justify-content-end mt-1">
                             <small>
                                 {% if user == comment.writer %}
-                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" style="color: #dc3545;">삭제하기</a>
-                                    <a href="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" class="card-link" style="color: #58595B;">수정하기</a>
+                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress();" style="color: #dc3545;">삭제하기</a>
+                                    <a href="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress();" style="color: #58595B;">수정하기</a>
                                 {% elif user == notice.writer %}
-                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" style="color: #dc3545;">삭제하기</a>
+                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress();" style="color: #dc3545;">삭제하기</a>
                                     <a onclick="{{ comment.writer.profile.sub_id }}(this);" class="card-link {{ comment.writer.profile.sub_id }}" style="color: #58595B;">멘션하기</a>
                                 {% else %}
                                     <a onclick="{{ comment.writer.profile.sub_id }}(this);" class="card-link {{ comment.writer.profile.sub_id }}" style="color: #58595B;">멘션하기</a>

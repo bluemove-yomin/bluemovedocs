@@ -51,7 +51,7 @@
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
-                <a type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">취소하기</a>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">취소하기</button>
                 <!-- Modal -->
                 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -64,8 +64,8 @@
                             입력된 정보가 모두 삭제됩니다.<br>정말 취소하시겠습니까?
                         </div>
                         <div class="modal-footer">
-                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" class="btn btn-outline-danger" onclick="goBack()">네, 취소할게요!</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack()">네, 취소할게요!</button>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -198,6 +198,9 @@
                                 return formCheck();
                             }
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                }
                                 form.submit();
                             }
                         }
@@ -252,6 +255,9 @@
                     }
                     else {
                         if ( confirm("이미지가 없으면 홈페이지 배너에 노출되지 않습니다." + "\n\n▶ 권장: 이미지 첨부" + "\n▶ 현재: 이미지 미첨부 → 홈페이지 배너에 표시되지 않습니다." + "\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                            }
                             form.submit();
                         }
                         else {

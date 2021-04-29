@@ -94,7 +94,7 @@
     <!-- 블루무버일 경우 작성하기 버튼 노출 -->
     {% if user.profile.level == 'bluemover' %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
-        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
+        <button class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'notice:write' %}';">작성하기</button>
     </div>
     {% endif %}
 
@@ -219,7 +219,7 @@
     <!-- 블루무버일 경우 작성하기 버튼 노출 -->
     {% if user.profile.level == 'bluemover' %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
-        <a href="{% url 'notice:write' %}" class="btn btn-outline-primary">작성하기</a>
+        <button class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'notice:write' %}';">작성하기</button>
     </div>
     {% endif %}
 

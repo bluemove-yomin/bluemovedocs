@@ -9,7 +9,7 @@
 
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;600&display=swap" rel="stylesheet">
+        <link id="font" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;600&display=swap" rel="stylesheet">
         <link href="/static/css/font.css" rel="stylesheet">
 
         <!-- Favicons -->
@@ -165,10 +165,10 @@
                 /* 나중에 조절해보기 */
                 transition: box-shadow .15s ease-in-out;
             }
-            .btn:hover, .btn:focus {
+            .btn:hover, .btn:focus, .btn:active {
                 font-weight: 600;
             }
-            .bg-white:hover, .bg-white:focus {
+            .bg-white:hover, .bg-white:focus, .bg-white:active {
                 color: #58595B;
             }
             .btn-primary {
@@ -176,7 +176,7 @@
                 background-color: #007DC5;
                 border-color: #007DC5;
             }
-            .btn-primary:hover, .btn-primary:focus {
+            .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
                 color: #FFFFFF;
                 font-weight: 600;
                 background-color: #005C91;
@@ -187,21 +187,17 @@
                 border-color: #005C91;
             }
             .btn-outline-primary.disabled, .btn-outline-primary:disabled {
-                background-color: #005C91;
-                border-color: #005C91;
-                color: #FFFFFF;
+                color: #007DC5;
             }
             .btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
-                background-color: #6c757d;
-                border-color: #6c757d;
-                color: #FFFFFF;
+                color: #58595B;
             }
             .btn-outline-primary {
                 color: #007DC5;
                 background-color: #FFFFFF;
                 border-color: #007DC5;
             }
-            .btn-outline-primary:hover, .btn-outline-primary:focus {
+            .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
                 color: #FFFFFF;
                 font-weight: 600;
                 background-color: #007DC5;
@@ -212,7 +208,7 @@
                 background-color: #58595B;
                 border-color: #58595B;
             }
-            .btn-secondary:hover, .btn-secondary:focus {
+            .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
                 color: #FFFFFF;
                 font-weight: 600;
                 background-color: #58595B;
@@ -223,16 +219,16 @@
                 background-color: #FFFFFF;
                 border-color: #58595B;
             }
-            .btn-outline-secondary:hover, .btn-outline-secondary:focus {
+            .btn-outline-secondary:hover, .btn-outline-secondary:focus, .btn-outline-secondary:active {
                 color: #FFFFFF;
                 font-weight: 600;
                 background-color: #58595B;
                 border-color: #58595B;
             }
-            .btn-danger:hover, .btn-danger:focus {
+            .btn-danger:hover, .btn-danger:focus, .btn-danger:active {
                 font-weight: 600;
             }
-            .btn-outline-danger:hover, .btn-outline-danger:focus {
+            .btn-outline-danger:hover, .btn-outline-danger:focus, .btn-outline-danger:active {
                 font-weight: 600;
             }
             #carouselControls {
@@ -353,6 +349,31 @@
                     links[i].rel = 'noopener';
                 }
             }
+        </script>
+        <!-- 데스크탑에서는 얇튼 폰트, 모바일에서는 두꺼운 폰트 -->
+        <script>
+            $(function() {
+                $(window).resize(function(){
+                    var width = window.innerWidth;
+                    if(width > 767){
+                        $('#font').attr('href', 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;600&display=swap');
+                    } else {
+                        $('#font').attr('href', 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600&display=swap');
+                    }
+                }).resize();
+            });
+        </script>
+        <!-- request를 보낸 뒤에 다시 request를 보내는 일이 없도록 button disabled, a href='' -->
+        <script>
+            function inProgress() {
+                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                    document.querySelectorAll(".btn")[i].disabled = true;
+                }
+                for (var i = 0; i < document.querySelectorAll(".card-link").length; i++) {
+                    var attr = document.querySelectorAll(".card-link")[i].getAttribute("style")
+                    document.querySelectorAll(".card-link")[i].setAttribute("style", attr + "pointer-events: none;");
+                }
+            };
         </script>
         <footer class="bd-footer px-2 py-3 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 70px;">
             <div class="container-md">

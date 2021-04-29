@@ -39,7 +39,7 @@ CLIENT_SECRET = get_secret("CLIENT_SECRET")
 SLACK_BOT_TOKEN = get_secret("SLACK_BOT_TOKEN")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # 배포 시 도메인 입력
 ALLOWED_HOSTS = ['*']
