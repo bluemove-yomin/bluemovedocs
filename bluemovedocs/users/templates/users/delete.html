@@ -219,11 +219,11 @@
                 {% endif %}
                 <div class="container-md mt-5 p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
                     {% if my_boxes|length > 0 or my_docs_create or my_docs_submit or my_docs_reject %}
-                        <button type="button" class="btn btn-outline-danger" disabled>삭제하기</button>
+                        <button type="button" class="btn btn-outline-danger" disabled>삭제 불가</button>
                     {% else %}
-                        <button id="waitLast" type="submit" class="btn btn-outline-danger">삭제하기</button>
+                        <button type="submit" class="btn btn-outline-danger submit">삭제하기</button>
                     {% endif %}
-                    <a href="{% url 'users:myaccount' user.id %}" class="btn btn-outline-secondary">취소하기</a>
+                    <button type="button" class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'users:myaccount' user.id %}'; innerText='⏳ 취소하기';">취소하기</button>
                 </div>
             </form>
             <!-- Forms Validation -->
@@ -257,8 +257,10 @@
                     var form = this;
                     e.preventDefault();
                     if ( document.querySelector("#confirm").value == '영구 삭제 확인' ) {
-                        $("#waitLast").attr("disabled", true);
-                        $("#waitLast").text("⏳ 작업 중...");
+                        for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                            document.querySelectorAll(".btn")[i].disabled = true;
+                        }
+                        document.querySelector(".submit").innerText = '⏳ 삭제하기';
                         return form.submit();
                     } else {
                         alert("'영구 삭제 확인'이라고 입력하세요.")

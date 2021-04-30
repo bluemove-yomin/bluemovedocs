@@ -156,7 +156,7 @@
                 <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_etcidHelp" class="form-text">
                     <p id="document_etcidHelpText" class="mb-2"></p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58</span>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/11LA-0FQJX11wBPlvg58lPLZfTOxMRd56k8r7xz_JSYo</span>
                 </div>
             </div>
             <div class="form-group mb-3">
@@ -256,7 +256,7 @@
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
-                <a type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">수정 취소하기</a>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">수정 취소하기</button>
                 <!-- Modal -->
                 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -269,8 +269,8 @@
                             수정 내역이 모두 삭제됩니다.<br>정말 취소하시겠습니까?
                         </div>
                         <div class="modal-footer">
-                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" class="btn btn-outline-danger" onclick="goBack()">네, 취소할게요!</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="goBack(); inProgress(); innerText='⏳ 네, 취소할게요!';">네, 취소할게요!</button>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -281,7 +281,7 @@
                     </div>
                     </div>
                 </div>
-                <button type="submit" id="wait" class="btn btn-outline-primary">수정 등록하기</button>
+                <button type="submit" class="btn btn-outline-primary submit">수정 등록하기</button>
             </div>
         </form>
 
@@ -936,10 +936,11 @@
                                 alert("내용을 입력하세요.")
                             }
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                }
                                 form.submit();
-                                var wait = document.querySelector("#wait");
-                                wait.innerText = "⏳ 작업 중..."
-                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -984,10 +985,11 @@
                             }
                             else {
                                 if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
+                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                        document.querySelectorAll(".btn")[i].disabled = true;
+                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                    }
                                     form.submit();
-                                    var wait = document.querySelector("#wait");
-                                    wait.innerText = "⏳ 작업 중..."
-                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;
@@ -1039,10 +1041,11 @@
                                 alert("내용을 입력하세요.")
                             }
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                }
                                 form.submit();
-                                var wait = document.querySelector("#wait");
-                                wait.innerText = "⏳ 작업 중..."
-                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -1081,10 +1084,11 @@
                             }
                             else {
                                 if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
+                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                        document.querySelectorAll(".btn")[i].disabled = true;
+                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                    }
                                     form.submit();
-                                    var wait = document.querySelector("#wait");
-                                    wait.innerText = "⏳ 작업 중..."
-                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;
@@ -1144,10 +1148,11 @@
                                 alert("내용을 입력하세요.")
                             }
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                }
                                 form.submit();
-                                var wait = document.querySelector("#wait");
-                                wait.innerText = "⏳ 작업 중..."
-                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -1192,10 +1197,11 @@
                             }
                             else {
                                 if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                        document.querySelectorAll(".btn")[i].disabled = true;
+                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                    }
                                     form.submit();
-                                    var wait = document.querySelector("#wait");
-                                    wait.innerText = "⏳ 작업 중..."
-                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;
@@ -1247,10 +1253,11 @@
                                 alert("내용을 입력하세요.")
                             }
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                }
                                 form.submit();
-                                var wait = document.querySelector("#wait");
-                                wait.innerText = "⏳ 작업 중..."
-                                wait.disabled = true;
                             }
                         }
                         // 유저가 새로운 기한을 입력했을 경우
@@ -1289,10 +1296,11 @@
                             }
                             else {
                                 if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                        document.querySelectorAll(".btn")[i].disabled = true;
+                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                                    }
                                     form.submit();
-                                    var wait = document.querySelector("#wait");
-                                    wait.innerText = "⏳ 작업 중..."
-                                    wait.disabled = true;
                                 }
                                 else {
                                     return false;

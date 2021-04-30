@@ -17,15 +17,15 @@
             </p>
             {% if user.is_authenticated %}
             <!-- Button trigger modal -->
-            <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}">
+            <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}">
                 {% if user in notice.favorite_user_set.all %}
-                <p class="mb-0 ps-2"><i class="fas fa-bookmark"></i></p>
+                    <p class="mb-0 ps-2"><i class="fas fa-bookmark"></i></p>
                 {% else %}
-                <p class="mb-0 ps-2"><i class="far fa-bookmark"></i></p>
+                    <p class="mb-0 ps-2"><i class="far fa-bookmark"></i></p>
                 {% endif %}
             </a>
             {% else %}
-            <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#listloginModal">
+            <a type="button" class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#listloginModal">
                 <p class="mb-1"><i class="far fa-bookmark"></i></p>
             </a>
             <!-- Modal -->
@@ -40,8 +40,8 @@
                             로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
                         </div>
                         <div class="modal-footer">
-                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                            <a type="button" href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary">네, 로그인할게요!</a>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'account_login' %}?next={{ request.path }}'; innerText='⏳ 네, 로그인할게요!';">네, 로그인할게요!</button>
                         </div>
                     </div>
                 </div>
@@ -83,19 +83,19 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
-                    <button type="button" class="btn btn-outline-danger" onclick="inProgress(); location.href='{% url 'notice:delete' notice.id %}'; innerText='네, 삭제할게요! ⏳';">네, 삭제할게요!</button>
+                    <button type="button" class="btn btn-outline-danger" onclick="inProgress(); location.href='{% url 'notice:delete' notice.id %}'; innerText='⏳ 네, 삭제할게요!';">네, 삭제할게요!</button>
                 </div>
             </div>
             </div>
         </div>
-        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:updateimage' notice.id %}#image'; innerText='{% if notice.image %}이미지 변경하기{% else %}이미지 추가하기{% endif %} ⏳';">
+        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:updateimage' notice.id %}#image'; innerText='⏳ {% if notice.image %}이미지 변경하기{% else %}이미지 추가하기{% endif %}';">
             {% if notice.image %}
                 이미지 변경하기
             {% else %}
                 이미지 추가하기
             {% endif %}
         </button>
-        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:update' notice.id %}'; innerText='수정하기 ⏳';">수정하기</button>
+        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:update' notice.id %}'; innerText='⏳ 수정하기';">수정하기</button>
     </div>
     {% endif %}
 
@@ -127,13 +127,13 @@
                 <input class="form-control" type="text" id="mention_name" name="mention_name" readOnly hidden>
                 <div class="card-footer d-flex justify-content-between">
                     <div>
-                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
+                        <small id="enterGuide" class="align-middle" style="color: #6C757D;" hidden><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
                     </div>
                     <div>
                         {% for account in user.socialaccount_set.all %}
-                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();">등록</button>
+                            <button type="submit" class="btn btn-secondary btn-sm comment" onclick="button_click();">등록</button>
                         {% empty %}
-                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" disabled>등록</button>
+                            <button type="submit" class="btn btn-secondary btn-sm comment" onclick="button_click();" disabled>등록</button>
                         {% endfor %}
                     </div>
                 </div>
@@ -143,11 +143,19 @@
         <script>
             $(function() {
                 $('textarea').on('keydown', function(event) {
-                    if (event.keyCode == 13)
+                    if (window.innerWidth > 767 && event.keyCode == 13)
                         if (!event.shiftKey){
                             event.preventDefault();
                             $('#commentForm').submit();
                         }
+                });
+
+                $(window).resize(function() {
+                    if (window.innerWidth > 767) {
+                        document.querySelector('#enterGuide').hidden=false;
+                    } else {
+                        document.querySelector('#enterGuide').hidden=true;
+                    }
                 });
                 
                 $('#commentForm').on('submit', function() {
@@ -204,10 +212,10 @@
                         <div class="d-grid justify-content-end mt-1">
                             <small>
                                 {% if user == comment.writer %}
-                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress();" style="color: #dc3545;">삭제하기</a>
-                                    <a href="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress();" style="color: #58595B;">수정하기</a>
+                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress(); innerText='⏳ 삭제하기';" style="color: #dc3545;">삭제하기</a>
+                                    <a href="{% url 'notice:updatecomment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress(); innerText='⏳ 수정하기';" style="color: #58595B;">수정하기</a>
                                 {% elif user == notice.writer %}
-                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress();" style="color: #dc3545;">삭제하기</a>
+                                    <a href="{% url 'notice:delete_comment' comment.id %}#commentBoxPosition" class="card-link" onclick="inProgress(); innerText='⏳ 삭제하기';" style="color: #dc3545;">삭제하기</a>
                                     <a onclick="{{ comment.writer.profile.sub_id }}(this);" class="card-link {{ comment.writer.profile.sub_id }}" style="color: #58595B;">멘션하기</a>
                                 {% else %}
                                     <a onclick="{{ comment.writer.profile.sub_id }}(this);" class="card-link {{ comment.writer.profile.sub_id }}" style="color: #58595B;">멘션하기</a>
@@ -259,6 +267,10 @@
                     alert("댓글을 최소 5자 이상 입력하세요.")
                 }
                 else {
+                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                        document.querySelectorAll(".btn")[i].disabled = true;
+                        document.querySelector(".comment").innerText = '⏳ 등록';
+                    }
                     form.submit();
                 }
             });

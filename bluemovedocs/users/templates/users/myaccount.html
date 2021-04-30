@@ -605,8 +605,8 @@
         </div>
         {% for account in user.socialaccount_set.all %}
             <div class="container-md mt-5 p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
-                <a href="{% url 'users:delete' user.id %}" class="btn btn-outline-danger">삭제하기</a>
-                <a href="{% url 'users:edit_info' user.id %}" class="btn btn-outline-secondary">수정하기</a>
+                <button class="btn btn-outline-danger" onclick="inProgress(); location.href='{% url 'users:delete' user.id %}'; innerText='⏳ 삭제하기';">삭제하기</button>
+                <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'users:edit_info' user.id %}'; innerText='⏳ 수정하기';">수정하기</button>
             </div>
         {% empty %}
         {% endfor %}

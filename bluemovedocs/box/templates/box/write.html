@@ -96,7 +96,7 @@
                 <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_etcidHelp" class="form-text">
                     <p id="document_etcidHelpText" class="mb-2"></p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58</span>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/11LA-0FQJX11wBPlvg58lPLZfTOxMRd56k8r7xz_JSYo</span>
                 </div>
             </div>
             <div class="form-group mb-3">
@@ -163,7 +163,7 @@
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
-                <a type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">취소하기</a>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">취소하기</button>
                 <!-- Modal -->
                 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -177,7 +177,7 @@
                         </div>
                         <div class="modal-footer">
                         <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" class="btn btn-outline-danger" onclick="goBack()">네, 취소할게요!</a>
+                        <a type="button" class="btn btn-outline-danger" onclick="goBack(); inProgress(); innerText='네, 취소할게요! ⏳';">네, 취소할게요!</a>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -188,7 +188,7 @@
                     </div>
                     </div>
                 </div>
-                <button type="submit" id="wait" class="btn btn-outline-primary">등록하기</button>
+                <button type="submit" class="btn btn-outline-primary submit">등록하기</button>
             </div>
         </form>
 
@@ -844,10 +844,11 @@
                                 alert("내용을 입력하세요.")
                             }
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                    document.querySelector('.submit').innerText='등록하기 ⏳';
+                                }
                                 form.submit();
-                                var wait = document.querySelector("#wait");
-                                wait.innerText = "⏳ 작업 중..."
-                                wait.disabled = true;
                             }
                         }
                         // 유저가 첨부한 이미지 크기가 1800 x 900이 아닐 경우
@@ -895,10 +896,11 @@
                                 // 유저가 첨부한 이미지 가로세로비가 2:1이 아닐 경우
                                 if ( ratio !== 2 ) {
                                     if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 권장 크기: 1800 x 900 (2:1)"  + "\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." +  "\n\n계속하시겠어요?") ) {
+                                        for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                            document.querySelectorAll(".btn")[i].disabled = true;
+                                            document.querySelector('.submit').innerText='등록하기 ⏳';
+                                        }
                                         form.submit();
-                                        var wait = document.querySelector("#wait");
-                                        wait.innerText = "⏳ 작업 중..."
-                                        wait.disabled = true;
                                     }
                                     else {
                                         document.querySelector("#image").value = '';
@@ -906,10 +908,11 @@
                                 }
                                 // 유저가 첨부한 이미지 가로세로비가 2:1일 경우
                                 else {
+                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                        document.querySelectorAll(".btn")[i].disabled = true;
+                                        document.querySelector('.submit').innerText='등록하기 ⏳';
+                                    }
                                     form.submit();
-                                    var wait = document.querySelector("#wait");
-                                    wait.innerText = "⏳ 작업 중..."
-                                    wait.disabled = true;
                                 }
                             }
                         }
@@ -957,10 +960,11 @@
                     }
                     else {
                         if ( confirm("이미지가 없으면 목록에서 블루무브 로고만 표시됩니다.\n\n▶ 권장: 이미지 첨부\n▶ 현재: 이미지 없음 → 목록에서 눈에 잘 띄지 않습니다.\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector('.submit').innerText='등록하기 ⏳';
+                            }
                             form.submit();
-                            var wait = document.querySelector("#wait");
-                            wait.innerText = "⏳ 작업 중..."
-                            wait.disabled = true;
                         }
                         else {
                             return false;

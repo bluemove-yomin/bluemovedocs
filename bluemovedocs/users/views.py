@@ -69,7 +69,17 @@ def write_info(request, id):
     random_sub_id = ''
     for i in range(9):
         random_sub_id += random.choice(string_pool)
-    if 'bluemove.or.kr' in user.email:
+    if user.is_superuser:
+        profile.level = 'admin'
+        user.last_name = '사'
+        user.first_name = '무국'
+        profile.phone = '02-3296-0613'
+        profile.info_update_flag = True
+        profile.sub_id = 'B' + random_sub_id
+        user.save(update_fields=['last_name', 'first_name'])
+        profile.save(update_fields=['level', 'phone', 'info_update_flag', 'sub_id'])
+        return redirect('users:myaccount', user.id)
+    elif 'bluemove.or.kr' in user.email:
         token = SocialToken.objects.get(account__user=request.user, account__provider='google')
         credentials = Credentials(
             client_id=client_id,

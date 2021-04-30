@@ -4,16 +4,50 @@
 {% include 'shared/_navbar4notice.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md my-5">
-        <p style="font-weight: 600;">
-            {% if notice.category == 'bluemover' %}
-                블루무버
-            {% elif notice.category == 'guest' %}
-                게스트
+        <div class="d-flex align-items-sm-center justify-content-between">
+            <p style="font-weight: 600;">
+                {% if notice.category == 'bluemover' %}
+                    📢 블루무버
+                {% elif notice.category == 'guest' %}
+                    📢 게스트
+                {% else %}
+                    📢 알 수 없음
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+            <!-- Button trigger modal -->
+            <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.path }}">
+                {% if user in notice.favorite_user_set.all %}
+                    <p class="mb-0 ps-2"><i class="fas fa-bookmark"></i></p>
+                {% else %}
+                    <p class="mb-0 ps-2"><i class="far fa-bookmark"></i></p>
+                {% endif %}
+            </a>
             {% else %}
-                알 수 없음
+            <a type="button" class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#listloginModal">
+                <p class="mb-1"><i class="far fa-bookmark"></i></p>
+            </a>
+            <!-- Modal -->
+            <div class="modal fade" id="listloginModal" tabindex="-1" aria-labelledby="listloginModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="listloginModalLabel" style="font-weight: 600;">🔑 로그인 필요</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'account_login' %}?next={{ request.path }}'; innerText='⏳ 네, 로그인할게요!';">네, 로그인할게요!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
-        </p>
-        <h2 style="font-weight: 600; color: #58595B;">{{ notice.title }}</h2>
+        </div>
+        <h2 style="font-weight: 600; color: #58595B; word-break: break-word; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">{{ notice.title }}</h2>
         <small>
             {{ notice.writer.last_name }}{{ notice.writer.first_name }}
             │
@@ -58,10 +92,10 @@
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <div>
-                        <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
+                        <small id='enterGuide' class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> <span style="font-weight: 600;">줄 바꿈</span>: Shift + Enter</small>
                     </div>
                     <div class="d-flex gap-2">
-                        <a type="button" href="{% url 'notice:read' notice.id %}?next={{ request.path }}#commentBoxPosition" class="btn btn-outline-danger btn-sm" onclick="goBack()">취소</a>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="goBack(); inProgress(); location.href='{% url 'notice:read' notice.id %}?next={{ request.path }}#commentBoxPosition'; innerText='⏳ 취소';">취소</button>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -69,9 +103,9 @@
                             }
                         </script>
                         {% for account in user.socialaccount_set.all %}
-                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();">등록</button>
+                            <button type="submit" class="btn btn-secondary btn-sm comment" onclick="button_click();">등록</button>
                         {% empty %}
-                            <button type="submit" class="btn btn-secondary btn-sm" onclick="button_click();" disabled>등록</button>
+                            <button type="submit" class="btn btn-secondary btn-sm comment" onclick="button_click();" disabled>등록</button>
                         {% endfor %}
                     </div>
                 </div>
@@ -81,11 +115,19 @@
         <script>
             $(function() {
                 $('textarea').on('keydown', function(event) {
-                    if (event.keyCode == 13)
+                    if (window.innerWidth > 767 && event.keyCode == 13)
                         if (!event.shiftKey){
                             event.preventDefault();
                             $('#commentForm').submit();
                         }
+                });
+
+                $(window).resize(function() {
+                    if (window.innerWidth > 767) {
+                        document.querySelector('#enterGuide').hidden=false;
+                    } else {
+                        document.querySelector('#enterGuide').hidden=true;
+                    }
                 });
                 
                 $('#commentForm').on('submit', function() {
@@ -158,6 +200,10 @@
                     alert("댓글을 최소 5자 이상 입력하세요.")
                 }
                 else {
+                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                        document.querySelectorAll(".btn")[i].disabled = true;
+                        document.querySelector(".comment").innerText = '⏳ 등록';
+                    }
                     form.submit();
                 }
             });

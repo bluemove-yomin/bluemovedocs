@@ -16,7 +16,7 @@
             </p>
             {% if user.is_authenticated %}
             <!-- Button trigger modal -->
-            <a class="bookmark" href="{% url 'box:box_favorite' box.id %}?next={{ request.path }}">
+            <a class="bookmark no-pointer" style="" href="{% url 'box:box_favorite' box.id %}?next={{ request.path }}">
                 {% if user in box.box_favorite_user_set.all %}
                 <p class="mb-0 ps-2"><i class="fas fa-bookmark"></i></p>
                 {% else %}
@@ -24,7 +24,7 @@
                 {% endif %}
             </a>
             {% else %}
-            <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#listloginModal">
+            <a type="button" class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#listloginModal">
                 <p class="mb-1"><i class="far fa-bookmark"></i></p>
             </a>
             <!-- Modal -->
@@ -39,8 +39,8 @@
                             로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
                         </div>
                         <div class="modal-footer">
-                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                            <a type="button" href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary">네, 로그인할게요!</a>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'account_login' %}?next={{ request.path }}'; innerText='⏳ 네, 로그인할게요!';">네, 로그인할게요!</button>
                         </div>
                     </div>
                 </div>
@@ -156,68 +156,52 @@
     {% if box.writer == request.user %}
         <div class="container-md mb-5 d-grid gap-2 d-sm-flex justify-content-sm-end">
             <!-- Button trigger modal -->
-            <a type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</a>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">삭제하기</button>
             <!-- Modal -->
             {% if created_valid_docs or submitted_valid_docs or rejected_valid_docs %}
                 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">😓 삭제 불가</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">😓 삭제 불가</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <mark style="background-color: #f8d7da; font-weight: 600;">유효(미제출, 제출, 반려) 문서</mark>가 있는 문서함은 삭제할 수 없습니다.<br>강제 삭제가 필요한 경우 테크 매니저에게 문의하세요.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 알겠습니다.</button>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            <mark style="background-color: #f8d7da; font-weight: 600;">유효(미제출, 제출, 반려) 문서</mark>가 있는 문서함은 삭제할 수 없습니다.<br>강제 삭제가 필요한 경우 테크 매니저에게 문의하세요.
-                        </div>
-                        <div class="modal-footer">
-                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 알겠습니다.</a>
-                        </div>
-                    </div>
                     </div>
                 </div>
             {% else %}
                 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                <button type="button" class="btn btn-outline-danger" onclick="inProgressBox(); location.href='{% url 'box:delete' box.id %}'; innerText='⏳ 네, 삭제할게요!';">네, 삭제할게요!</button>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                            삭제된 자료는 복구할 수 없습니다.<br>정말 삭제하시겠습니까?
-                        </div>
-                        <div class="modal-footer">
-                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" href="{% url 'box:delete' box.id %}" class="btn btn-outline-danger">네, 삭제할게요!</a>
-                        </div>
-                    </div>
                     </div>
                 </div>
             {% endif %}
-            <button onclick="wait_please()" id="wait_please" class="btn btn-outline-secondary">
+            <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'box:updateimage' box.id %}#image'; innerText='⏳ {% if box.image %}이미지 변경하기{% else %}이미지 추가하기{% endif %}';">
                 {% if box.image %}
-                이미지 변경하기
+                    이미지 변경하기
                 {% else %}
-                이미지 추가하기
+                    이미지 추가하기
                 {% endif %}
             </button>
-            <script>
-                function wait_please() {
-                    var wait = document.querySelector("#wait_please");
-                    wait.innerText = "⏳ 작업 중..."
-                    wait.disabled = true;
-                    location.href='{% url 'box:updateimage' box.id %}#image'
-                }
-            </script>
-            <button onclick="wait_bro()" id="wait_bro" class="btn btn-outline-secondary">수정하기</button>
-            <script>
-                function wait_bro() {
-                    var wait = document.querySelector("#wait_bro");
-                    wait.innerText = "⏳ 작업 중..."
-                    wait.disabled = true;
-                    location.href='{% url 'box:update' box.id %}'
-                }
-            </script>
+            <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'box:update' box.id %}'; innerText='⏳ 수정하기';">수정하기</button>
         </div>
     {% endif %}
 
@@ -248,15 +232,7 @@
         <div class="container-md border rounded px-sm-4 px-3 pt-4 pb-2">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="mb-3" style="font-weight: 600; color: #58595B;">미결재 문서</h3>
-                <p class="mb-2 text-muted"><i class="fas fa-sync-alt"></i> <a onclick="wait_count()" id="wait_count" href="javascript:location.reload();" target="_self" style="font-weight: 300; color:#58595B;">{{ all_docs|length }}명 제출함</a></p>
-                <script>
-                    function wait_count() {
-                        var wait = document.querySelector("#wait_count");
-                        wait.innerText = "⏳ 작업 중..."
-                        wait.disabled = true;
-                        location.href='javascript:location.reload()'
-                    }
-                </script>
+                <p class="mb-2 text-muted"><i class="fas fa-sync-alt"></i> <a class='no-pointer' onclick="innerText = '⏳ {{ all_docs|length }}명 제출함'; disabled = true; location.href='javascript:location.reload()';" target="_self" style="font-weight: 300; color:#58595B;">{{ all_docs|length }}명 제출함</a></p>
             </div>
             <div class="list-group list-group-flush mt-1" id="refresh_submitted">
                 <!-- 미결재 문서 있을 경우 -->
@@ -291,7 +267,7 @@
                                 <tr>
                                     <td class="ps-0 pe-3 py-0 m-0" rowspan="2">
                                         <small>
-                                            <a href="#" class="modalFreezing" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
+                                            <a class="no-pointer" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
                                         </small>
                                     </td>
                                 </tr>
@@ -300,9 +276,9 @@
                                 <td class="p-0 m-0" rowspan="1">
                                     <small>
                                         {% if doc.user.profile.level == 'bluemover' %}
-                                            <a href="#" class="modalFreezing" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
+                                            <a class="no-pointer" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
                                         {% else %}
-                                            <a href="#" class="modalFreezing" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                            <a class="no-pointer" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
                                         {% endif %}
                                     </small>
                                 </td>
@@ -336,7 +312,7 @@
                                 <tr>
                                     <td class="ps-0 pe-3 py-0 m-0" rowspan="2">
                                         <small>
-                                            <a href="#" class="modalFreezing" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
+                                            <a href="#" class="no-pointer" style="color: #DC3545;" data-bs-toggle="modal" data-bs-target="#docRejectModal{{doc.id}}">반려하기</a>
                                         </small>
                                     </td>
                                 </tr>
@@ -345,9 +321,9 @@
                                 <td class="p-0 m-0">
                                     <small>
                                         {% if doc.user.profile.level == 'bluemover' %}
-                                            <a href="#" class="modalFreezing" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
+                                            <a href="#" class="no-pointer" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">승인하기</a>
                                         {% else %}
-                                            <a href="#" class="modalFreezing" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
+                                            <a href="#" class="no-pointer" style="color: #58595B;" data-bs-toggle="modal" data-bs-target="#docReturnModal{{doc.id}}">반환하기</a>
                                         {% endif %}
                                     </small>
                                 </td>
@@ -385,8 +361,8 @@
                                         </span>
                                     </div>
                                     <div class="modal-footer hide">
-                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <input type="submit" value="네, 반려할게요!" class="btn btn-outline-danger" onclick="doNotClose();">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                        <input type="submit" value="네, 반려할게요!" class="btn btn-outline-danger reject" onclick="inProgressReject();">
                                     </div>
                                 </div>
                             </div>
@@ -399,7 +375,7 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title hide" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
-                                        <h5 class="modal-title show0101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                        <h5 class="modal-title show01" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
                                         <button type="button" class="btn-close hide" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -415,14 +391,14 @@
                                             <br>정말 승인하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 승인하세요.</small>
                                         </span>
-                                        <span class="show0202" style="display: none;">
+                                        <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 승인하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                     <div class="modal-footer hide">
-                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose2();">네, 승인할게요!</a>
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="inProgressBox(); location.href='{% url 'box:return_doc' doc.id %}#docPosition'; innerText='⏳ 네, 승인할게요!';">네, 승인할게요!</button>
                                     </div>
                                 </div>
                             </div>
@@ -433,7 +409,7 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title hide" id="docReturnModalLabel" style="font-weight: 600;">💥 반환 확인</h5>
-                                        <h5 class="modal-title show0101" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                        <h5 class="modal-title show01" id="docReturnModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
                                         <button type="button" class="btn-close hide" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body">
@@ -441,14 +417,14 @@
                                             문서 반환 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 반환하세요.</small>
                                         </span>
-                                        <span class="show0202" style="display: none;">
+                                        <span class="show02" style="display: none;">
                                             {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 문서를 반환하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                         </span>
                                     </div>
                                     <div class="modal-footer hide">
-                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <a type="button" href="{% url 'box:return_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose2();">네, 반환할게요!</a>
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="inProgressBox(); location.href='{% url 'box:return_doc' doc.id %}#docPosition'; innerText='⏳ 네, 반환할게요!';">네, 반환할게요!</button>
                                     </div>
                                 </div>
                             </div>
@@ -472,7 +448,11 @@
             <div class="container border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                 <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-user-slash"></i></span><br>
                 <span style="color: #58595B;">
-                    {{ user.last_name }}{{ user.first_name }}님은 이 문서의 대상이 아닙니다.
+                    {% if box.category == 'bluemover' %}
+                        블루무버 대상 문서함입니다.
+                    {% else %}
+                        게스트 대상 문서함입니다.
+                    {% endif %}
                 </span>
             </div>
         </div>
@@ -543,25 +523,25 @@
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
                         <div class="d-flex justify-content-between">
                             <div></div>
-                            <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                            <a class="container no-pointer" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
                                 <span style="color: #58595B; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.rejection_date }} 반려<br>(사유: {{ doc.reject_reason }})</small>
                             </a>
-                            <button type="button" class="btn-close float-end freezing" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                            <button type="button" class="btn-close float-end delete" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
                     {% if box.deadline_is_over and doc.user.profile.level == 'guest' %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'">반환받기</button>
+                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="inProgress(); location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'; innerText='⏳ 반환받기';">반환받기</button>
                         </div>
                     {% elif box.deadline_is_over and doc.user.profile.level == 'bluemover' %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button href="#" class="container btn btn-primary" disabled>제출 불가</button>
+                            <button class="container btn btn-primary" disabled>제출 불가</button>
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
-                            <a type="button" class="container btn btn-primary modalFreezing" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</a>
+                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</button>
                         </div>
                     {% endif %}
                     <!-- docSubmitModal -->
@@ -600,8 +580,8 @@
                                         </span>
                                     </div>
                                     <div class="modal-footer hide">
-                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose();">네, 제출할게요!</a>
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="inProgressBox(); location.href='{% url 'box:submit_doc' doc.id %}#docPosition'; innerText='⏳ 네, 제출할게요!';">네, 제출할게요!</button>
                                     </div>
                                 {% endif %}
                             </div>
@@ -613,19 +593,19 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title hide" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
-                                    <h5 class="modal-title show0101" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <h5 class="modal-title show01" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
                                     <button type="button" class="btn-close hide" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <span class="hide">문서 삭제 시 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
-                                    <span class="show0202" style="display: none;">
+                                    <span class="show02" style="display: none;">
                                         {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </span>
                                 </div>
                                 <div class="modal-footer hide">
-                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger" onclick="doNotClose2();">네, 삭제할게요!</a>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="inProgressBox(); location.href='{% url 'box:delete_doc' doc.id %}#docPosition'; innerText='⏳ 네, 삭제할게요!';">네, 삭제할게요!</button>
                                 </div>
                             </div>
                         </div>
@@ -657,12 +637,12 @@
                                     <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                     <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
                                 </a>
-                                <button type="button" class="btn-close float-end freezing" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                                <button type="button" class="btn-close float-end delete" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                             </div>
                         {% endif %}
                     </div>
                     <div class="container-md d-flex p-0 my-2">
-                        <button href="{% url 'box:submit_doc' doc.id %}#docPosition" class="container btn btn-primary modalFreezing" disabled>제출 완료</button>
+                        <button class="container btn btn-primary" disabled>제출 완료</button>
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
@@ -681,8 +661,8 @@
                                     </span>
                                 </div>
                                 <div class="modal-footer hide">
-                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger" onclick="doNotClose();">네, 삭제할게요!</a>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="inProgressBox(); location.href='{% url 'box:delete_doc' doc.id %}#docPosition'; innerText='⏳ 네, 삭제할게요!';">네, 삭제할게요!</button>
                                 </div>
                             </div>
                         </div>
@@ -711,20 +691,20 @@
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.creation_date }} 생성</small>
                             </a>
-                            <button type="button" class="btn-close float-end freezing" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
+                            <button type="button" class="btn-close float-end delete" style="padding-top: 1rem;" data-bs-toggle="modal" data-bs-target="#docDeleteModal"></button>
                         </div>
                     </div>
                     {% if box.deadline_is_over and doc.user.profile.level == 'guest' %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'">반환받기</button>
+                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal" onclick="inProgree(); location.href='{% url 'box:return_doc_before_submit' doc.id %}#docPosition'; innerText='⏳ 반환받기';">반환받기</button>
                         </div>
                     {% elif box.deadline_is_over and doc.user.profile.level == 'bluemover' %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button href="#" class="container btn btn-primary" disabled>제출 불가</button>
+                            <button class="container btn btn-primary" disabled>제출 불가</button>
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
-                            <a type="button" class="container btn btn-primary modalFreezing" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</a>
+                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</button>
                         </div>
                     {% endif %}
                     <!-- docSubmitModal -->
@@ -763,8 +743,8 @@
                                         </span>
                                     </div>
                                     <div class="modal-footer hide">
-                                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                        <a type="button" href="{% url 'box:submit_doc' doc.id %}#docPosition" class="btn btn-outline-primary" onclick="doNotClose();">네, 제출할게요!</a>
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                        <button type="button" class="btn btn-outline-primary" onclick="inProgressBox(); location.href='{% url 'box:submit_doc' doc.id %}#docPosition'; innerText='⏳ 네, 제출할게요!';">네, 제출할게요!</button>
                                     </div>
                                 {% endif %}
                             </div>
@@ -776,19 +756,19 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title hide" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
-                                    <h5 class="modal-title show0101" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
+                                    <h5 class="modal-title show01" id="docDeleteModalLabel" style="font-weight: 600; display: none;">⏳ 작업 중</h5>
                                     <button type="button" class="btn-close hide" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <span class="hide">문서 삭제 시 문서에 대한 모든 권한을 잃게 됩니다.<br>정말 삭제하시겠습니까?</span>
-                                    <span class="show0202" style="display: none;">
+                                    <span class="show02" style="display: none;">
                                         {{ doc.user.last_name }}{{ doc.user.first_name }}님의 문서를 삭제하고 있습니다.<br>작업이 종료될 때까지 브라우저를 닫지 마세요.<br><br>
                                         <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
                                     </span>
                                 </div>
                                 <div class="modal-footer hide">
-                                    <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                                    <a type="button" href="{% url 'box:delete_doc' doc.id %}#docPosition" class="btn btn-outline-danger" onclick="doNotClose2();">네, 삭제할게요!</a>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                                    <button type="button" class="btn btn-outline-danger" onclick="inProgressBox(); location.href='{% url 'box:delete_doc' doc.id %}#docPosition'; innerText='⏳ 네, 삭제할게요!';">네, 삭제할게요!</button>
                                 </div>
                             </div>
                         </div>
@@ -805,7 +785,14 @@
                     </div>
                     <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                         <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-exclamation-triangle"></i></span><br>
-                        <span style="color: #58595B;">무언가 잘못되었습니다.</span>
+                        <span style="color: #58595B;">
+                            무언가 잘못되었습니다.
+                            {% if box.category == 'bluemover' %}
+                                테크 매니저에게 문의해주세요.
+                            {% else %}
+                                사무국에 문의해주세요.
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -833,21 +820,10 @@
                         </div>
                         <form id="docForm" name="docForm" action="{% url 'box:create_doc' box.id %}#docPosition" method="POST">
                             {% csrf_token %}
-                            <button onclick="wait_doc()" class="container btn shadow-sm border rounded text-center mb-2" id="docButton" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
+                            <button class="container btn shadow-sm border rounded text-center mb-2" onclick="inProgress(); document.querySelector('#createDocBtnMsg').innerText='⏳ 새 문서 생성 중';" type="submit" style="padding-top: 2rem; padding-bottom: 3.1rem;" data-bs-toggle="modal" data-bs-target="#docCreateModal">
                                 <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
-                                <span id="waitDocText" style="color: #58595B;">새 문서를 생성하려면 누르세요.</span>
+                                <span id="createDocBtnMsg" style="color: #58595B;">새 문서를 생성하려면 누르세요.</span>
                             </button>
-                            <script>
-                                function wait_doc() {
-                                    function wait_doc_real() {
-                                        var wait = document.querySelector("#docButton");
-                                        wait.disabled = true;
-                                        var waitDocText = document.querySelector("#waitDocText");
-                                        waitDocText.innerText = "⏳ 작업 중..."
-                                    }
-                                    setTimeout(wait_doc_real, 0);
-                                };
-                            </script>
                             <!-- docCreateModal -->
                             <div class="modal fade" id="docCreateModal" tabindex="-1" aria-labelledby="docCreateModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -888,73 +864,78 @@
         });
     </script>
 
-    <!-- doNotClose -->
+    <!-- inProgressReject -->
     <script>
-        window.onerror = function(){
-            return true;
-        }
         var reason = document.querySelector("#reject_reason");
-        function doNotClose() {
-            if ( reason ) {
+        function inProgressReject() {
+            function realInProgressReject() {
                 if ( reason.value ) {
                     for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
                         document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
                     }
-                    document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
-                    document.querySelector(".show02").setAttribute("style", "display:inline");
-                    if (document.querySelector(".freezing")) {
-                        for (var i = 0; i < document.querySelectorAll(".freezing").length; i++) {
-                            document.querySelectorAll(".freezing")[i].disabled = true;
+                    for (var i = 0; i < document.querySelectorAll(".show01").length; i++) {
+                        document.querySelectorAll(".show01")[i].setAttribute("style", "font-weight: 600; display:inline");
+                    }
+                    for (var i = 0; i < document.querySelectorAll(".show02").length; i++) {
+                        document.querySelectorAll(".show02")[i].setAttribute("style", "display:inline");
+                    }
+                    if (document.querySelector(".delete")) {
+                        for (var i = 0; i < document.querySelectorAll(".delete").length; i++) {
+                            document.querySelectorAll(".delete")[i].disabled = true;
                         }
                     }
-                    for (var i = 0; i < document.querySelectorAll(".modalFreezing").length; i++) {
-                        document.querySelectorAll(".modalFreezing")[i].setAttribute("data-bs-target", "");
-                        document.querySelectorAll(".modalFreezing")[i].innerText = '⏳ 작업 중...';
+                    document.querySelector('.reject').value = '⏳ 네, 반려할게요!';
+                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                        document.querySelectorAll(".btn")[i].disabled = true;
+                    }
+                    for (var i = 0; i < document.querySelectorAll(".card-link").length; i++) {
+                        var attr = document.querySelectorAll(".card-link")[i].getAttribute("style")
+                        document.querySelectorAll(".card-link")[i].setAttribute("style", attr + "pointer-events: none;");
+                    }
+                    for (var i = 0; i < document.querySelectorAll(".no-pointer").length; i++) {
+                        var attr = document.querySelectorAll(".no-pointer")[i].getAttribute("style")
+                        document.querySelectorAll(".no-pointer")[i].setAttribute("style", attr + "pointer-events: none;");
                     }
                 }
                 else {
                     return alert('반려 사유를 입력하세요.')
                 }
             }
-            else {
-                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
-                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
-                }
-                document.querySelector(".show01").setAttribute("style", "font-weight: 600; display:inline");
-                document.querySelector(".show02").setAttribute("style", "display:inline");
-                if (document.querySelector(".freezing")) {
-                    for (var i = 0; i < document.querySelectorAll(".freezing").length; i++) {
-                        document.querySelectorAll(".freezing")[i].disabled = true;
-                    }
-                }
-                for (var i = 0; i < document.querySelectorAll(".modalFreezing").length; i++) {
-                    document.querySelectorAll(".modalFreezing")[i].setAttribute("data-bs-target", "");
-                    document.querySelectorAll(".modalFreezing")[i].innerText = '⏳ 작업 중...';
-                }
-            }
+            setTimeout(realInProgressReject, 0);
         };
     </script>
 
-    <!-- doNotClose2 -->
+    <!-- inProgressBox -->
     <script>
-        window.onerror = function(){
-            return true;
-        }
-        function doNotClose2() {
-            for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
-                document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
-            }
-            document.querySelector(".show0101").setAttribute("style", "font-weight: 600; display:inline");
-            document.querySelector(".show0202").setAttribute("style", "display:inline");
-            if (document.querySelector(".freezing")) {
-                for (var i = 0; i < document.querySelectorAll(".freezing").length; i++) {
-                    document.querySelectorAll(".freezing")[i].disabled = true;
+        function inProgressBox() {
+            function realInProgressBox() {
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show01").length; i++) {
+                    document.querySelectorAll(".show01")[i].setAttribute("style", "font-weight: 600; display:inline");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show02").length; i++) {
+                    document.querySelectorAll(".show02")[i].setAttribute("style", "display:inline");
+                }
+                if (document.querySelector(".delete")) {
+                    for (var i = 0; i < document.querySelectorAll(".delete").length; i++) {
+                        document.querySelectorAll(".delete")[i].disabled = true;
+                    }
+                }
+                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                    document.querySelectorAll(".btn")[i].disabled = true;
+                }
+                for (var i = 0; i < document.querySelectorAll(".card-link").length; i++) {
+                    var attr = document.querySelectorAll(".card-link")[i].getAttribute("style")
+                    document.querySelectorAll(".card-link")[i].setAttribute("style", attr + "pointer-events: none;");
+                }
+                for (var i = 0; i < document.querySelectorAll(".no-pointer").length; i++) {
+                    var attr = document.querySelectorAll(".no-pointer")[i].getAttribute("style")
+                    document.querySelectorAll(".no-pointer")[i].setAttribute("style", attr + "pointer-events: none;");
                 }
             }
-            for (var i = 0; i < document.querySelectorAll(".modalFreezing").length; i++) {
-                document.querySelectorAll(".modalFreezing")[i].setAttribute("data-bs-target", "");
-                document.querySelectorAll(".modalFreezing")[i].innerText = '⏳ 작업 중...';
-            }
+            setTimeout(realInProgressBox, 0);
         };
     </script>
 

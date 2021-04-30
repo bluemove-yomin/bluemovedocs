@@ -43,9 +43,9 @@
                     <!-- Button trigger modal -->
                     <div class="text-end">
                         {% if not request.path == '/notice/' %}
-                        <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#noticeTablePosition">
+                        <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#noticeTablePosition">
                         {% else %}
-                        <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}">
+                        <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}">
                         {% endif %}
                             {% if user in notice.favorite_user_set.all %}
                             <i class="fas fa-bookmark"></i>
@@ -56,7 +56,7 @@
                     </div>
                     {% else %}
                     <div class="text-end">
-                        <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#tableloginModal">
+                        <a type="button" class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#tableloginModal">
                             <i class="far fa-bookmark"></i>
                         </a>
                     </div>
@@ -72,8 +72,8 @@
                                 로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
                             </div>
                             <div class="modal-footer">
-                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                            <a type="button" href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary">네, 로그인할게요!</a>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'account_login' %}?next={{ request.path }}'; innerText='⏳ 네, 로그인할게요!';">네, 로그인할게요!</button>
                             </div>
                         </div>
                         </div>
@@ -94,7 +94,7 @@
     <!-- 블루무버일 경우 작성하기 버튼 노출 -->
     {% if user.profile.level == 'bluemover' %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
-        <button class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'notice:write' %}'; innerText='작성하기 ⏳';">작성하기</button>
+        <button class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'notice:write' %}'; innerText='⏳ 작성하기';">작성하기</button>
     </div>
     {% endif %}
 
@@ -166,7 +166,7 @@
             </p>
             {% if user.is_authenticated %}
             <!-- Button trigger modal -->
-            <a class="bookmark" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#noticeTablePosition">
+            <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#noticeTablePosition">
                 {% if user in notice.favorite_user_set.all %}
                 <p class="mb-1"><i class="fas fa-bookmark"></i></p>
                 {% else %}
@@ -174,7 +174,7 @@
                 {% endif %}
             </a>
             {% else %}
-            <a type="button" class="bookmark" data-bs-toggle="modal" data-bs-target="#listloginModal">
+            <a type="button" class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#listloginModal">
                 <p class="mb-1"><i class="far fa-bookmark"></i></p>
             </a>
             <!-- Modal -->
@@ -189,8 +189,8 @@
                             로그인 후 북마크에 추가할 수 있습니다.<br>로그인하시겠어요?
                         </div>
                         <div class="modal-footer">
-                            <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                            <a type="button" href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-outline-primary">네, 로그인할게요!</a>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'account_login' %}?next={{ request.path }}'; innerText='⏳ 네, 로그인할게요!';">네, 로그인할게요!</button>
                         </div>
                     </div>
                 </div>
@@ -219,7 +219,7 @@
     <!-- 블루무버일 경우 작성하기 버튼 노출 -->
     {% if user.profile.level == 'bluemover' %}
     <div class="container-md d-grid sm-flex justify-content-sm-end mt-5 p-0">
-        <button class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'notice:write' %}'; innerText='작성하기 ⏳';">작성하기</button>
+        <button class="btn btn-outline-primary" onclick="inProgress(); location.href='{% url 'notice:write' %}'; innerText='⏳ 작성하기';">작성하기</button>
     </div>
     {% endif %}
 

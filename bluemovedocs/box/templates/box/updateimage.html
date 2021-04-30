@@ -225,13 +225,13 @@
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <!-- Button trigger modal -->
-                <a type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
                     {% if box.image %}
-                    이미지 변경 취소하기
+                        이미지 변경 취소하기
                     {% else %}
-                    이미지 추가 취소하기
+                        이미지 추가 취소하기
                     {% endif %}
-                </a>
+                </button>
                 <!-- Modal -->
                 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -242,15 +242,15 @@
                         </div>
                         <div class="modal-body">
                             {% if box.image %}
-                            이미지 변경 내역이 삭제됩니다.
+                                이미지 변경 내역이 삭제됩니다.
                             {% else %}
-                            이미지 추가 내역이 삭제됩니다.
+                                이미지 추가 내역이 삭제됩니다.
                             {% endif %}
                             <br>정말 취소하시겠습니까?
                         </div>
                         <div class="modal-footer">
-                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" class="btn btn-outline-danger" onclick="goBack()">네, 취소할게요!</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="goBack(); inProgress(); innerText='⏳ 네, 취소할게요!';">네, 취소할게요!</button>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -262,9 +262,9 @@
                     </div>
                 </div>
                 {% if box.image %}
-                    <button type="submit" id="wait_imageChange" class="btn btn-outline-primary">이미지 변경 등록하기</button>
+                    <button type="submit" class="btn btn-outline-primary submit-change">이미지 변경 등록하기</button>
                 {% else %}
-                    <button type="submit" id="wait_imageAdd" class="btn btn-outline-primary">이미지 추가 등록하기</button>
+                    <button type="submit" class="btn btn-outline-primary submit-add">이미지 추가 등록하기</button>
                 {% endif %}
             </div>
         </form>
@@ -336,20 +336,30 @@
                         ratio = width/height;
                         // 유저가 첨부한 이미지가 1800 x 900일 경우
                         if( width == 1800 && height == 900 ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                            }
+                            if (document.querySelector(".submit-change")) {
+                                document.querySelector(".submit-change").innerText = '⏳ 이미지 변경 등록하기';
+                            } else {
+                                document.querySelector(".submit-add").innerText = '⏳ 이미지 추가 등록하기';
+                            }
                             form.submit();
-                            var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
-                            wait.innerText = "⏳ 작업 중..."
-                            wait.disabled = true;
                         }
                         // 유저가 첨부한 이미지가 1800 x 900이 아닐 경우
                         else {
                             // 유저가 첨부한 이미지 가로세로비가 2:1이 아닐 경우
                             if ( ratio !== 2 ) {
                                 if ( confirm("이미지는 본문에선 원본 비율, 목록에선 2:1 비율로 표시됩니다." + "\n\n▶ 권장 크기: 1800 x 900 (2:1)"  + "\n▶ 현재 크기: " + width + " x " + height + " (" + ratio.toFixed(1) + ": 1) → 목록에선 크롭됩니다." +  "\n\n계속하시겠어요?") ) {
+                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                        document.querySelectorAll(".btn")[i].disabled = true;
+                                    }
+                                    if (document.querySelector(".submit-change")) {
+                                        document.querySelector(".submit-change").innerText = '⏳ 이미지 변경 등록하기';
+                                    } else {
+                                        document.querySelector(".submit-add").innerText = '⏳ 이미지 추가 등록하기';
+                                    }
                                     form.submit();
-                                    var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
-                                    wait.innerText = "⏳ 작업 중..."
-                                    wait.disabled = true;
                                 }
                                 else {
                                     document.querySelector("#image").value = '';
@@ -357,10 +367,15 @@
                             }
                             // 유저가 첨부한 이미지 가로세로비가 2:1일 경우
                             else {
+                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                    document.querySelectorAll(".btn")[i].disabled = true;
+                                }
+                                if (document.querySelector(".submit-change")) {
+                                    document.querySelector(".submit-change").innerText = '⏳ 이미지 변경 등록하기';
+                                } else {
+                                    document.querySelector(".submit-add").innerText = '⏳ 이미지 추가 등록하기';
+                                }
                                 form.submit();
-                                var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
-                                wait.innerText = "⏳ 작업 중..."
-                                wait.disabled = true;
                             }
                         }
                     };
@@ -370,17 +385,24 @@
                     // 이게 지금 '이미지 변경' 작업일 경우
                     if ( document.querySelector("body > main > div > form > div.form-group.mb-5 > div.mb-4.d-flex.justify-content-center > img") ) {
                         if ( confirm("이미지 삭제를 선택하셨습니다.\n\n▶ 이미지 변경: 새로운 이미지 첨부 후 등록\n▶ 이미지 삭제: 미첨부 상태로 등록 → 선택된 옵션입니다.\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                            }
+                            if (document.querySelector(".submit-change")) {
+                                document.querySelector(".submit-change").innerText = '⏳ 이미지 변경 등록하기';
+                            } else {
+                                document.querySelector(".submit-add").innerText = '⏳ 이미지 추가 등록하기';
+                            }
                             form.submit();
-                            var wait = document.querySelector("#wait_imageChange") || document.querySelector("#wait_imageAdd");
-                            wait.innerText = "⏳ 작업 중..."
-                            wait.disabled = true;
                         }
                         else {
                             return false;
                         }
                     }
                     // 이게 지금 '이미지 추가' 작업일 경우
-                    else {}
+                    else {
+                        alert('추가할 이미지를 선택하세요.')
+                    }
                 }
             });
         </script>

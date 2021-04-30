@@ -137,10 +137,12 @@
             a {
                 color: #007DC5;
                 text-decoration: none;
+                cursor: pointer;
             }
             a:hover, a:focus {
                 color: #007DC5;
                 font-weight: 600;
+                cursor: pointer;
             }
             #pills-tab > .nav-item {
                 color: #58595B;
@@ -363,16 +365,23 @@
                 }).resize();
             });
         </script>
-        <!-- request를 보낸 뒤에 다시 request를 보내는 일이 없도록 button disabled, a href='' -->
+        <!-- 중복 request 방지 -->
         <script>
             function inProgress() {
-                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                    document.querySelectorAll(".btn")[i].disabled = true;
+                function realInProgress() {
+                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                        document.querySelectorAll(".btn")[i].disabled = true;
+                    }
+                    for (var i = 0; i < document.querySelectorAll(".card-link").length; i++) {
+                        var attr01 = document.querySelectorAll(".card-link")[i].getAttribute("style")
+                        document.querySelectorAll(".card-link")[i].setAttribute("style", attr01 + "pointer-events: none;");
+                    }
+                    for (var i = 0; i < document.querySelectorAll(".no-pointer").length; i++) {
+                        var attr02 = document.querySelectorAll(".no-pointer")[i].getAttribute("style")
+                        document.querySelectorAll(".no-pointer")[i].setAttribute("style", attr02 + "pointer-events: none;");
+                    }
                 }
-                for (var i = 0; i < document.querySelectorAll(".card-link").length; i++) {
-                    var attr = document.querySelectorAll(".card-link")[i].getAttribute("style")
-                    document.querySelectorAll(".card-link")[i].setAttribute("style", attr + "pointer-events: none;");
-                }
+                setTimeout(realInProgress, 0);
             };
         </script>
         <footer class="bd-footer px-2 py-3 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 70px;">

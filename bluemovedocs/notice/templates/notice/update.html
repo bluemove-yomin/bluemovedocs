@@ -91,8 +91,8 @@
                             수정 내역이 모두 삭제됩니다.<br>정말 취소하시겠습니까?
                         </div>
                         <div class="modal-footer">
-                        <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack(); innerText='네, 취소할게요! ⏳';">네, 취소할게요!</a>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack(); innerText='⏳ 네, 취소할게요!';">네, 취소할게요!</button>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -103,7 +103,7 @@
                     </div>
                     </div>
                 </div>
-                <input type="submit" value="수정 등록하기" class="btn btn-outline-primary">
+                <input type="submit" value="수정 등록하기" class="btn btn-outline-primary submit">
             </div>
         </form>
 
@@ -207,7 +207,7 @@
                 else {
                     for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
                         document.querySelectorAll(".btn")[i].disabled = true;
-                        document.querySelectorAll(".btn")[i].value = '수정 등록하기 ⏳';
+                        document.querySelector(".submit").value = '⏳ 수정 등록하기';
                     }
                     form.submit();
                 }
