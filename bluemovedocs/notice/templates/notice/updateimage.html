@@ -100,7 +100,7 @@
                         </div>
                         <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
-                        <button type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack();">네, 취소할게요!</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack(); innerText='네, 취소할게요! ⏳';">네, 취소할게요!</button>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -187,6 +187,7 @@
                         if( width == 1800 && height == 900 ) {
                             for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
                                 document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelectorAll(".btn")[i].value = '{% if notice.image %}이미지 변경 등록하기{% else %}이미지 추가 등록하기{% endif %} ⏳';
                             }
                             form.submit();
                         }
@@ -204,6 +205,7 @@
                         if ( confirm("이미지 삭제를 선택하셨습니다.\n\n▶ 이미지 변경: 새로운 이미지 첨부 후 등록\n▶ 이미지 삭제: 미첨부 상태로 등록 → 선택된 옵션입니다.\n\n계속하시겠어요?") ) {
                             for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
                                 document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelectorAll(".btn")[i].value = '{% if notice.image %}이미지 변경 등록하기{% else %}이미지 추가 등록하기{% endif %} ⏳';
                             }
                             form.submit();
                         }

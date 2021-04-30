@@ -83,19 +83,19 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</button>
-                    <button type="button" class="btn btn-outline-danger" onclick="inProgress(); location.href='{% url 'notice:delete' notice.id %}';">네, 삭제할게요!</button>
+                    <button type="button" class="btn btn-outline-danger" onclick="inProgress(); location.href='{% url 'notice:delete' notice.id %}'; innerText='네, 삭제할게요! ⏳';">네, 삭제할게요!</button>
                 </div>
             </div>
             </div>
         </div>
-        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:updateimage' notice.id %}#image';">
+        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:updateimage' notice.id %}#image'; innerText='{% if notice.image %}이미지 변경하기{% else %}이미지 추가하기{% endif %} ⏳';">
             {% if notice.image %}
                 이미지 변경하기
             {% else %}
                 이미지 추가하기
             {% endif %}
         </button>
-        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:update' notice.id %}';">수정하기</button>
+        <button class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'notice:update' notice.id %}'; innerText='수정하기 ⏳';">수정하기</button>
     </div>
     {% endif %}
 

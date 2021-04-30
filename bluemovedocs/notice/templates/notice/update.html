@@ -92,7 +92,7 @@
                         </div>
                         <div class="modal-footer">
                         <a type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">앗, 잠시만요.</a>
-                        <a type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack();">네, 취소할게요!</a>
+                        <a type="button" class="btn btn-outline-danger" onclick="inProgress(); goBack(); innerText='네, 취소할게요! ⏳';">네, 취소할게요!</a>
                         <!-- goBack Script -->
                         <script>
                             function goBack() {
@@ -207,6 +207,7 @@
                 else {
                     for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
                         document.querySelectorAll(".btn")[i].disabled = true;
+                        document.querySelectorAll(".btn")[i].value = '수정 등록하기 ⏳';
                     }
                     form.submit();
                 }
