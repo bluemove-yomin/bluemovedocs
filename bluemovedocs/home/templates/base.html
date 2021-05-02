@@ -384,6 +384,16 @@
                 setTimeout(realInProgress, 0);
             };
         </script>
+        <!-- Internet Explorer 미지원 안내 -->
+        <script>
+            (function BrowserVersion() {
+                let agent = navigator.userAgent.toLowerCase();
+                console.log((agent.indexOf("trident") || agent.indexOf("msie")) !== -1)      
+                if((agent.indexOf("trident") || agent.indexOf("msie")) !== -1) {
+                    alert("블루무브 닥스는 Internet Explorer를 지원하지 않습니다.\n번거로우시겠지만 Chrome, Opera, Firefox, Safari, Edge, 기타 Chrome 기반 브라우저로 이용 부탁드립니다.")
+                }
+            })();
+        </script>
         <footer class="bd-footer px-2 py-3 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 70px;">
             <div class="container-md">
                 <small>
@@ -395,6 +405,15 @@
                     <p class="mb-0" style="color: #58595B;">ⓒ 파란물결 블루무브</p>
                 </small>
             </div>
+            <script>
+                (function BrowserVersion() {
+                    let agent = navigator.userAgent.toLowerCase();
+                    console.log((agent.indexOf("trident") || agent.indexOf("msie")) !== -1)      
+                    if((agent.indexOf("trident") || agent.indexOf("msie")) !== -1) {
+                        document.body.innerHTML = '블루무브 닥스는 Internet Explorer를 지원하지 않습니다.<br>번거로우시겠지만 Chrome, Opera, Firefox, Safari, Edge, 기타 Chrome 기반 브라우저로 이용 부탁드립니다.';
+                    }
+                })();
+            </script>
         </footer>
     </body>
 
