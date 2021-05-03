@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from notice.models import *
 from .models import *
 from users.models import Profile
+from notice.models import Notice
+from box.models import Box
 
 
 def home(request):
@@ -16,7 +17,8 @@ def home(request):
         None
     # 회원가입 정보등록 끝
     all_noticies = Notice.objects.all().order_by('-id')
-    return render(request, 'home/home.html', {'all_noticies': all_noticies})
+    all_boxes = Box.objects.all().order_by('-id')
+    return render(request, 'home/home.html', {'all_noticies': all_noticies, 'all_boxes': all_boxes})
 
 
 def handler500(request):
