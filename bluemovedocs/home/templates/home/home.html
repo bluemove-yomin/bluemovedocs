@@ -1,103 +1,126 @@
 {% extends 'base.html' %}
 {% block title %} 블루무브 닥스 {% endblock %}
 {% block content %}
-{% include 'shared/_navbar4home.html' %}
+{% include 'shared/_navbar.html' %}
 <main>
-    <!-- Carousel -->
-    <div id="carouselControls" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <a href="#"><img src="/static/images/slide01.png" class="d-block w-100" alt="블루무브 닥스에 오신 것을 환영합니다."></a>
+    <div id="banner" class="container-md">
+        <!-- Carousel -->
+        <div id="carouselControls" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <a href="{% url 'help:main' %}"><img src="/static/images/slide01.png" class="lozad d-block w-100" alt="블루무브 닥스로 간편한 문서 작업을 경험하세요. 도움말로 이동하려면 클릭하세요."></a>
+                </div>
+                {% for notice in all_noticies %}
+                    {% if notice.image %}
+                        <div class="carousel-item">
+                            <a href="{% url 'notice:read' notice.id %}"><img data-src="{{ notice.image.url }}" class="lozad d-block w-100" alt="{{ notice.title }} 해당 공지사항으로 이동하려면 클릭하세요."></a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             </div>
-            {% for notice in all_noticies %}
-                {% if notice.image %}
-                    <div class="carousel-item">
-                        <a href="{% url 'notice:read' notice.id %}"><img data-src="{{ notice.image.url }}" class="lozad d-block w-100" alt="{{ notice.title }}"></a>
-                    </div>
-                {% endif %}
-            {% endfor %}
+            <a class="carousel-control-prev" href="#carouselControls" role="button" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">이전 슬라이드 보기</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselControls" role="button" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">다음 슬라이드 보기</span>
+            </a>
         </div>
-        <a class="carousel-control-prev" href="#carouselControls" role="button" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">이전 슬라이드 보기</span>
-        </a>
-        <a class="carousel-control-next" href="#carouselControls" role="button" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">다음 슬라이드 보기</span>
-        </a>
+        <script>
+            $(function() {
+                $(window).resize(function(){
+                    var width = window.innerWidth;
+                    if(width < 768){
+                        $('#banner').attr('class', '');
+                    } else {
+                        $('#banner').attr('class', 'container-md');
+                    }
+                }).resize();
+            });
+        </script>
     </div>
-
     <div class="px-2 px-md-5">
         <div class="container-md">
-            <div class="container-md px-0">
-                <div class="mt-4">
-                    <div class="row row-cols-1 row-cols-lg-3 g-4">
-                        <div class="col">
-                            <div class="shadow-sm h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="font-weight: 600; color: #58595B;">📢 공지사항</h5>
-                                    <div class="card-text d-grid gap-2">
-                                        {% for notice in all_noticies|slice:":5" %}
-                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                                {% if notice.category == 'bluemover' %}
-                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
-                                                {% elif notice.category == 'guest' %}
-                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
-                                                {% else %}
-                                                    알 수 없음
-                                                {% endif %}
-                                                <a href="{% url 'notice:read' notice.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ notice.title }}</a>
-                                            </div>
-                                        {% empty %}
-                                            <div class="text-center"><br><h4 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h4><p class="mb-4">공지사항이 없습니다.</p></div>
-                                        {% endfor %}
-                                    </div>
+            <div style="margin-top: 2rem;">
+                <div class="row row-cols-1 row-cols-lg-3 g-5">
+                    <div class="col">
+                        <div class="h-100">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'notice:main' %}"><h5 class="card-title" style="font-weight: 600; color: #58595B;">📢 공지사항</h5></a>
+                                    <a href="{% url 'notice:main' %}" style="margin-top: .02rem; color: #58595B;"><i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                <div class="card-text d-grid gap-2 border-top">
+                                    <span style="margin-bottom: .2rem!important;"></span>
+                                    {% for notice in all_noticies|slice:":5" %}
+                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                            {% if notice.category == 'bluemover' %}
+                                                <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                            {% elif notice.category == 'guest' %}
+                                                <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                            {% else %}
+                                                알 수 없음
+                                            {% endif %}
+                                            <a href="{% url 'notice:read' notice.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ notice.title }}</a>
+                                        </div>
+                                    {% empty %}
+                                        <div class="text-center"><br><h4 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h4><p class="mb-4">공지사항이 없습니다.</p></div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="col">
-                            <div class="shadow-sm h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="font-weight: 600; color: #58595B;">📁 문서함</h5>
-                                    <div class="card-text d-grid gap-2">
-                                        {% for box in all_boxes|slice:":5" %}
-                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                                {% if box.category == 'bluemover' %}
-                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
-                                                {% elif box.category == 'guest' %}
-                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
-                                                {% else %}
-                                                    알 수 없음
-                                                {% endif %}
-                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ box.title }}</a>
-                                            </div>
-                                        {% empty %}
-                                            <div class="text-center"><br><h4 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h4><p class="mb-4">문서함이 없습니다.</p></div>
-                                        {% endfor %}
-                                    </div>
+                    </div>
+                    <div class="col">
+                        <div class="h-100">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'box:main' %}"><h5 class="card-title" style="font-weight: 600; color: #58595B;">📁 문서함</h5></a>
+                                    <a href="{% url 'box:main' %}" style="margin-top: .02rem; color: #58595B;"><i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                <div class="card-text d-grid gap-2 border-top">
+                                    <span style="margin-bottom: .2rem!important;"></span>
+                                    {% for box in all_boxes|slice:":5" %}
+                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                            {% if box.category == 'bluemover' %}
+                                                <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                            {% elif box.category == 'guest' %}
+                                                <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                            {% else %}
+                                                알 수 없음
+                                            {% endif %}
+                                            <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ box.title }}</a>
+                                        </div>
+                                    {% empty %}
+                                        <div class="text-center"><br><h4 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h4><p class="mb-4">문서함이 없습니다.</p></div>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
-                        <div class="col">
-                            <div class="shadow-sm h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title" style="font-weight: 600; color: #58595B;">💡 헬프센터</h5>
-                                    <div class="card-text d-grid gap-2">
-                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                            <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">블루무브 닥스에 로그인하기</a>
-                                        </div>
-                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                            <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">블루무브 닥스에서 회원 정보 삭제하기</a>
-                                        </div>
-                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                            <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">공지사항 또는 문서함 업데이트 알림 받기</a>
-                                        </div>
-                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                            <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">공지사항 댓글에서 멘션하기</a>
-                                        </div>
-                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                            <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">새 문서 생성하기</a>
-                                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="h-100">
+                            <div class="card-body p-0">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'help:main' %}"><h5 class="card-title" style="font-weight: 600; color: #58595B;">👩‍🏫 도움말</h5></a>
+                                    <a href="{% url 'help:main' %}" style="margin-top: .02rem; color: #58595B;"><i class="fas fa-chevron-right"></i></a>
+                                </div>
+                                <div class="card-text d-grid gap-2 border-top">
+                                    <span style="margin-bottom: .2rem!important;"></span>
+                                    <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                        <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">블루무브 닥스에 로그인하기</a>
+                                    </div>
+                                    <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                        <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">블루무브 닥스에서 회원 정보 삭제하기</a>
+                                    </div>
+                                    <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                        <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">공지사항 또는 문서함 업데이트 알림 받기</a>
+                                    </div>
+                                    <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                        <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">공지사항 댓글에서 멘션하기</a>
+                                    </div>
+                                    <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                        <a href="" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">새 문서 생성하기</a>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +130,6 @@
             </div>
         </div>
     </div>
-
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script>
     <script>
         const observer = lozad();

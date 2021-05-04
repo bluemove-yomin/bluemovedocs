@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'home',
     'notice',
     'box',
+    'help',
     'django.contrib.sites',
     'allauth',
     'allauth.account',

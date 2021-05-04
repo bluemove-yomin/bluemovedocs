@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %} 문서함 | 블루무브 닥스 {% endblock %}
 {% block content %}
-{% include 'shared/_navbar4box.html' %}
+{% include 'shared/_navbar.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md my-5">
         <div class="d-flex align-items-sm-center justify-content-between">
@@ -29,7 +29,7 @@
             </a>
             <!-- Modal -->
             <div class="modal fade" id="listloginModal" tabindex="-1" aria-labelledby="listloginModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="listloginModalLabel" style="font-weight: 600;">🔑 로그인 필요</h5>
@@ -160,7 +160,7 @@
             <!-- Modal -->
             {% if created_valid_docs or submitted_valid_docs or rejected_valid_docs %}
                 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">😓 삭제 불가</h5>
@@ -177,7 +177,7 @@
                 </div>
             {% else %}
                 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="deleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
@@ -333,7 +333,7 @@
                     <!-- docRejectModal -->
                     <form action="{% url 'box:reject_doc' doc.id %}#docPosition" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <div class="modal fade" id="docRejectModal{{doc.id}}" tabindex="-1" aria-labelledby="docRejectLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title hide" id="docRejectModalLabel" style="font-weight: 600;">💥 반려 확인</h5>
@@ -371,7 +371,7 @@
                     <!-- docReturnModal -->
                     {% if doc.user.profile.level == 'bluemover' %}
                         <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title hide" id="docReturnModalLabel" style="font-weight: 600;">💼 승인 확인</h5>
@@ -405,7 +405,7 @@
                         </div>
                     {% else %}
                         <div class="modal fade" id="docReturnModal{{doc.id}}" tabindex="-1" aria-labelledby="docReturnLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title hide" id="docReturnModalLabel" style="font-weight: 600;">💥 반환 확인</h5>
@@ -537,7 +537,7 @@
                         </div>
                     {% elif box.deadline_is_over and doc.user.profile.level == 'bluemover' %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button class="container btn btn-primary" disabled>제출 불가</button>
+                            <button class="container btn btn-primary" disabled>⛔ 제출 불가</button>
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
@@ -546,7 +546,7 @@
                     {% endif %}
                     <!-- docSubmitModal -->
                     <div class="modal fade" id="docSubmitModal" tabindex="-1" aria-labelledby="docSubmitModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 {% if box.deadline_is_over %}
                                     <div class="modal-header">
@@ -589,7 +589,7 @@
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title hide" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
@@ -646,7 +646,7 @@
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title hide" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
@@ -700,7 +700,7 @@
                         </div>
                     {% elif box.deadline_is_over and doc.user.profile.level == 'bluemover' %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button class="container btn btn-primary" disabled>제출 불가</button>
+                            <button class="container btn btn-primary" disabled>⛔ 제출 불가</button>
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
@@ -709,7 +709,7 @@
                     {% endif %}
                     <!-- docSubmitModal -->
                     <div class="modal fade" id="docSubmitModal" tabindex="-1" aria-labelledby="docSubmitModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 {% if box.deadline_is_over %}
                                     <div class="modal-header">
@@ -752,7 +752,7 @@
                     </div>
                     <!-- docDeleteModal -->
                     <div class="modal fade" id="docDeleteModal" tabindex="-1" aria-labelledby="docDeleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title hide" id="docDeleteModalLabel" style="font-weight: 600;">💥 삭제 확인</h5>
@@ -826,7 +826,7 @@
                             </button>
                             <!-- docCreateModal -->
                             <div class="modal fade" id="docCreateModal" tabindex="-1" aria-labelledby="docCreateModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
+                                <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             {% if box.deadline_is_over %}

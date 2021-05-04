@@ -39,6 +39,9 @@
         <!-- Font Awesome -->
         <script src="https://kit.fontawesome.com/0675dc33e9.js" crossorigin="anonymous"></script>
 
+        <!-- XEIcon -->
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/xeicon@2.3.3/xeicon.min.css">
+
         <!-- Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
         <style>
@@ -222,8 +225,9 @@
                 border-color: #007DC5;
             }
             .btn-outline-primary.disabled, .btn-outline-primary:disabled {
-                font-weight: 600;
-                color: #FFFFFF;
+                color: #005C91;
+                background-color: #FFFFFF;
+                border-color: #005C91;
             }
 
             /* btn-outline-secondary */
@@ -239,8 +243,9 @@
                 border-color: #58595B;
             }
             .btn-outline-secondary.disabled, .btn-outline-secondary:disabled {
-                font-weight: 600;
-                color: #FFFFFF;
+                color: #58595B;
+                background-color: #FFFFFF;
+                border-color: #58595B;
             }
 
             /* btn-outline-danger */
@@ -251,8 +256,9 @@
                 border-color: #DC3545;
             }
             .btn-outline-danger.disabled, .btn-outline-danger:disabled {
-                font-weight: 600;
-                color: #FFFFFF;
+                color: #DC3545;
+                background-color: #FFFFFF;
+                border-color: #DC3545;
             }
 
             #carouselControls {
@@ -355,6 +361,16 @@
                 background-color: #007DC5;
                 border-color: #007DC5;
             }
+
+            /* accordion */
+            .accordion-button:not(.collapsed) {
+                font-weight: 600;
+                color: #212529;
+                background-color: #F0F0F0;
+            }
+            .accordion-button:not(.collapsed)::after {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+            }
         </style>
         <title>{% block title %} Override Here {% endblock %}</title>
     </head>
@@ -416,13 +432,31 @@
                 }
             })();
         </script>
-        <footer class="bd-footer px-2 py-3 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 70px;">
+        <!-- 내비게이션 바 버튼 active -->
+        <script>
+            (function navbarActive() {
+                var navbarNotice = document.querySelector("#navbarNotice");
+                var navbarBox = document.querySelector("#navbarBox");
+                var navbarHelp = document.querySelector("#navbarHelp");
+                if (document.querySelector("head > title").innerText.indexOf("공지사항") !== -1) {
+                    navbarNotice.setAttribute("class", "nav-link p-2 active")
+                } else if (document.querySelector("head > title").innerText.indexOf("문서함") !== -1) {
+                    navbarBox.setAttribute("class", "nav-link p-2 active")
+                } else if (document.querySelector("head > title").innerText.indexOf("도움말") !== -1) {
+                    navbarHelp.setAttribute("class", "nav-link p-2 active")
+                } else {
+                    
+                }
+            })();
+        </script>
+        <footer class="bd-footer px-2 py-4 p-md-5 bg-light text-center text-md-start" style="position: sticky; margin-top: 60px;">
             <div class="container-md">
                 <small>
                     <ul class="bd-footer-links ps-0 mb-3">
-                        <li class="d-inline-block"><a href="https://bluemove.or.kr:451" target="_blank">웹사이트</a></li>
-                        <li class="d-inline-block ms-3"><a href="https://blog.naver.com/bluewavebluemove" target="_blank">블로그</a></li>
-                        <li class="d-inline-block ms-3"><a href="https://fb.com/bwbluemove" target="_blank">페이스북</a></li>
+                        <li class="d-inline-block"><a href="https://bluemove.or.kr:451" target="_blank" style="color: #58595B;">웹사이트</a></li>
+                        <li class="d-inline-block ms-2"><a href="https://blog.naver.com/bluewavebluemove" target="_blank" style="color: #58595B;">블로그</a></li>
+                        <li class="d-inline-block ms-2"><a href="https://instagram.com/bwbluemove" target="_blank" style="color: #58595B;">인스타그램</a></li>
+                        <li class="d-inline-block ms-2"><a href="https://fb.com/bwbluemove" target="_blank" style="color: #58595B;">페이스북</a></li>
                     </ul>
                     <p class="mb-0" style="color: #58595B;">ⓒ 파란물결 블루무브</p>
                 </small>

@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %} 내 계정 | 블루무브 닥스 {% endblock %}
 {% block content %}
-{% include 'shared/_navbar4home.html' %}
+{% include 'shared/_navbar.html' %}
 <main class="px-2 px-md-5">
     <div class="container-md mt-5 table-responsive">
         <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">💙 내 계정</h1>
@@ -219,7 +219,7 @@
                 {% endif %}
                 <div class="container-md mt-5 p-0 d-grid gap-2 d-sm-flex justify-content-sm-end">
                     {% if my_boxes|length > 0 or my_docs_create or my_docs_submit or my_docs_reject %}
-                        <button type="button" class="btn btn-outline-danger" disabled>삭제 불가</button>
+                        <button type="button" class="btn btn-outline-danger" disabled>⛔ 삭제 불가</button>
                     {% else %}
                         <button type="submit" class="btn btn-outline-danger submit">삭제하기</button>
                     {% endif %}
