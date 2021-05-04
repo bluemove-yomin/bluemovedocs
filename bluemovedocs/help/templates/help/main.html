@@ -13,7 +13,7 @@
         {% endif %}
 
         <div class="container-md px-0">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            <div class="row row-cols-1 row-cols-lg-3 g-4">
                 <div class="col">
                     <div class="shadow-sm h-100">
                         <div class="card-body pb-0">
@@ -36,10 +36,6 @@
                                     </h2>
                                     <div id="account01" class="accordion-collapse collapse" aria-labelledby="account01Heading" data-bs-parent="#accordionFlushAccount">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <!-- <div class="callout callout-dark mt-0 mb-3">
-                                                <span style="font-weight: 600; color: #58595B;"><i class="fab fa-google"></i> Google 계정 이용 안내</span><br>
-                                                <small style="color: #6C757D;">블루무브 닥스를 이용하려면 Google 계정을 이용하세요. <a href="#">자세히 보기</a></small>
-                                            </div> -->
                                             <h5 style="font-weight: 600;">블루무버</h5>
                                             <p>
                                                 블루무버 계정<small>(예: example@bluemove.or.kr)</small>으로 로그인하세요.<br>
@@ -68,6 +64,7 @@
                                             <p>
                                                 첫 로그인 시 Google 계정 정보가 블루무브 닥스에 임시 저장됩니다.<br>
                                                 성과 이름, 휴대전화 번호를 입력하고 '등록하기' 버튼을 클릭하세요.<br>
+                                                회원 정보가 정상적으로 등록되면 블루무버에게는 Slack 알림이, 게스트에게는 이메일 알림이 전송됩니다.<br>
                                                 로그인을 취소하면 임시 저장된 Google 계정 정보가 삭제됩니다.
                                             </p>
                                             <p class="m-0">
@@ -109,7 +106,7 @@
                                                 '💙 내 계정'으로 이동한 다음 페이지 맨 밑에 있는 '삭제하기' 버튼을 클릭하세요.<br>
                                                 페이지 밑에서 '영구 삭제 확인' 입력 후 다시 '삭제하기' 버튼을 클릭하세요.<br>
                                                 회원 정보를 삭제하면 Google 계정 정보 및 해당 페이지에서 안내되는 모든 자료가 영구 삭제되며 복원할 수 없습니다.<br>
-                                                회원 정보가 정상적으로 삭제되면 블루무버에게는 Slack 알림이, 게스트에게는 블루무브 닥스에 등록했던 이메일 주소로 알림이 전송됩니다.
+                                                회원 정보가 정상적으로 삭제되면 블루무버에게는 Slack 알림이, 게스트에게는 이메일 알림이 전송됩니다.
                                             </p>
                                             <p class="m-0">
                                                 {% if user.is_authenticated %}
@@ -423,7 +420,119 @@
                     </div>
                 </div>
             </div>
+            <div class="mt-4">
+                <div class="row row-cols-1 row-cols-lg-1 g-4">
+                    <div class="col">
+                        <div class="shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-weight: 600; color: #58595B;">🏦 사무국 문의</h5>
+                                <p class="card-text pt-2">
+                                    <i class="xi-kakaotalk"></i> 카카오톡 <a href="https://pf.kakao.com/_tlSwxd">파란물결블루무브</a> 또는 <i class="xi-gmail"></i> 이메일 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 먼저 문의 부탁드립니다.<br><i class="xi-call"></i> 전화 <a href="tel:02-3296-0613">02-3296-0613</a>은 통화 연결이 어려울 수 있습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <script>
+            (function accordionActive() {
+                var account01 = document.querySelector("#account01Heading > span");
+                var account02 = document.querySelector("#account02Heading > span");
+                var account03 = document.querySelector("#account03Heading > span");
+                var account04 = document.querySelector("#account04Heading > span");
+                var account05 = document.querySelector("#account05Heading > span");
+                var account06 = document.querySelector("#account06Heading > span");
+                var notice01 = document.querySelector("#notice01Heading > span");
+                var notice02 = document.querySelector("#notice02Heading > span");
+                var notice03 = document.querySelector("#notice03Heading > span");
+                var notice04 = document.querySelector("#notice04Heading > span");
+                var notice05 = document.querySelector("#notice05Heading > span");
+                var notice06 = document.querySelector("#notice06Heading > span");
+                var box01 = document.querySelector("#box01Heading > span");
+                var box02 = document.querySelector("#box02Heading > span");
+                var box03 = document.querySelector("#box03Heading > span");
+                var box04 = document.querySelector("#box04Heading > span");
+                var box05 = document.querySelector("#box05Heading > span");
+                var box06 = document.querySelector("#box06Heading > span");
+                var box07 = document.querySelector("#box07Heading > span");
+                var box08 = document.querySelector("#box08Heading > span");
+                var box09 = document.querySelector("#box09Heading > span");
+                var box10 = document.querySelector("#box10Heading > span");
+                var box11 = document.querySelector("#box11Heading > span");
+                if (window.location.href.indexOf("#account01") !== -1) {
+                    account01.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#account01").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#account02") !== -1) {
+                    account02.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#account02").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#account03") !== -1) {
+                    account03.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#account03").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#account04") !== -1) {
+                    account04.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#account04").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#account05") !== -1) {
+                    account05.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#account05").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#account06") !== -1) {
+                    account06.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#account06").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#notice01") !== -1) {
+                    notice01.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#notice01").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#notice02") !== -1) {
+                    notice02.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#notice02").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#notice03") !== -1) {
+                    notice03.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#notice03").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#notice04") !== -1) {
+                    notice04.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#notice04").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#notice05") !== -1) {
+                    notice05.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#notice05").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#notice06") !== -1) {
+                    notice06.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#notice06").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box01") !== -1) {
+                    box01.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box01").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box02") !== -1) {
+                    box02.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box02").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box03") !== -1) {
+                    box03.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box03").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box04") !== -1) {
+                    box04.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box04").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box05") !== -1) {
+                    box05.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box05").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box06") !== -1) {
+                    box06.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box06").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box07") !== -1) {
+                    box07.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box07").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box08") !== -1) {
+                    box08.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box08").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box09") !== -1) {
+                    box09.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box09").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box10") !== -1) {
+                    box10.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box10").setAttribute("class", "accordion-collapse collapse show")
+                } else if (window.location.href.indexOf("#box11") !== -1) {
+                    box11.setAttribute("class", "accordion-button px-3");
+                    document.querySelector("#box11").setAttribute("class", "accordion-collapse collapse show")
+                } else {}
+            })();
+        </script>
 
     </div>
 </main>
