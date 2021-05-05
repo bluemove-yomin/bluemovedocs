@@ -289,7 +289,7 @@
         <script>
             $(document).on("keyup", "#title", function() {
                 $(this).val(
-                    $(this).val().replace(/[ \[\]{}()<>?|`~!@#$%^&*-_+=,.;:\"\\]/g,"")
+                    $(this).val().replace(/[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g, "")
                 );
             });
         </script>

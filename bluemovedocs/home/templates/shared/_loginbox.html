@@ -16,7 +16,7 @@
         <div class="d-flex justify-content-center mb-0 mt-4">
           {% for provider in socialaccount_providers %}
             {% if provider.name == 'Google' %}
-              <a href="{% provider_login_url provider.id process=process scope='https://www.googleapis.com/auth/drive, https://www.googleapis.com/auth/documents' auth_params='hd=bluemove.or.kr' %}" type="button" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-3" id="google-bluemover"><img src="/static/images/favicons/favicon-96x96.png" height="18">블루무버 계정으로 로그인</a>
+              <a href="{% provider_login_url provider.id process=process scope='https://www.googleapis.com/auth/drive, https://www.googleapis.com/auth/documents' auth_params='hd=bluemove.or.kr' %}" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-3" id="google-bluemover" style="cursor: pointer;"><img src="/static/images/favicons/favicon-96x96.png" height="18">블루무버 계정으로 로그인</a>
               <script type="text/javascript">
                   $(document).ready(function() {
                     $( "#google-bluemover" ).hover(
@@ -63,7 +63,7 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
         {% endif %}
         <div><input type="checkbox" name="remember" id="id_remember"> <label for="id_remember">아이디 저장</label></div>
-        <div class="d-flex justify-content-center"><button class="primaryAction btn shadow-sm bg-white rounded mt-0" style="width: 231.36px; height: 38px;" type="submit" id="login">로그인</button></div>
+        <div class="d-flex justify-content-center"><button class="primaryAction btn shadow-sm bg-white rounded mt-0" style="width: 231.36px; height: 38px; cursor: pointer;" type="submit" id="login">로그인</button></div>
         <script type="text/javascript">
           $(document).ready(function() {
           // executes when HTML-Document is loaded and DOM is ready
@@ -98,12 +98,12 @@
           <div class="d-flex justify-content-center mb-0 mt-4">
             {% for provider in socialaccount_providers %}
               {% if provider.name == 'Google' %}
-                <a href="{% provider_login_url provider.id process=process scope='https://www.googleapis.com/auth/drive, https://www.googleapis.com/auth/documents' auth_params='hd=bluemove.or.kr' %}" type="button" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-3" id="google-bluemover"><img src="/static/images/favicons/favicon-96x96.png" height="18">블루무버 계정으로 로그인</a>
+                <a href="{% provider_login_url provider.id process=process scope='https://www.googleapis.com/auth/drive, https://www.googleapis.com/auth/documents' auth_params='hd=bluemove.or.kr' %}" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-3" id="google-bluemover" style="cursor: pointer;"><img src="/static/images/favicons/favicon-96x96.png" height="18">블루무버 계정으로 로그인</a>
                 <script type="text/javascript">
                     $(document).ready(function() {
                       $( "#google-bluemover" ).hover(
                         function() {
-                          $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+                          $(this).addClass('shadow-lg'); 
                         }, function() {
                           $(this).removeClass('shadow-lg');
                         }
@@ -147,13 +147,13 @@
           <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
           {% endif %}
           <div><input type="checkbox" name="remember" id="id_remember"> <label for="id_remember">아이디 저장</label></div>
-          <div class="d-flex justify-content-center"><button class="primaryAction btn shadow-sm bg-white rounded mt-0" style="width: 231.36px; height: 38px;" type="submit" id="login">로그인</button></div>
+          <div class="d-flex justify-content-center"><button class="primaryAction btn shadow-sm bg-white rounded mt-0" style="width: 231.36px; height: 38px; cursor: pointer;" type="submit" id="login">로그인</button></div>
           <script type="text/javascript">
             $(document).ready(function() {
             // executes when HTML-Document is loaded and DOM is ready
               $( "#login" ).hover(
               function() {
-                  $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+                  $(this).addClass('shadow-lg'); 
               }, function() {
                   $(this).removeClass('shadow-lg');
               });
@@ -165,3 +165,14 @@
     </div>
   </div>
 </div>
+
+<!-- 카카오톡 인앱 브라우저 Google 계정 로그인 불가 안내 -->
+<script>
+  (function Kakaotalk() {
+    let agent = navigator.userAgent.toLowerCase();
+    console.log((agent.indexOf("kakaotalk")) !== -1)      
+    if((agent.indexOf("kakaotalk")) !== -1) {
+      alert("Google 보안 정책에 의해 카카오톡 인앱 브라우저에서는 Google 계정 로그인이 불가합니다.\n번거로우시겠지만 블루무브 닥스에 최적화된 Chrome으로 이용 부탁드립니다. 🙏")
+    }
+  })();
+</script>

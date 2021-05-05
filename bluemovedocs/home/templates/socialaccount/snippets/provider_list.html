@@ -6,7 +6,7 @@
 
 <!-- Google로 로그인 -->
 {% if provider.name == 'Google' %}
-<a href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}" type="button" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-3" id="google"><img src="/static/images/google.png" height="18">{{provider.name}} 계정으로 로그인</a>
+<a href="{% provider_login_url provider.id process=process scope=scope auth_params=auth_params %}" class="btn shadow-sm bg-white rounded d-inline-flex align-items-center gap-3" id="google" class="cursor: pointer;"><img src="/static/images/google.png" height="18">{{provider.name}} 계정으로 로그인</a>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -16,7 +16,7 @@
 
     $( "#google" ).hover(
     function() {
-        $(this).addClass('shadow-lg').css('cursor', 'pointer'); 
+        $(this).addClass('shadow-lg'); 
     }, function() {
         $(this).removeClass('shadow-lg');
     }

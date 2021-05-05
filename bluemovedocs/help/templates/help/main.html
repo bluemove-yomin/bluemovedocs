@@ -26,11 +26,11 @@
                                 <h5 class="card-title" style="font-weight: 600; color: #58595B;">💙 내 계정 도움말</h5>
                             {% endif %}
                         </div>
-                        <div class="card-body pt-0 px-0">
+                        <div class="card-body py-0 px-0">
                             <div class="accordion accordion-flush" id="accordionFlushAccount">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="account01Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#account01" aria-expanded="false" aria-controls="account01">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#account01" aria-expanded="false" aria-controls="account01">
                                             블루무브 닥스에 로그인하기
                                         </span>
                                     </h2>
@@ -38,113 +38,128 @@
                                         <div class="accordion-body" style="word-break: keep-all;">
                                             <h5 style="font-weight: 600;">블루무버</h5>
                                             <p>
-                                                블루무버 계정<small>(예: example@bluemove.or.kr)</small>으로 로그인하세요.<br>
-                                                개인 Google 계정<small>(예: example@gmail.com)</small>으로 '블루무버 로그인' 시 블루무브 닥스 서비스를 정상적으로 이용할 수 없습니다.
+                                                <b>🔐 로그인</b>에서 '블루무버 계정으로 로그인' 버튼을 클릭하세요.
                                             </p>
-                                            <p>
-                                                <a href="https://drive.google.com/drive/folders/0AJ7doCmZ41AkUk9PVA">Google Drive의 공유 드라이브</a>에 대한 권한이 없거나 <a href="http://bwbluemove.slack.com">Slack 파란물결 블루무브 워크스페이스</a>에 가입되어 있지 않을 경우 로그인이 불가합니다.<br>
-                                                로그인이 불가할 경우 테크 매니저에게 문의해주세요.
-                                            </p>
+                                            <small>
+                                                <ul>
+                                                    <li>블루무버 계정(예: example@bluemove.or.kr)으로 로그인하세요.</li>
+                                                    <li>블루무브의 <a href="https://drive.google.com/drive/folders/0AJ7doCmZ41AkUk9PVA">Google Drive 공유 드라이브</a>에 대한 액세스 권한이 있어야 합니다.</li>
+                                                    <li>블루무브의 <a href="http://bwbluemove.slack.com">Slack 워크스페이스</a>에 가입된 상태여야 합니다.</li>
+                                                    <li>블루무버 얼럼나이의 경우 게스트로 로그인해주시기 바랍니다.</li>
+                                                </ul>
+                                            </small>
+                                            <hr style="color: rgba(0,0,0,.5);">
                                             <h5 style="font-weight: 600;">게스트</h5>
-                                            <p class="m-0">
-                                                개인 Google 계정<small>(예: example@gmail.com)</small>으로 로그인하세요.<br>
-                                                회사나 학교에서 제공하는 Google Workspace 계정<small>(예: example@university.ac.kr)</small>은 허용되지 않습니다.
+                                            <p>
+                                                <b>🔐 로그인</b>에서 'Google 계정으로 로그인' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>개인 Google 계정(예: example@gmail.com)으로 로그인하세요.</li>
+                                                    <li>회사나 학교에서 제공하는 Google Workspace 계정(예: example@university.ac.kr)으로는 로그인할 수 없습니다.</li>
+                                                    <li>Google 계정이 없을 경우 <b><a href="https://accounts.google.com/signup/v2/webcreateaccount?flowName=GlifWebSignIn&flowEntry=SignUp">Google 계정 만들기</a></b>에서 새로 만들 수 있습니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="account02Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#account02" aria-expanded="false" aria-controls="account02">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#account02" aria-expanded="false" aria-controls="account02">
                                             회원 정보 등록하기
                                         </span>
                                     </h2>
                                     <div id="account02" class="accordion-collapse collapse" aria-labelledby="account01Heading" data-bs-parent="#accordionFlushAccount">
                                         <div class="accordion-body" style="word-break: keep-all;">
                                             <p>
-                                                첫 로그인 시 Google 계정 정보가 블루무브 닥스에 임시 저장됩니다.<br>
-                                                성과 이름, 휴대전화 번호를 입력하고 '등록하기' 버튼을 클릭하세요.<br>
-                                                회원 정보가 정상적으로 등록되면 블루무버에게는 Slack 알림이, 게스트에게는 이메일 알림이 전송됩니다.<br>
-                                                로그인을 취소하면 임시 저장된 Google 계정 정보가 삭제됩니다.
+                                                블루무브 닥스 첫 로그인 시 <b>🔐 로그인</b>에서 성과 이름, 휴대전화 번호를 입력하고 '등록하기' 버튼을 클릭하세요.<br>
                                             </p>
-                                            <p class="m-0">
-                                                성과 이름은 실명으로, 휴대전화 번호는 실제 사용 중인 번호로 입력하세요.<br>
-                                                회원 정보는 등록 이후 수정 가능합니다.
-                                            </p>
+                                            <small>
+                                                <ul>
+                                                    <li>성과 이름은 실명으로, 휴대전화 번호는 실제 사용 중인 번호를 입력하세요.</li>
+                                                    <li>회원 정보는 등록 이후에도 수정할 수 있습니다.</li>
+                                                    <li>회원 정보가 정상적으로 등록되면 블루무버에게는 Slack 메시지가, 게스트에게는 이메일이 발송됩니다.</li>
+                                                    <li>첫 로그인 시 로그인을 취소하면 블루무브 닥스에 임시 저장된 Google 계정 정보가 삭제됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="account03Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#account03" aria-expanded="false" aria-controls="account03">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#account03" aria-expanded="false" aria-controls="account03">
                                             회원 정보 수정하기
                                         </span>
                                     </h2>
                                     <div id="account03" class="accordion-collapse collapse" aria-labelledby="account03Heading" data-bs-parent="#accordionFlushAccount">
                                         <div class="accordion-body" style="word-break: keep-all;">
                                             <p>
-                                                '💙 내 계정'으로 이동한 다음 페이지 맨 밑에 있는 '수정하기' 버튼을 클릭하세요.<br>
-                                                회원 정보 등록 시 입력했던 정보<small>(성, 이름, 휴대전화 번호)</small>만 수정할 수 있습니다.
+                                                <b>💙 내 계정</b>에서 '수정하기' 버튼을 클릭하세요.
                                             </p>
-                                            <p class="m-0">
-                                                성과 이름은 실명으로, 휴대전화 번호는 실제 사용 중인 번호로 입력하세요.<br>
-                                                회원 정보는 언제든 수정할 수 있습니다.<br>
-                                                <small>(유효 문서가 존재할 경우 수정 불가하도록 업데이트될 예정입니다.)</small>
-                                            </p>
+                                            <small>
+                                                <ul>
+                                                    <li>이메일 주소는 수정할 수 없습니다.</li>
+                                                    <li>성과 이름은 실명으로, 휴대전화 번호는 실제 사용 중인 번호를 입력하세요.</li>
+                                                    <li>회원 정보는 유효 문서(예: 미제출 문서, 제출된 문서, 반려된 문서)가 존재하지 않는 한 언제든 수정할 수 있습니다.<br>(2021.05. 업데이트 예정)</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="account04Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#account04" aria-expanded="false" aria-controls="account04">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#account04" aria-expanded="false" aria-controls="account04">
                                             회원 정보 삭제하기
                                         </span>
                                     </h2>
                                     <div id="account04" class="accordion-collapse collapse" aria-labelledby="account04Heading" data-bs-parent="#accordionFlushAccount">
                                         <div class="accordion-body" style="word-break: keep-all;">
                                             <p>
-                                                '💙 내 계정'으로 이동한 다음 페이지 맨 밑에 있는 '삭제하기' 버튼을 클릭하세요.<br>
-                                                페이지 밑에서 '영구 삭제 확인' 입력 후 다시 '삭제하기' 버튼을 클릭하세요.<br>
-                                                회원 정보를 삭제하면 Google 계정 정보 및 해당 페이지에서 안내되는 모든 자료가 영구 삭제되며 복원할 수 없습니다.<br>
-                                                회원 정보가 정상적으로 삭제되면 블루무버에게는 Slack 알림이, 게스트에게는 이메일 알림이 전송됩니다.
+                                                <b>💙 내 계정</b>에서 '삭제하기' 버튼을 클릭하세요.
                                             </p>
-                                            <p class="m-0">
-                                                {% if user.is_authenticated %}
-                                                    단, {{ user.first_name }}님의 계정에 특정 정보가 남아 있을 경우 회원 정보 삭제가 불가할 수 있습니다.<br>
-                                                {% else %}
-                                                    단, 계정에 특정 정보가 남아 있을 경우 회원 정보 삭제가 불가할 수 있습니다.<br>
-                                                {% endif %}
-                                                이 경우 해당 페이지에서 제시되는 안내 사항을 따라주시기 바랍니다.
-                                            </p>
+                                            <small>
+                                                <ul>
+                                                    <li>블루무버의 경우 생성했던 문서함이 모두 삭제된 상태여야 합니다.</li>
+                                                    <li>게스트의 경우 유효 문서(예: 미제출 문서, 제출된 문서, 반려된 문서)가 존재하지 않는 상태여야 합니다.</li>
+                                                    <li>회원 정보 삭제 시 블루무브 닥스에 저장된 Google 계정 정보와 해당 계정을 통해 생성된 공지사항, 댓글이 함께 삭제됩니다.</li>
+                                                    <li>승인 및 반환된 문서는 회원 정보 삭제의 영향을 받지 않습니다.</li>
+                                                    <li>회원 정보가 정상적으로 삭제되면 블루무버에게는 Slack 메시지가, 게스트에게는 이메일이 발송됩니다.</li>
+                                                    <li>삭제된 회원 정보는 복원할 수 없습니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="account05Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#account05" aria-expanded="false" aria-controls="account05">
-                                            Google 계정 프로필 사진 변경하기
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#account05" aria-expanded="false" aria-controls="account05">
+                                            Google 계정 만들기
                                         </span>
                                     </h2>
                                     <div id="account05" class="accordion-collapse collapse" aria-labelledby="account05Heading" data-bs-parent="#accordionFlushAccount">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                블루무브 닥스는 Google 계정 정보 중 '공개 정보<small>(예: 성명, 이메일 주소, 프로필 사진)</small>'를 빌려 쓰는 것일 뿐, 해당 정보를 직접 변경할 수 있는 권한이 없습니다.<br>
-                                                프로필 사진 변경은 '<a href="https://myaccount.google.com/">Google 계정</a>'에서 가능합니다.
+                                            <p>
+                                                <b><a href="https://accounts.google.com/signup/v2/webcreateaccount?flowName=GlifWebSignIn&flowEntry=SignUp">Google 계정 만들기</a></b>에서 Google 계정을 새로 만들 수 있습니다.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>Google 계정이 없을 경우 블루무브 닥스를 이용할 수 없습니다.</li>
+                                                    <li>블루무버 활동회원의 경우 테크 매니저에게 문의해주시기 바랍니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="account06Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#account06" aria-expanded="false" aria-controls="account06">
-                                            Google 계정 만들기
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#account06" aria-expanded="false" aria-controls="account06">
+                                            Google 계정 프로필 사진 변경하기
                                         </span>
                                     </h2>
                                     <div id="account06" class="accordion-collapse collapse" aria-labelledby="account06Heading" data-bs-parent="#accordionFlushAccount">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                블루무브 닥스를 이용하려면 Google 계정이 반드시 필요합니다.<br>
-                                                '<a href="https://accounts.google.com/signup/v2/webcreateaccount?flowName=GlifWebSignIn&flowEntry=SignUp">Google 계정 만들기</a>'에서 새 계정을 만들 수 있습니다.
+                                            <p class="mb-0">
+                                                <b><a href="https://myaccount.google.com/">Google 계정</a></b>에서 Google 계정 프로필 사진을 변경할 수 있습니다.
                                             </p>
                                         </div>
                                     </div>
@@ -161,89 +176,127 @@
                                 <a href="{% url 'notice:main' %}" style="margin-top: .02rem; color: #58595B;"><i class="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
-                        <div class="card-body pt-0 px-0">
+                        <div class="card-body py-0 px-0">
                             <div class="accordion accordion-flush" id="accordionFlushNotice">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="notice01Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#notice01" aria-expanded="false" aria-controls="notice01">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#notice01" aria-expanded="false" aria-controls="notice01">
                                             공지사항 작성하기
                                         </span>
                                     </h2>
                                     <div id="notice01" class="accordion-collapse collapse" aria-labelledby="notice01Heading" data-bs-parent="#accordionFlushNotice">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>📢 공지사항</b>에서 '작성하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>이미지 크기는 반드시 1800 x 900이어야 합니다.</li>
+                                                    <li>'작성하기' 버튼은 블루무버에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="notice02Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#notice02" aria-expanded="false" aria-controls="notice02">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#notice02" aria-expanded="false" aria-controls="notice02">
                                             공지사항 수정하기
                                         </span>
                                     </h2>
                                     <div id="notice02" class="accordion-collapse collapse" aria-labelledby="notice02Heading" data-bs-parent="#accordionFlushNotice">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 공지사항 페이지</b>에서 '수정하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>이미지를 추가(또는 변경 및 삭제)하려면 '이미지 추가(또는 변경)하기' 버튼을 클릭하세요.</li>
+                                                    <li>'수정하기' 및 '이미지 추가(또는 변경)하기' 버튼은 작성자에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="notice03Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#notice03" aria-expanded="false" aria-controls="notice03">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#notice03" aria-expanded="false" aria-controls="notice03">
                                             공지사항에 이미지 추가하기
                                         </span>
                                     </h2>
                                     <div id="notice03" class="accordion-collapse collapse" aria-labelledby="notice03Heading" data-bs-parent="#accordionFlushNotice">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 공지사항 페이지</b>에서 '이미지 추가하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>이미지 크기는 반드시 1800 x 900이어야 합니다.</li>
+                                                    <li>'이미지 추가하기' 버튼은 작성자에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="notice04Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#notice04" aria-expanded="false" aria-controls="notice04">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#notice04" aria-expanded="false" aria-controls="notice04">
                                             공지사항 이미지 변경 및 삭제하기
                                         </span>
                                     </h2>
                                     <div id="notice04" class="accordion-collapse collapse" aria-labelledby="notice04Heading" data-bs-parent="#accordionFlushNotice">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 공지사항 페이지</b>에서 '이미지 변경하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>이미지 크기는 반드시 1800 x 900이어야 합니다.</li>
+                                                    <li>이미지를 삭제하려면 <b>이미지 변경 페이지</b>에서 아무것도 첨부하지 않은 채 '이미지 변경 등록하기' 버튼을 클릭하세요.</li>
+                                                    <li>'이미지 변경하기' 버튼은 작성자에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="notice05Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#notice05" aria-expanded="false" aria-controls="notice05">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#notice05" aria-expanded="false" aria-controls="notice05">
                                             공지사항 업데이트 시 알림 받기
                                         </span>
                                     </h2>
                                     <div id="notice05" class="accordion-collapse collapse" aria-labelledby="notice05Heading" data-bs-parent="#accordionFlushNotice">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>📢 공지사항</b> 또는 <b>해당 공지사항 페이지</b>에서 <i class="far fa-bookmark"></i>(북마크) 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>북마크에 있는 공지사항이 수정되면 블루무버에게는 Slack 메시지가, 게스트에게는 이메일이 발송됩니다.</li>
+                                                    <li>북마크에 있는 공지사항의 제목이 수정될 경우 수정 전 제목과 수정 후 제목을 모두 확인할 수 있습니다.</li>
+                                                    <li>공지사항에 댓글이 작성될 경우 작성자는 북마크 추가 여부와 관계없이 Slack 메시지 알림을 받을 수 있습니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="notice06Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#notice06" aria-expanded="false" aria-controls="notice06">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#notice06" aria-expanded="false" aria-controls="notice06">
                                             공지사항 댓글에서 멘션하기
                                         </span>
                                     </h2>
                                     <div id="notice06" class="accordion-collapse collapse" aria-labelledby="notice06Heading" data-bs-parent="#accordionFlushNotice">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 공지사항 페이지 댓글란</b>에서 멘션할 사람의 댓글을 찾아 '멘션하기'를 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>공지사항 댓글에서 멘션된 블루무버에게는 Slack 메시지가, 게스트에게는 이메일이 발송됩니다.</li>
+                                                    <li>멘션 대상은 해당 공지사항에 댓글을 작성한 사람으로 한정됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -259,176 +312,275 @@
                                 <a href="{% url 'box:main' %}" style="margin-top: .02rem; color: #58595B;"><i class="fas fa-chevron-right"></i></a>
                             </div>
                         </div>
-                        <div class="card-body pt-0 px-0">
+                        <div class="card-body py-0 px-0">
                             <div class="accordion accordion-flush" id="accordionFlushBox">
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box01Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box01" aria-expanded="false" aria-controls="box01">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box01" aria-expanded="false" aria-controls="box01">
                                             문서함 생성하기
                                         </span>
                                     </h2>
                                     <div id="box01" class="accordion-collapse collapse" aria-labelledby="box01Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>📁 문서함</b>에서 '생성하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>이미지는 본문에선 원본 비율로, 목록에선 2:1 비율로 표시되며 권장 크기는 1800 x 900입니다.</li>
+                                                    <li>'생성하기' 버튼은 블루무버에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box02Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box02" aria-expanded="false" aria-controls="box02">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box02" aria-expanded="false" aria-controls="box02">
                                             문서함 수정하기
                                         </span>
                                     </h2>
                                     <div id="box02" class="accordion-collapse collapse" aria-labelledby="box02Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지</b>에서 '수정하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>이미지를 추가(또는 변경 및 삭제)하려면 '이미지 추가(또는 변경)하기' 버튼을 클릭하세요.</li>
+                                                    <li>'수정하기' 및 '이미지 추가(또는 변경)하기' 버튼은 생성자(검토자)에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box03Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box03" aria-expanded="false" aria-controls="box03">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box03" aria-expanded="false" aria-controls="box03">
                                             문서함에 이미지 추가하기
                                         </span>
                                     </h2>
                                     <div id="box03" class="accordion-collapse collapse" aria-labelledby="box03Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지</b>에서 '이미지 추가하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>이미지는 본문에선 원본 비율로, 목록에선 2:1 비율로 표시되며 권장 크기는 1800 x 900입니다.</li>
+                                                    <li>'이미지 추가하기' 버튼은 생성자(검토자)에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box04Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box04" aria-expanded="false" aria-controls="box04">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box04" aria-expanded="false" aria-controls="box04">
                                             문서함 이미지 변경 및 삭제하기
                                         </span>
                                     </h2>
                                     <div id="box04" class="accordion-collapse collapse" aria-labelledby="box04Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지</b>에서 '이미지 변경하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>이미지는 본문에선 원본 비율로, 목록에선 2:1 비율로 표시되며 권장 크기는 1800 x 900입니다.</li>
+                                                    <li>이미지를 삭제하려면 <b>이미지 변경 페이지</b>에서 아무것도 첨부하지 않은 채 '이미지 변경 등록하기' 버튼을 클릭하세요.</li>
+                                                    <li>'이미지 변경하기' 버튼은 생성자(검토자)에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box05Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box05" aria-expanded="false" aria-controls="box05">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box05" aria-expanded="false" aria-controls="box05">
                                             문서함 업데이트 시 알림 받기
                                         </span>
                                     </h2>
                                     <div id="box05" class="accordion-collapse collapse" aria-labelledby="box05Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>📁 문서함</b> 또는 <b>해당 문서함 페이지</b>에서 <i class="far fa-bookmark"></i>(북마크) 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>북마크에 있는 문서함이 수정되면 블루무버에게는 Slack 메시지가, 게스트에게는 이메일이 발송됩니다.</li>
+                                                    <li>북마크에 있는 문서함의 기한이 수정될 경우 '일정 변경' 텍스트가 표시됩니다.</li>
+                                                    <li>문서함에 문서가 접수될 경우 생성자(검토자)는 북마크 추가 여부와 관계없이 Slack 메시지 알림을 받을 수 있습니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box06Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box06" aria-expanded="false" aria-controls="box06">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box06" aria-expanded="false" aria-controls="box06">
                                             문서 생성 및 작성하기
                                         </span>
                                     </h2>
                                     <div id="box06" class="accordion-collapse collapse" aria-labelledby="box06Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지 '내 문서'</b>에서 <i class="fas fa-file-medical"></i>(새 문서) 버튼 또는 <i class="fas fa-file-alt" aria-hidden="true"></i>(문서) 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>모바일 환경에서 문서를 작성하려면 Google Docs(또는 Google Sheets 및 Google Slides) 앱이 설치되어 있어야 합니다.</li>
+                                                    <li><i class="fas fa-file-medical"></i>(새 문서) 버튼은 대상자에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box07Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box07" aria-expanded="false" aria-controls="box07">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box07" aria-expanded="false" aria-controls="box07">
                                             문서 제출하기
                                         </span>
                                     </h2>
                                     <div id="box07" class="accordion-collapse collapse" aria-labelledby="box07Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <h5 style="font-weight: 600;">블루무버</h5>
+                                            <p>
+                                                <b>해당 문서함 페이지 '내 문서'</b>에서 '제출하기' 또는 '다시 제출하기' 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>문서 제출 시 해당 문서에 대한 수정 및 삭제 권한을 잃게 되며 조회 권한만 유지됩니다.</li>
+                                                    <li>문서가 정상적으로 제출되면 Slack 메시지가 발송됩니다.</li>
+                                                    <li>기한 초과 시 문서를 제출할 수 없습니다.</li>
+                                                </ul>
+                                            </small>
+                                            <hr style="color: rgba(0,0,0,.5);">
+                                            <h5 style="font-weight: 600;">게스트</h5>
+                                            <p>
+                                                <b>해당 문서함 페이지 '내 문서'</b>에서 '제출하기' 또는 '다시 제출하기' 버튼을 클릭하세요.
+                                            </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>문서 제출 시 해당 문서에 대한 수정 권한을 잃게 되며 조회 및 삭제 권한은 유지됩니다.</li>
+                                                    <li>문서가 정상적으로 제출되면 이메일이 발송됩니다.</li>
+                                                    <li>기한 초과 시 문서를 제출할 수 없으며 반환받기만 가능합니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box08Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box08" aria-expanded="false" aria-controls="box08">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box08" aria-expanded="false" aria-controls="box08">
                                             문서 삭제하기
                                         </span>
                                     </h2>
                                     <div id="box08" class="accordion-collapse collapse" aria-labelledby="box08Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <h5 style="font-weight: 600;">블루무버</h5>
+                                            <p>
+                                                <b>해당 문서함 페이지 '내 문서'</b>에서 <i class="fas fa-times"></i>(삭제) 버튼을 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>미제출 문서 및 반려된 문서만 삭제할 수 있습니다.</li>
+                                                    <li>승인된 문서는 블루무브 닥스에서 삭제할 수 없습니다.</li>
+                                                    <li>문서가 정상적으로 삭제되면 Slack 메시지가 발송됩니다.</li>
+                                                    <li>삭제된 문서는 복원할 수 없습니다.</li>
+                                                </ul>
+                                            </small>
+                                            <hr style="color: rgba(0,0,0,.5);">
+                                            <h5 style="font-weight: 600;">게스트</h5>
+                                            <p>
+                                                <b>해당 문서함 페이지 '내 문서'</b>에서 <i class="fas fa-times"></i>(삭제) 버튼을 클릭하세요.
+                                            </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>제출된 문서 삭제 시 제출 포기로 간주되며 해당 문서에 대한 모든 권한을 잃게 됩니다.</li>
+                                                    <li>반환된 문서는 블루무브 닥스에서 삭제할 수 없습니다.</li>
+                                                    <li>문서가 정상적으로 삭제되면 이메일이 발송됩니다.</li>
+                                                    <li>삭제된 문서는 복원할 수 없습니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box09Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box09" aria-expanded="false" aria-controls="box09">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box09" aria-expanded="false" aria-controls="box09">
                                             문서 검토하기
                                         </span>
                                     </h2>
                                     <div id="box09" class="accordion-collapse collapse" aria-labelledby="box09Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지 '미결재 문서'</b>에서 검토할 문서를 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>생성자(검토자)는 '문서함 정보' 콜아웃에서 총 문서 수를 확인할 수 있습니다.</li>
+                                                    <li>'미결재 문서'는 생성자(검토자)에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box10Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box10" aria-expanded="false" aria-controls="box10">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box10" aria-expanded="false" aria-controls="box10">
                                             문서 반려하기
                                         </span>
                                     </h2>
                                     <div id="box10" class="accordion-collapse collapse" aria-labelledby="box10Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지 '미결재 문서'</b>에서 반려할 문서를 찾아 '반려하기'를 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>생성자(검토자)가 입력한 반려 사유는 해당 문서 작성자(제출자)에게 전달됩니다.</li>
+                                                    <li>문서가 정상적으로 반려되면 생성자(검토자)와 블루무버 작성자(제출자)에게는 Slack 메시지가, 게스트 작성자(제출자)에게는 이메일이 발송됩니다.</li>
+                                                    <li>'미결재 문서'는 생성자(검토자)에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="box11Heading">
-                                        <span class="accordion-button collapsed px-3" type="button" style="word-break: keep-all;" data-bs-toggle="collapse" data-bs-target="#box11" aria-expanded="false" aria-controls="box11">
+                                        <span class="accordion-button collapsed px-3" style="word-break: keep-all; cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#box11" aria-expanded="false" aria-controls="box11">
                                             문서 승인 및 반환하기
                                         </span>
                                     </h2>
                                     <div id="box11" class="accordion-collapse collapse" aria-labelledby="box11Heading" data-bs-parent="#accordionFlushBox">
                                         <div class="accordion-body" style="word-break: keep-all;">
-                                            <p class="m-0">
-                                                준비 중입니다.
+                                            <p>
+                                                <b>해당 문서함 페이지 '미결재 문서'</b>에서 승인(또는 반환)할 문서를 찾아 '승인(또는 반환)하기'를 클릭하세요.
                                             </p>
+                                            <small>
+                                                <ul>
+                                                    <li>⏳(모래시계) 아이콘이 표시되면 브라우저를 닫지 말고 작업이 완료될 때까지 기다려주시기 바라며 60초 이내에 작업이 완료되지 않을 경우 새로고침 후 다시 시도해주시기 바랍니다.</li>
+                                                    <li>블루무버 작성자(제출자)의 문서 승인 시 해당 문서가 최종 디렉토리로 이동되며 문서에 대한 권한은 해당 공유 드라이브 또는 최종 디렉토리의 설정에 따르게 됩니다.</li>
+                                                    <li>게스트 작성자(제출자)의 문서 반환 시 생성자(검토자)는 해당 문서에 대한 모든 권한을 잃게 되고 작성자(제출자)는 수정 및 삭제 권한을 얻게 됩니다.</li>
+                                                    <li>문서가 정상적으로 승인(또는 반환)되면 생성자(검토자)와 블루무버 작성자(제출자)에게는 Slack 메시지가, 게스트 작성자(제출자)에게는 이메일이 발송됩니다.</li>
+                                                    <li>'미결재 문서'는 생성자(검토자)에게만 표시됩니다.</li>
+                                                </ul>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="mt-4">
-                <div class="row row-cols-1 row-cols-lg-1 g-4">
-                    <div class="col">
-                        <div class="shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title" style="font-weight: 600; color: #58595B;">🏦 사무국 문의</h5>
-                                <p class="card-text pt-2">
-                                    <i class="xi-kakaotalk"></i> 카카오톡 <a href="https://pf.kakao.com/_tlSwxd">파란물결블루무브</a> 또는 <i class="xi-gmail"></i> 이메일 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 먼저 문의 부탁드립니다.<br><i class="xi-call"></i> 전화 <a href="tel:02-3296-0613">02-3296-0613</a>은 통화 연결이 어려울 수 있습니다.
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -463,73 +615,73 @@
                 var box11 = document.querySelector("#box11Heading > span");
                 if (window.location.href.indexOf("#account01") !== -1) {
                     account01.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#account01").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#account01").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#account02") !== -1) {
                     account02.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#account02").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#account02").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#account03") !== -1) {
                     account03.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#account03").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#account03").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#account04") !== -1) {
                     account04.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#account04").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#account04").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#account05") !== -1) {
                     account05.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#account05").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#account05").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#account06") !== -1) {
                     account06.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#account06").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#account06").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#notice01") !== -1) {
                     notice01.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#notice01").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#notice01").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#notice02") !== -1) {
                     notice02.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#notice02").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#notice02").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#notice03") !== -1) {
                     notice03.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#notice03").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#notice03").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#notice04") !== -1) {
                     notice04.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#notice04").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#notice04").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#notice05") !== -1) {
                     notice05.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#notice05").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#notice05").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#notice06") !== -1) {
                     notice06.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#notice06").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#notice06").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box01") !== -1) {
                     box01.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box01").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box01").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box02") !== -1) {
                     box02.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box02").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box02").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box03") !== -1) {
                     box03.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box03").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box03").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box04") !== -1) {
                     box04.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box04").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box04").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box05") !== -1) {
                     box05.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box05").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box05").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box06") !== -1) {
                     box06.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box06").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box06").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box07") !== -1) {
                     box07.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box07").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box07").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box08") !== -1) {
                     box08.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box08").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box08").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box09") !== -1) {
                     box09.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box09").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box09").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box10") !== -1) {
                     box10.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box10").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box10").setAttribute("class", "accordion-collapse collapse show");
                 } else if (window.location.href.indexOf("#box11") !== -1) {
                     box11.setAttribute("class", "accordion-button px-3");
-                    document.querySelector("#box11").setAttribute("class", "accordion-collapse collapse show")
+                    document.querySelector("#box11").setAttribute("class", "accordion-collapse collapse show");
                 } else {}
             })();
         </script>

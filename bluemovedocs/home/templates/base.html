@@ -137,6 +137,13 @@
             main {
                 flex: 1;
             }
+            ul {
+                padding-left: 1.25rem;
+                margin-bottom: 0;
+            }
+            li {
+                margin-top: .25rem;
+            }
             a {
                 color: #007DC5;
                 text-decoration: none;
@@ -281,7 +288,7 @@
             .dropdown-item:hover {
                 font-weight: 600;
             }
-            .dropdown-item:focus {
+            .dropdown-item:focus, .dropdown-item:active {
                 font-weight: 600;
                 color: #FFFFFF;
                 background-color: #007DC5;
@@ -428,7 +435,7 @@
                 let agent = navigator.userAgent.toLowerCase();
                 console.log((agent.indexOf("trident") || agent.indexOf("msie")) !== -1)      
                 if((agent.indexOf("trident") || agent.indexOf("msie")) !== -1) {
-                    alert("블루무브 닥스는 Internet Explorer를 지원하지 않습니다.\n번거로우시겠지만 Chrome, Opera, Firefox, Safari, Edge, 기타 Chrome 기반 브라우저로 이용 부탁드립니다.")
+                    alert("블루무브 닥스는 Internet Explorer를 지원하지 않습니다.\n번거로우시겠지만 블루무브 닥스에 최적화된 Chrome으로 이용 부탁드립니다. 🙏")
                 }
             })();
         </script>
@@ -466,7 +473,7 @@
                     let agent = navigator.userAgent.toLowerCase();
                     console.log((agent.indexOf("trident") || agent.indexOf("msie")) !== -1)      
                     if((agent.indexOf("trident") || agent.indexOf("msie")) !== -1) {
-                        document.body.innerHTML = '블루무브 닥스는 Internet Explorer를 지원하지 않습니다.<br>번거로우시겠지만 Chrome, Opera, Firefox, Safari, Edge, 기타 Chrome 기반 브라우저로 이용 부탁드립니다.';
+                        document.body.innerHTML = '블루무브 닥스는 Internet Explorer를 지원하지 않습니다.<br>번거로우시겠지만 블루무브 닥스에 최적화된 Chrome으로 이용 부탁드립니다. 🙏';
                     }
                 })();
             </script>
