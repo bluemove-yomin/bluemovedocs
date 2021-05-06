@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
-{% block title %} 문서함 | 블루무브 닥스 {% endblock %}
+{% block meta %}
+    <meta name="robots" content="index,follow">
+    <meta name="description" content="{{ box.content | truncatechars:150 }}">
+    <meta name="subject" content="블루무브 닥스 문서함">
+    <meta property="og:url" content="{% url 'box:read' box.id %}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% if box.folder_prefix != None %}{{ box.folder_prefix }}_{{ box.title }}{% else %}{{ box.title }}{% endif %} | 블루무브 닥스">
+    <meta property="og:image" content="{% if box.image %}{{ box.image.url }}{% else %}https://docs.bluemove.or.kr/static/images/slide01.png{% endif %}">
+    <meta property="og:image:alt" content="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
+    <meta property="og:image:width" content="1800px">
+    <meta property="og:image:height" content="900px">
+    <meta property="og:description" content="{{ box.content | truncatechars:150 }}">
+    <meta property="og:site_name" content="블루무브 닥스">
+    <meta property="og:locale" content="ko_KR">
+{% endblock %}
+{% block title %} {% if box.folder_prefix != None %}{{ box.folder_prefix }}_{{ box.title }}{% else %}{{ box.title }}{% endif %} | 블루무브 닥스 {% endblock %}
 {% block content %}
 {% include 'shared/_navbar.html' %}
 <main class="px-2 px-md-5">

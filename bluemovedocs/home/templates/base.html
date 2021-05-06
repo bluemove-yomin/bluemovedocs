@@ -6,6 +6,12 @@
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="theme-color" content="#007DC5">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="keywords" content="블루무브 닥스, 파란물결 블루무브, 블루무브, 블루무버">
+        {% block meta %}
+            Override Here
+        {% endblock %}
 
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -384,7 +390,7 @@
 
     <body>
         {% block content %}
-        Override Here
+            Override Here
         {% endblock %}
         <!-- 외부 링크는 모두 새 탭으로 열기 -->
         <script>

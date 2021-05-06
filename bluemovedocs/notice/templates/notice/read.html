@@ -1,6 +1,20 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %} 공지사항 | 블루무브 닥스 {% endblock %}
+{% block meta %}
+    <meta name="robots" content="index,follow">
+    <meta name="description" content="{{ notice.content | truncatechars:150 }}">
+    <meta name="subject" content="블루무브 닥스 공지사항">
+    <meta property="og:url" content="{% url 'notice:read' notice.id %}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ notice.title }} | 블루무브 닥스">
+    <meta property="og:image" content="{% if notice.image %}{{ notice.image.url }}{% else %}https://docs.bluemove.or.kr/static/images/slide01.png{% endif %}">
+    <meta property="og:image:alt" content="이미지 내용은 아래 본문과 같으니 참고하시기 바랍니다.">
+    <meta property="og:image:width" content="1800px">
+    <meta property="og:image:height" content="900px">
+    <meta property="og:description" content="{{ notice.content | truncatechars:150 }}">
+    <meta property="og:site_name" content="블루무브 닥스">
+    <meta property="og:locale" content="ko_KR">
+{% endblock %}
+{% block title %} {{ notice.title }} | 블루무브 닥스 {% endblock %}
 {% block content %}
 {% include 'shared/_navbar.html' %}
 <main class="px-2 px-md-5">
