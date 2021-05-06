@@ -32,7 +32,7 @@
                 </h4>
                 <small>
                     {% for account in user.socialaccount_set.all %}
-                        {{ account.date_joined }} 가입
+                        {{ account.date_joined | date:"DATE_FORMAT" }} {{ account.date_joined | time:"a h:i" }} 가입
                     {% empty %}
                         사무국 공동 계정으로 로그인하셨군요!
                     {% endfor %}

@@ -19,17 +19,17 @@
 <main class="px-2 px-md-5">
     <div class="container-md mt-5 table-responsive">
         <h1 class="mb-4 pb-2" style="font-weight: 600; color: #58595B;">🔐 로그인</h1>
-        <div class="callout callout-dark hide01" style="word-break: break-word;">
+        <div class="callout callout-dark hide" style="word-break: break-word;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-user-edit"></i> 회원 정보 등록</span><br>
-            <small style="color: #6C757D;"><span id="user_email">{{ user.email }}</span> 계정 정보가 블루무브 닥스에 저장되었습니다. 계속하려면 실명과 휴대전화 번호를 등록하세요. 이 과정은 첫 로그인 시에만 진행됩니다.</small>
+            <small style="color: #6C757D;"><span id="user_email">{{ user.email }}</span> 계정 정보가 블루무브 닥스에 임시 저장되었습니다. 계속하려면 <mark style="background-color: #f8d7da; font-weight: 600;"><span id="remaining"></span>초 이내</mark>에 실명과 휴대전화 번호를 등록하세요. 이 과정은 첫 로그인 시에만 진행됩니다.</small>
         </div>
-        <div class="callout callout-warning mb-5 show01" style="word-break: break-word; display: none;">
+        <div class="callout callout-warning mb-5 show" style="word-break: break-word; display: none;">
             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 미허용 계정</span><br>
-            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace(구 G Suite) 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
+            <small style="color: #6C757D;">회사나 학교에서 제공하는 Google Workspace 계정은 이용할 수 없습니다. 블루무브 닥스에 저장된 {{ user.email }} 계정 정보를 삭제하려면 로그인을 취소하세요.</small>
         </div>
         <form action="{% url 'users:write_info' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="row g-2 mb-3 hide02">
+            <div class="row g-3 mb-3 hide">
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="last_name" id="last_name" placeholder="홍" value="{{ user.last_name }}" required>
@@ -45,16 +45,36 @@
                     </div>
                 </div>
             </div>
-            <div class="form-floating mb-5 hide03">
+            <div class="form-floating mb-5 hide">
                 <input type="tel" class="form-control" name="phone" id="phone" placeholder="010-1234-5678" minlength="13" maxlength="13" required>
                 <label for="phone">휴대전화 번호</label>
                 <div class="invalid-feedback">휴대전화 번호 11자리를 입력하세요. 숫자만 입력할 수 있습니다.</div>
             </div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
                 <button type="button" class="btn btn-outline-secondary" onclick="inProgress(); location.href='{% url 'users:login_cancelled_delete' user.id %}'; innerText='⏳ 로그인 취소하기';">로그인 취소하기</button>
-                <button type="submit" class="btn btn-outline-primary hide04 submit">등록하기</button>
+                <button type="submit" class="btn btn-outline-primary hide submit">등록하기</button>
             </div>
+            <script>
+                setInterval(function userdata_expired_button() {
+                    if (Date.now() >= {{ userdata_expired_datetime_ms }}) {
+                        document.querySelector(".submit").innerText = "⛔ 등록 불가";
+                        document.querySelector(".submit").disabled = true;
+                    }
+                    document.querySelector("#remaining").innerText = Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000));
+                    if (Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000)) == 0) {
+                        window.location.href="{% url 'users:login_cancelled_delete' user.id %}"
+                    }
+                }, 1000);
+            </script>
         </form>
+
+        <!-- 로그인 자동 취소 안내 -->
+        <script>
+            (function signUp() {
+                var user_email = document.querySelector("#user_email").innerText
+                alert("어서오세요! 👋\n" + user_email + " 계정의 블루무브 닥스 첫 로그인입니다.\n계속하려면 회원 정보를 등록하세요.\n\n{{ userdata_expired_datetime | date:'DATE_FORMAT' }} {{ userdata_expired_datetime | time:'a h:i:s' }}까지 회원 정보가 등록되지 않을 경우 자동으로 로그인이 취소됩니다.");
+            })();
+        </script>
 
         <!-- Forms Validation -->
         <script>
@@ -193,68 +213,68 @@
             if ( target.indexOf('bluemove.or.kr') !== -1 ) {
             }
             else if ( target.indexOf('.edu') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.ac.kr') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.hs.kr') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.ms.kr') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.go.kr') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.co.kr') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.or.kr') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else if ( target.indexOf('.org') !== -1 ) {
-                document.querySelector(".hide01").setAttribute("style", "display:none");
-                document.querySelector(".hide02").setAttribute("style", "display:none");
-                document.querySelector(".hide03").setAttribute("style", "display:none");
-                document.querySelector(".hide04").setAttribute("style", "display:none");
-                document.querySelector(".show01").setAttribute("style", "display:block");
-                document.querySelector(".show02").setAttribute("style", "display:block");
+                for (var i = 0; i < document.querySelectorAll(".hide").length; i++) {
+                    document.querySelectorAll(".hide")[i].setAttribute("style", "display:none");
+                }
+                for (var i = 0; i < document.querySelectorAll(".show").length; i++) {
+                    document.querySelectorAll(".show")[i].setAttribute("style", "display:block");
+                }
             }
             else {
             };

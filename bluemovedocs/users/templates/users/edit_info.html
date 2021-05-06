@@ -25,7 +25,7 @@
         </div>
         <form action="{% url 'users:edit_info' user.id %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
             {% csrf_token %}
-            <div class="row g-2 mb-3 hide02">
+            <div class="row g-3 mb-3 hide02">
                 <div class="col-md">
                     <div class="form-floating">
                         <input type="text" class="form-control" name="last_name" id="last_name" placeholder="홍" value="{{ user.last_name }}" required>

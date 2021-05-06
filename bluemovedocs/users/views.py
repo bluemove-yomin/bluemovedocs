@@ -18,6 +18,7 @@ import base64
 from slack_sdk import WebClient
 import string
 import random
+import datetime
 from django.conf import settings
 
 
@@ -67,6 +68,8 @@ def write_info(request, id):
     profile = Profile.objects.get(user=user)
     string_pool = string.ascii_letters + string.digits
     random_sub_id = ''
+    userdata_expired_datetime = user.date_joined + datetime.timedelta(minutes = 1)
+    userdata_expired_datetime_ms = int(userdata_expired_datetime.timestamp() * 1000)
     for i in range(9):
         random_sub_id += random.choice(string_pool)
     if user.is_superuser:
@@ -134,6 +137,9 @@ def write_info(request, id):
         except:
             user.delete()
             return redirect('users:login_cancelled_no_slack')
+        if datetime.datetime.now() >= userdata_expired_datetime:
+            user.delete()
+            return render(request, 'users/login_cancelled_delete.html')
         profile.level = 'bluemover'
         if request.method == "POST":
             user.last_name = request.POST.get("last_name")
@@ -190,6 +196,9 @@ def write_info(request, id):
             )
             return redirect('users:myaccount', user.id)
     elif 'gmail.com' in user.email or 'naver.com' in user.email or 'kakao.com' in user.email or 'daum.net' in user.email or 'hanmail.net' in user.email or 'nate.com' in user.email:
+        if datetime.datetime.now() >= userdata_expired_datetime:
+            user.delete()
+            return render(request, 'users/login_cancelled_delete.html')
         profile.level = 'guest'
         if request.method == "POST":
             user.last_name = request.POST.get("last_name")
@@ -571,11 +580,21 @@ def write_info(request, id):
     else:
         user.delete()
         return redirect('users:login_cancelled')
-    return render(request, 'users/write_info.html')
+    return render(request, 'users/write_info.html', {'userdata_expired_datetime': userdata_expired_datetime, 'userdata_expired_datetime_ms': userdata_expired_datetime_ms})
 
 
 @login_required
 def edit_info(request, id):
+    # 회원가입 정보등록 시작
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        if not profile.info_update_flag == True:
+            return redirect('users:write_info', request.user.id)
+        else:
+            None
+    else:
+        None
+    # 회원가입 정보등록 끝
     user = get_object_or_404(User, pk=id)
     profile = Profile.objects.get(user=user)
     if request.method == "POST":
@@ -590,6 +609,16 @@ def edit_info(request, id):
 
 @login_required
 def delete(request, id):
+    # 회원가입 정보등록 시작
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user=request.user)
+        if not profile.info_update_flag == True:
+            return redirect('users:write_info', request.user.id)
+        else:
+            None
+    else:
+        None
+    # 회원가입 정보등록 끝
     user = get_object_or_404(User, pk=id)
     my_notices = Notice.objects.filter(writer=user)
     my_comments = Comment.objects.filter(writer=user)
@@ -931,6 +960,7 @@ def delete(request, id):
         'my_docs_return': my_docs_return,
         'my_docs_delete': my_docs_delete
         })
+
 
 def login_cancelled(request):
     return render(request, 'users/login_cancelled.html')

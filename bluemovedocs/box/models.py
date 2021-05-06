@@ -6,7 +6,6 @@ import datetime
 from ckeditor.fields import RichTextField
 from allauth.socialaccount.models import SocialAccount
 from slack_sdk import WebClient
-import datetime
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from email.mime.text import MIMEText
