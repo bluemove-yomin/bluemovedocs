@@ -1,6 +1,11 @@
 {% load socialaccount %}
 {% get_providers as socialaccount_providers %}
 
+<div class="callout callout-dark" style="word-break: break-word;">
+  <span style="font-weight: 600; color: #58595B;"><i class="fab fa-google"></i> Google 계정 로그인 안내</span><br>
+  <small style="color: #6C757D;">블루무브 닥스를 이용하려면 Google 계정으로 로그인하세요. <a href="{% url 'help:main' %}#account01">도움말 보기</a></small>
+</div>
+
 <!-- #loginPageLarge -->
 <div class="card-group mt-3" id="loginPageLarge">
   <div class="card mb-sm-0">
@@ -11,7 +16,7 @@
       <div class="d-grid align-items-center">
         <p class="card-text m-0">블루무버 계정으로 로그인하세요.</p>
         <small class="align-middle mt-lg-3 mt-0" style="color: #6C757D;">
-          <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">블루무버 로그인 안내</span>: 공유 드라이브 권한 소유자, Slack 가입자만 블루무버 로그인이 가능합니다.<br>
+          <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">블루무버 로그인 안내</span>: 공유 드라이브 권한 소유자, Slack 워크스페이스 가입자만 로그인 가능합니다.<br>
         </small>
         <div class="d-flex justify-content-center mb-0 mt-4">
           {% for provider in socialaccount_providers %}
@@ -42,7 +47,7 @@
       <div class="d-grid align-items-center">
         <p class="card-text m-0">개인 Google 계정으로 로그인하세요.</p>
         <small class="align-middle mt-lg-3 mt-0" style="color: #6C757D;">
-          <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">게스트 로그인 안내</span>: 회사나 학교에서 제공하는 Google Workspace(구 G Suite) 계정은 이용할 수 없습니다.<br>
+          <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">게스트 로그인 안내</span>: 회사나 학교에서 제공하는 Google Workspace 계정으로는 로그인할 수 없습니다.<br>
         </small>
         <div class="d-flex justify-content-center mb-0 mt-4">{% include "socialaccount/snippets/provider_list.html" with process="login" %}</div>
       </div>
@@ -93,7 +98,7 @@
         <div class="d-grid align-items-center">
           <p class="card-text m-0">블루무버 계정으로 로그인하세요.</p>
           <small class="align-middle mt-lg-3 mt-0" style="color: #6C757D;">
-            <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">블루무버 로그인 안내</span>: 공유 드라이브 권한 소유자, Slack 가입자만 블루무버 로그인이 가능합니다.<br>
+            <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">블루무버 로그인 안내</span>: 공유 드라이브 권한 소유자, Slack 워크스페이스 가입자만 로그인 가능합니다.<br>
           </small>
           <div class="d-flex justify-content-center mb-0 mt-4">
             {% for provider in socialaccount_providers %}
@@ -124,7 +129,7 @@
         <div class="d-grid align-items-center">
           <p class="card-text m-0">개인 Google 계정으로 로그인하세요.</p>
           <small class="align-middle mt-lg-3 mt-0" style="color: #6C757D;">
-            <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">게스트 로그인 안내</span>: 회사나 학교에서 제공하는 Google Workspace(구 G Suite) 계정은 이용할 수 없습니다.<br>
+            <i class="fas fa-info-circle"></i> <span style="font-weight: 600;">게스트 로그인 안내</span>: 회사나 학교에서 제공하는 Google Workspace 계정으로는 로그인할 수 없습니다.<br>
           </small>
           <div class="d-flex justify-content-center mb-0 mt-4">{% include "socialaccount/snippets/provider_list.html" with process="login" %}</div>
         </div>

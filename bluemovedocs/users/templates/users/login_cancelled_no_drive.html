@@ -14,14 +14,9 @@
   {% providers_media_js %}
 
   <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 공유 드라이브 권한 필요</span><br>
-    <small>로그인이 거부되었습니다. 블루무브 닥스를 이용하려면 테크 매니저에게 공유 드라이브 권한을 요청하세요. <a href="{% url 'help:main' %}#account01">도움말 보기</a></small>
+    <span style="font-weight: 600; color: #58595B;"><i class="fab fa-google-drive"></i> 공유 드라이브 권한 필요</span><br>
+    <small>로그인이 거부되었습니다. 블루무브 닥스를 이용하려면 테크 매니저에게 Google Drive 공유 드라이브 권한을 요청하세요. <a href="{% url 'help:main' %}#account01">도움말 보기</a></small>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-
-  <div class="callout callout-dark" style="word-break: break-word;">
-    <span style="font-weight: 600; color: #58595B;"><i class="fab fa-google"></i> Google 계정 이용 안내</span><br>
-    <small style="color: #6C757D;">블루무브 닥스를 이용하려면 Google 계정을 이용하세요. <a href="{% url 'help:main' %}#account01">도움말 보기</a></small>
   </div>
 
   {% include 'shared/_loginbox.html' %}
