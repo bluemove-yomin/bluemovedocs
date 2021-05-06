@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
-{% load static %}
+{% block meta %}
+    <meta name="description" content="블루무브 닥스의 로그인 페이지입니다.">
+    <meta name="subject" content="블루무브 닥스 로그인">
+    <meta property="og:url" content="{% url 'account_login' %}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="로그인 | 블루무브 닥스">
+    <meta property="og:image" content="https://docs.bluemove.or.kr/static/images/slide01.png">
+    <meta property="og:image:alt" content="전자문서관리플랫폼 블루무브 닥스">
+    <meta property="og:image:width" content="1800px">
+    <meta property="og:image:height" content="900px">
+    <meta property="og:description" content="블루무브 닥스의 로그인 페이지입니다.">
+    <meta property="og:site_name" content="블루무브 닥스">
+    <meta property="og:locale" content="ko_KR">
+{% endblock %}
 {% block title %} 로그인 | 블루무브 닥스 {% endblock %}
 {% block content %}
 {% include 'shared/_navbar4writeinfo.html' %}
