@@ -1414,7 +1414,7 @@ def delete_doc(request, doc_id):
                                                                         align="center"
                                                                         class="mcnButtonBlockInner">
                                                                         <a
-                                                                            href="http://docs.bluemove.or.kr/"
+                                                                            href="https://docs.bluemove.or.kr/"
                                                                             target="_blank"
                                                                             style="text-decoration:none;">
                                                                             <table
@@ -1434,7 +1434,7 @@ def delete_doc(request, doc_id):
                                                                                             <a
                                                                                                 class="mcnButton"
                                                                                                 title="블루무브 닥스 열기"
-                                                                                                href="http://docs.bluemove.or.kr/"
+                                                                                                href="https://docs.bluemove.or.kr/"
                                                                                                 target="_blank"
                                                                                                 style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 열기</a>
                                                                                         </td>
@@ -1757,7 +1757,7 @@ def delete_doc(request, doc_id):
                                                                         align="center"
                                                                         class="mcnButtonBlockInner">
                                                                         <a
-                                                                            href="http://docs.bluemove.or.kr/"
+                                                                            href="https://docs.bluemove.or.kr/"
                                                                             target="_blank"
                                                                             style="text-decoration:none;">
                                                                             <table
@@ -1777,7 +1777,7 @@ def delete_doc(request, doc_id):
                                                                                             <a
                                                                                                 class="mcnButton"
                                                                                                 title="블루무브 닥스 열기"
-                                                                                                href="http://docs.bluemove.or.kr/"
+                                                                                                href="https://docs.bluemove.or.kr/"
                                                                                                 target="_blank"
                                                                                                 style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 열기</a>
                                                                                         </td>
@@ -1914,7 +1914,7 @@ def delete_doc(request, doc_id):
                                         "text": "문서함 열기"
                                     },
                                     "value": "open_box",
-                                    "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                                    "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                                 }
                             ]
                         }
@@ -1978,7 +1978,7 @@ def delete_doc(request, doc_id):
                                     "text": "문서함 열기"
                                 },
                                 "value": "open_box",
-                                "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                             }
                         ]
                     }
@@ -2097,138 +2097,404 @@ def submit_doc(request, doc_id):
             )
         except:
             None
-        slack = client.chat_postMessage(
-            channel = doc.box.channel_id,
-            link_names = True,
-            as_user = True,
-            blocks = [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
-                    },
-                    "accessory": {
-                        "type": "image",
-                        "image_url": doc.avatar_src,
-                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                    }
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Google 문서 열기"
-                            },
-                            "style": "primary",
-                            "value": "open_doc",
-                            "url": "https://docs.google.com/document/d/" + doc.file_id
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "문서함 열기"
-                            },
-                            "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+        if 'document' in doc.box.document_mimetype:
+            slack = client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
                         }
-                    ]
-                }
-            ],
-            text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
-        )
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Docs 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/document/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
+            )
+        elif 'spreadsheet' in doc.box.document_miemtype:
+            slack = client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Sheets 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
+            )
+        else:
+            slack = client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Slides 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/presentation/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
+            )
         doc.slack_ts = slack['ts']
         # 09. OUTSIDE 클라이언트 슬랙 메시지 발신
-        client.chat_postMessage(
-            channel = doc.user.profile.slack_user_id,
-            link_names = True,
-            as_user = True,
-            blocks = [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + "' 제출됨",
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 제출되었습니다."
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
-                    },
-                    "accessory": {
-                        "type": "image",
-                        "image_url": doc.avatar_src,
-                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                    }
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Google 문서 열기"
-                            },
-                            "style": "primary",
-                            "value": "open_doc",
-                            "url": "https://docs.google.com/document/d/" + doc.file_id
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "문서함 열기"
-                            },
-                            "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+        if 'document' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + "' 제출됨",
                         }
-                    ]
-                }
-            ],
-            text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 제출됨",
-        )
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 제출되었습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Docs 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/document/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 제출됨",
+            )
+        elif 'spreadsheet' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + "' 제출됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 제출되었습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Sheets 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 제출됨",
+            )
+        else:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + "' 제출됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 제출되었습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Slides 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/presentation/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 제출됨",
+            )
         doc.save()
         return redirect('box:read', id=doc.box.id)
     ###########################################
@@ -2563,7 +2829,7 @@ def submit_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                        href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -2583,7 +2849,7 @@ def submit_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                                            href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -2905,7 +3171,7 @@ def submit_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                        href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -2925,7 +3191,7 @@ def submit_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                                            href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -3018,7 +3284,74 @@ def submit_doc(request, doc_id):
             )
         except:
             None
-        slack = client.chat_postMessage(
+        if 'document' in doc.box.document_mimetype:
+            slack = client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "' 접수됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*Google 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Docs 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/document/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "' 접수됨",
+            )
+        elif 'spreadsheet' in doc.box.document_mimetype:
+            slack = client.chat_postMessage(
             channel = doc.box.channel_id,
             link_names = True,
             as_user = True,
@@ -3063,11 +3396,11 @@ def submit_doc(request, doc_id):
                             "type": "button",
                             "text": {
                                 "type": "plain_text",
-                                "text": "Google 문서 열기"
+                                "text": "Google Sheets 열기"
                             },
                             "style": "primary",
                             "value": "open_doc",
-                            "url": "https://docs.google.com/document/d/" + doc.file_id
+                            "url": "https://docs.google.com/spreadsheets/d/" + doc.file_id
                         },
                         {
                             "type": "button",
@@ -3076,7 +3409,73 @@ def submit_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                        }
+                    ]
+                }
+            ],
+            text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "' 접수됨",
+        )
+        else:
+            slack = client.chat_postMessage(
+            channel = doc.box.channel_id,
+            link_names = True,
+            as_user = True,
+            blocks = [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "' 접수됨",
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님, " + doc.user.last_name + doc.user.first_name + "님이 제출한 문서를 확인하세요."
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*Google 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date
+                    },
+                    "accessory": {
+                        "type": "image",
+                        "image_url": doc.avatar_src,
+                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                    }
+                },
+                {
+                    "type": "actions",
+                    "elements": [
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "Google Slides 열기"
+                            },
+                            "style": "primary",
+                            "value": "open_doc",
+                            "url": "https://docs.google.com/presentation/d/" + doc.file_id
+                        },
+                        {
+                            "type": "button",
+                            "text": {
+                                "type": "plain_text",
+                                "text": "문서함 열기"
+                            },
+                            "value": "open_box",
+                            "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -3231,7 +3630,7 @@ def reject_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -3239,71 +3638,204 @@ def reject_doc(request, doc_id):
             text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
         )
         # 09. OUTSIDE 클라이언트 슬랙 메시지 발신
-        client.chat_postMessage(
-            channel = doc.user.profile.slack_user_id,
-            link_names = True,
-            as_user = True,
-            blocks = [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 반려되었습니다.\n반려 사유를 해소하여 " + str(doc.box.deadline) + " 이내에 다시 제출해주시기 바랍니다."
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*반려일:* " + doc.rejection_date + "\n*반려 사유:*\n" + doc.reject_reason
-                    },
-                    "accessory": {
-                        "type": "image",
-                        "image_url": doc.avatar_src,
-                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                    }
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Google 문서 열기"
-                            },
-                            "style": "primary",
-                            "value": "open_doc",
-                            "url": "https://docs.google.com/document/d/" + doc.file_id
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "문서함 열기"
-                            },
-                            "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+        if 'document' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
                         }
-                    ]
-                }
-            ],
-            text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
-        )
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 반려되었습니다.\n반려 사유를 해소하여 " + str(doc.box.deadline) + " 이내에 다시 제출해주시기 바랍니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*반려일:* " + doc.rejection_date + "\n*반려 사유:*\n" + doc.reject_reason
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Docs 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/document/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
+            )
+        elif 'spreadsheet' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 반려되었습니다.\n반려 사유를 해소하여 " + str(doc.box.deadline) + " 이내에 다시 제출해주시기 바랍니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*반려일:* " + doc.rejection_date + "\n*반려 사유:*\n" + doc.reject_reason
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Sheets 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
+            )
+        else:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 반려되었습니다.\n반려 사유를 해소하여 " + str(doc.box.deadline) + " 이내에 다시 제출해주시기 바랍니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*반려일:* " + doc.rejection_date + "\n*반려 사유:*\n" + doc.reject_reason
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Slides 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/presentation/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
+            )
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -3635,7 +4167,7 @@ def reject_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                        href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -3655,7 +4187,7 @@ def reject_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                                            href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -3979,7 +4511,7 @@ def reject_doc(request, doc_id):
                                                                     align="center"
                                                                     class="mcnButtonBlockInner">
                                                                     <a
-                                                                        href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                        href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                         target="_blank"
                                                                         style="text-decoration:none;">
                                                                         <table
@@ -3999,7 +4531,7 @@ def reject_doc(request, doc_id):
                                                                                         <a
                                                                                             class="mcnButton"
                                                                                             title="블루무브 닥스 문서함 열기"
-                                                                                            href="http://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
+                                                                                            href="https://docs.bluemove.or.kr/box/""" + str(doc.box.id) + """/"
                                                                                             target="_blank"
                                                                                             style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                     </td>
@@ -4141,7 +4673,7 @@ def reject_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
@@ -4276,137 +4808,403 @@ def return_doc(request, doc_id):
             )
         except:
             None
-        client.chat_postMessage(
-            channel = doc.box.channel_id,
-            link_names = True,
-            as_user = True,
-            blocks = [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님이 " + doc.user.last_name + doc.user.first_name + "님의 문서를 아래와 같이 승인했습니다."
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
-                    },
-                    "accessory": {
-                        "type": "image",
-                        "image_url": doc.avatar_src,
-                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                    }
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Google 문서 열기"
-                            },
-                            "style": "primary",
-                            "value": "open_doc",
-                            "url": "https://docs.google.com/document/d/" + doc.file_id
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "문서함 열기"
-                            },
-                            "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+        if 'document' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
                         }
-                    ]
-                }
-            ],
-            text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
-        )
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님이 " + doc.user.last_name + doc.user.first_name + "님의 문서를 아래와 같이 승인했습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Docs 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/document/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+            )
+        elif 'spreadsheet' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님이 " + doc.user.last_name + doc.user.first_name + "님의 문서를 아래와 같이 승인했습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Sheets 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+            )
+        else:
+            client.chat_postMessage(
+                channel = doc.box.channel_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.box.writer.email.replace('@bluemove.or.kr', '').lower() + ">님이 " + doc.user.last_name + doc.user.first_name + "님의 문서를 아래와 같이 승인했습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Slides 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/presentation/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+            )
         # 08. OUTSIDE 클라이언트 슬랙 메시지 발신
-        client.chat_postMessage(
-            channel = doc.user.profile.slack_user_id,
-            link_names = True,
-            as_user = True,
-            blocks = [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 승인되었습니다."
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
-                    },
-                    "accessory": {
-                        "type": "image",
-                        "image_url": doc.avatar_src,
-                        "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
-                    }
-                },
-                {
-                    "type": "actions",
-                    "elements": [
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "Google 문서 열기"
-                            },
-                            "style": "primary",
-                            "value": "open_doc",
-                            "url": "https://docs.google.com/document/d/" + doc.file_id
-                        },
-                        {
-                            "type": "button",
-                            "text": {
-                                "type": "plain_text",
-                                "text": "문서함 열기"
-                            },
-                            "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+        if 'document' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
                         }
-                    ]
-                }
-            ],
-            text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
-        )
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 승인되었습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Docs 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/document/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+            )
+        elif 'spreadsheet' in doc.box.document_mimetype:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 승인되었습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Sheets 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+            )
+        else:
+            client.chat_postMessage(
+                channel = doc.user.profile.slack_user_id,
+                link_names = True,
+                as_user = True,
+                blocks = [
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "<@" + doc.user.email.replace('@bluemove.or.kr', '').lower() + ">님의 문서가 아래와 같이 승인되었습니다."
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "```파일 ID: " + doc.file_id + "\n파일명: " + doc.name + "```"
+                        }
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": "*블루무버 계정:*\n" +  doc.user.email + "\n*생성일:* " + doc.creation_date + "\n*제출일:* " + doc.submission_date + "\n*승인일:* " + doc.return_date
+                        },
+                        "accessory": {
+                            "type": "image",
+                            "image_url": doc.avatar_src,
+                            "alt_text": doc.user.last_name + doc.user.first_name + "님의 프로필 사진"
+                        }
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "Google Slides 열기"
+                                },
+                                "style": "primary",
+                                "value": "open_doc",
+                                "url": "https://docs.google.com/presentation/d/" + doc.file_id
+                            },
+                            {
+                                "type": "button",
+                                "text": {
+                                    "type": "plain_text",
+                                    "text": "문서함 열기"
+                                },
+                                "value": "open_box",
+                                "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            }
+                        ]
+                    }
+                ],
+                text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
+            )
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -5250,7 +6048,7 @@ def return_doc(request, doc_id):
                                 "text": "문서함 열기"
                             },
                             "value": "open_box",
-                            "url": "http://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
+                            "url": "https://docs.bluemove.or.kr/box/" + str(doc.box.id) + "/#docPosition"
                         }
                     ]
                 }
