@@ -388,9 +388,9 @@
                                                 <div class="invalid-feedback">반려 사유를 입력하세요.</div>
                                             </div>
                                             {% if doc.user.profile.level == 'bluemover' %}
-                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 작성자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
                                             {% else %}
-                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
+                                                문서 반려 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 작성자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 권한을 얻게 됩니다.<br>정말 반려하시겠습니까?<br><br>
                                             {% endif %}
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> {{ doc.user.last_name }}{{ doc.user.first_name }}님에게 반려 사유가 전달됩니다.</small>
                                         </span>
@@ -453,7 +453,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <span class="hide">
-                                            문서 반환 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 제출자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
+                                            문서 반환 시<br>✔ 검토자 {{ box.writer.last_name }}{{ box.writer.first_name }}님은 문서에 대한 모든 권한을 잃게 되고<br>✔ 작성자 {{ doc.user.last_name }}{{ doc.user.first_name }}님은 수정 및 삭제 권한을 얻게 됩니다.<br>정말 반환하시겠습니까?<br><br>
                                             <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 최종 검토가 끝난 문서만 반환하세요.</small>
                                         </span>
                                         <span class="show02" style="display: none;">
