@@ -268,6 +268,7 @@ def create_doc(request, id):
             drive_service = build('drive', 'v3', credentials=credentials)
             docs_service = build('docs', 'v1', credentials=credentials)
             sheets_service = build('sheets', 'v4', credentials=credentials)
+            slides_service = build('slides', 'v1', credentials=credentials)
             try:
                 drive_response = drive_service.drives().list().execute()
             except:
@@ -373,7 +374,40 @@ def create_doc(request, id):
                     }
                 ).execute()
             else:
-                None
+                slides_service.presentations().batchUpdate(
+                    presentationId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-name}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-phone}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-email}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                                }
+                            }
+                        ]
+                    }
+                ).execute()
             # 07. OUTSIDE 클라이언트 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId = file_id,
@@ -410,6 +444,7 @@ def create_doc(request, id):
             drive_service = build('drive', 'v3', credentials=credentials)
             docs_service = build('docs', 'v1', credentials=credentials)
             sheets_service = build('sheets', 'v4', credentials=credentials)
+            slides_service = build('slides', 'v1', credentials=credentials)
             # 02. 서비스 계정 My Drive 내 템플릿 문서 생성(복사)
             application_id = box.document_id ##### 템플릿 문서 ID INPUT #####
             drive_response = drive_service.files().copy(
@@ -492,7 +527,40 @@ def create_doc(request, id):
                     }
                 ).execute()
             else:
-                None
+                slides_service.presentations().batchUpdate(
+                    presentationId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-name}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-phone}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-email}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                                }
+                            }
+                        ]
+                    }
+                ).execute()
             # 04. 서비스 계정 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId=file_id,
