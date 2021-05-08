@@ -116,10 +116,10 @@ def write(request):
             folders_list_H.append(tuple((folder_id, folder_name)))
     drive_response = drive_service.files().list(
         corpora='allDrives',
-        fields="files(id, name)",
+        fields="files(id, name, mimeType)",
         includeItemsFromAllDrives=True,
         orderBy="name",
-        q="mimeType='application/vnd.google-apps.document' and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
+        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
         supportsAllDrives=True,
     ).execute()
     all_templates = drive_response.get('files')
@@ -127,7 +127,8 @@ def write(request):
     for template in all_templates:
         template_id = template['id']
         template_name = template['name']
-        templates_list.append(tuple((template_id, template_name)))
+        template_mimetype = template['mimeType']
+        templates_list.append(tuple((template_id, template_name, template_mimetype)))
     # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
@@ -181,16 +182,28 @@ def create(request):
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
                 box_document_name = request.POST.get('document_id').split('#')[1]
+                box_document_mimetype = request.POST.get('document_id').split('#')[2]
                 official_template_flag = True
-            else:
+            elif 'document' in request.POST.get('document_etcid'):
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
                 box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.document'
+                official_template_flag = False
+            elif 'spreadsheets' in request.POST.get('document_etcid'):
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
+                official_template_flag = False
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.presentation'
                 official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, folder_name=box_folder_name, folder_prefix=box_folder_prefix, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
+            form.save(category=box_category, folder_name=box_folder_name, folder_prefix=box_folder_prefix, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
         ##############################
         ##### 대상이 guest일 경우 #####
         ##############################
@@ -201,16 +214,28 @@ def create(request):
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
                 box_document_name = request.POST.get('document_id').split('#')[1]
+                box_document_mimetype = request.POST.get('document_id').split('#')[2]
                 official_template_flag = True
-            else:
+            elif 'document' in request.POST.get('document_etcid'):
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
                 box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.document'
+                official_template_flag = False
+            elif 'spreadsheets' in request.POST.get('document_etcid'):
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
+                official_template_flag = False
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.presentation'
                 official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, document_name=box_document_name, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
+            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -242,6 +267,7 @@ def create_doc(request, id):
             )
             drive_service = build('drive', 'v3', credentials=credentials)
             docs_service = build('docs', 'v1', credentials=credentials)
+            sheets_service = build('sheets', 'v4', credentials=credentials)
             try:
                 drive_response = drive_service.drives().list().execute()
             except:
@@ -267,10 +293,11 @@ def create_doc(request, id):
                     'description': '블루무브 닥스에서 ' + request.user.last_name + request.user.first_name + '님이 생성한 ' + box.folder_prefix + '_' + box.title.replace(" ","") + '입니다.\n\n' +
                                 '📧 생성일: ' + datetime.date.today().strftime('%Y-%m-%d'),
                 },
-                fields = 'id, name'
+                fields = 'id, name, mimeType'
             ).execute()
             file_id = drive_response.get('id') ##### 문서 ID OUTPUT #####
             name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
+            mimetype = drive_response.get('mimeType') ##### 파일 mimeType OUTPUT #####
             # 04. 문서 위치 OUTSIDE 클라이언트 My Drive 최상위 경로로 변경
             drive_service.files().update(
                 fileId = file_id,
@@ -281,40 +308,72 @@ def create_doc(request, id):
                 fileId = folder_id,
             ).execute()
             # 06. 문서 내 템플릿 태그 적용
-            docs_service.documents().batchUpdate(
-                documentId = file_id,
-                body = {
-                    'requests': [
-                        {
-                            'replaceAllText': {
-                                'containsText': {
-                                    'text': '{{user-name}}',
-                                    'matchCase':  'true'
-                                },
-                                'replaceText': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+            if 'document' in mimetype:
+                docs_service.documents().batchUpdate(
+                    documentId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-name}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-phone}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-email}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                                }
                             }
-                        },
-                        {
-                            'replaceAllText': {
-                                'containsText': {
-                                    'text': '{{user-phone}}',
-                                    'matchCase':  'true'
-                                },
-                                'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                        ]
+                    }
+                ).execute()
+            elif 'spreadsheet' in mimetype:
+                sheets_service.spreadsheets().batchUpdate(
+                    spreadsheetId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'findReplace': {
+                                    'find': '{{user-name}}',
+                                    'replacement': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+                                    'allSheets': True
+                                }
+                            },
+                            {
+                                'findReplace': {
+                                    'find': '{{user-phone}}',
+                                    'replacement': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'allSheets': True
+                                }
+                            },
+                            {
+                                'findReplace': {
+                                    'find': '{{user-email}}',
+                                    'replacement': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                                    'allSheets': True
+                                }
                             }
-                        },
-                        {
-                            'replaceAllText': {
-                                'containsText': {
-                                    'text': '{{user-email}}',
-                                    'matchCase':  'true'
-                                },
-                                'replaceText': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
-                            }
-                        }
-                    ]
-                }
-            ).execute()
+                        ]
+                    }
+                ).execute()
+            else:
+                None
             # 07. OUTSIDE 클라이언트 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId = file_id,
@@ -323,81 +382,117 @@ def create_doc(request, id):
             permissions_list = drive_response.get('permissions')
             for permissions_data in permissions_list:
                 outside_permission_id = permissions_data['id'] ##### OUTSIDE 클라이언트 권한 ID OUTPUT #####
-            # 08. 문서 데이터 DB 반영
-            doc_user = request.user
-            doc_name = name
-            doc_file_id = file_id
-            doc_outside_permission_id = outside_permission_id
-            doc_creation_date = datetime.date.today().strftime('%Y-%m-%d')
-            if SocialAccount.objects.filter(user=request.user):
-                doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
-            else:
-                doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
-            Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
-            if 'next' in request.GET:
-                return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
-            else:
-                return redirect('box:read', box.id)
+                # 08. 문서 데이터 DB 반영
+                doc_user = request.user
+                doc_name = name
+                doc_file_id = file_id
+                doc_outside_permission_id = outside_permission_id
+                doc_creation_date = datetime.date.today().strftime('%Y-%m-%d')
+                if SocialAccount.objects.filter(user=request.user):
+                    doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
+                else:
+                    doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
+                Doc.objects.create(user=doc_user, name=doc_name, mimetype=mimetype, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
+                if 'next' in request.GET:
+                    return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
+                else:
+                    return redirect('box:read', box.id)
         ###########################################
         ##### OUTSIDE 클라이언트가 guest일 경우 #####
         ###########################################
         if request.user.profile.level == 'guest':
             # 01. 서비스 계정 Google Drive, Google Docs API 호출
-            SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents']
+            SERVICE_ACCOUNT_SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/documents', 'https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/presentations']
             credentials = ServiceAccountCredentials.from_json_keyfile_name (
                 service_account_creds,
                 SERVICE_ACCOUNT_SCOPES,
             )
             drive_service = build('drive', 'v3', credentials=credentials)
             docs_service = build('docs', 'v1', credentials=credentials)
+            sheets_service = build('sheets', 'v4', credentials=credentials)
             # 02. 서비스 계정 My Drive 내 템플릿 문서 생성(복사)
             application_id = box.document_id ##### 템플릿 문서 ID INPUT #####
             drive_response = drive_service.files().copy(
                 fileId = application_id,
+                supportsAllDrives = True,
                 body = {
                     'name': '블루무브_' + box.title.replace(" ","") + request.user.last_name + request.user.first_name + request.user.profile.sub_id + '_' + datetime.date.today().strftime('%y%m%d'),
                     'description': '블루무브 닥스에서 ' + request.user.last_name + request.user.first_name + '님이 생성한 ' + box.title.replace(" ","") + '입니다.\n\n' +
                                 '📧 생성일: ' + datetime.date.today().strftime('%Y-%m-%d'),
+                    'writersCanShare': 'true', ##### OUTSIDE 클라이언트가 guest일 경우 반드시 writersCanShare = true
                 },
-                fields = 'id, name'
+                fields = 'id, name, mimeType'
             ).execute()
             file_id = drive_response.get('id') ##### 문서 ID OUTPUT #####
             name = drive_response.get('name') ##### 파일 최종 이름 OUTPUT #####
+            mimetype = drive_response.get('mimeType') ##### 파일 mimeType OUTPUT #####
             # 03. 문서 내 템플릿 태그 적용
-            docs_response = docs_service.documents().batchUpdate(
-                documentId = file_id,
-                body = {
-                    'requests': [
-                        {
-                            'replaceAllText': {
-                                'containsText': {
-                                    'text': '{{user-name}}',
-                                    'matchCase':  'true'
-                                },
-                                'replaceText': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+            if 'document' in mimetype:
+                docs_service.documents().batchUpdate(
+                    documentId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-name}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-phone}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                }
+                            },
+                            {
+                                'replaceAllText': {
+                                    'containsText': {
+                                        'text': '{{user-email}}',
+                                        'matchCase':  'true'
+                                    },
+                                    'replaceText': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                                }
                             }
-                        },
-                        {
-                            'replaceAllText': {
-                                'containsText': {
-                                    'text': '{{user-phone}}',
-                                    'matchCase':  'true'
-                                },
-                                'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                        ]
+                    }
+                ).execute()
+            elif 'spreadsheet' in mimetype:
+                sheets_service.spreadsheets().batchUpdate(
+                    spreadsheetId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'findReplace': {
+                                    'find': '{{user-name}}',
+                                    'replacement': request.user.last_name + request.user.first_name, ##### OUTSIDE 클라이언트 성명 INPUT #####
+                                    'allSheets': True
+                                }
+                            },
+                            {
+                                'findReplace': {
+                                    'find': '{{user-phone}}',
+                                    'replacement': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'allSheets': True
+                                }
+                            },
+                            {
+                                'findReplace': {
+                                    'find': '{{user-email}}',
+                                    'replacement': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                                    'allSheets': True
+                                }
                             }
-                        },
-                        {
-                            'replaceAllText': {
-                                'containsText': {
-                                    'text': '{{user-email}}',
-                                    'matchCase':  'true'
-                                },
-                                'replaceText': request.user.email, ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
-                            }
-                        }
-                    ]
-                }
-            ).execute()
+                        ]
+                    }
+                ).execute()
+            else:
+                None
             # 04. 서비스 계정 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId=file_id,
@@ -427,7 +522,7 @@ def create_doc(request, id):
                     doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
                 else:
                     doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
-                Doc.objects.create(user=doc_user, name=doc_name, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, permission_id=doc_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
+                Doc.objects.create(user=doc_user, name=doc_name, mimetype=mimetype, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, permission_id=doc_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
                 if 'next' in request.GET:
                     return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
                 else:
@@ -501,7 +596,12 @@ def read(request, id):
             all_docs = box.docs.filter(Q(submit_flag=True) & Q(reject_flag=False) & Q(return_flag=False)).order_by('-id')
             for doc in all_docs:
                 if doc.user.profile.level == 'bluemover':
-                    doc_src = "https://docs.google.com/document/d/" + doc.file_id
+                    if 'document' in box.document_mimetype:
+                        doc_src = "https://docs.google.com/document/d/" + doc.file_id
+                    elif 'spreadsheet' in box.document_mimetype:
+                        doc_src = "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                    else:
+                        doc_src = "https://docs.google.com/presentation/d/" + doc.file_id
                     try:
                         urllib.request.urlopen(doc_src)
                     except urllib.error.HTTPError:
@@ -529,7 +629,12 @@ def read(request, id):
                 if doc.delete_flag == True:
                     None
                 else:
-                    doc_src = "https://docs.google.com/document/d/" + doc.file_id
+                    if 'document' in box.document_mimetype:
+                        doc_src = "https://docs.google.com/document/d/" + doc.file_id
+                    elif 'spreadsheet' in box.document_mimetype:
+                        doc_src = "https://docs.google.com/spreadsheets/d/" + doc.file_id
+                    else:
+                        doc_src = "https://docs.google.com/presentation/d/" + doc.file_id
                     try:
                         urllib.request.urlopen(doc_src)
                     except urllib.error.HTTPError:
@@ -675,10 +780,10 @@ def update(request, id):
             folders_list_H.append(tuple((folder_id, folder_name)))
     drive_response = drive_service.files().list(
         corpora='allDrives',
-        fields="files(id, name)",
+        fields="files(id, name, mimeType)",
         includeItemsFromAllDrives=True,
         orderBy="name",
-        q="mimeType='application/vnd.google-apps.document' and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
+        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
         supportsAllDrives=True,
     ).execute()
     all_templates = drive_response.get('files')
@@ -686,7 +791,8 @@ def update(request, id):
     for template in all_templates:
         template_id = template['id']
         template_name = template['name']
-        templates_list.append(tuple((template_id, template_name)))
+        template_mimetype = template['mimeType']
+        templates_list.append(tuple((template_id, template_name, template_mimetype)))
     # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
@@ -712,29 +818,53 @@ def update(request, id):
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
                 box_document_name = request.POST.get('document_id').split('#')[1]
+                box_document_mimetype = request.POST.get('document_id').split('#')[2]
                 official_template_flag = True
-            else:
+            elif 'document' in request.POST.get('document_etcid'):
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
                 box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.document'
+                official_template_flag = False
+            elif 'spreadsheets' in request.POST.get('document_etcid'):
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
+                official_template_flag = False
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.presentation'
                 official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         elif form.is_valid() and box.category == 'guest':
             box_title = request.POST.get('title')
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
                 box_document_name = request.POST.get('document_id').split('#')[1]
+                box_document_mimetype = request.POST.get('document_id').split('#')[2]
                 official_template_flag = True
-            else:
+            elif 'document' in request.POST.get('document_etcid'):
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
                 box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.document'
+                official_template_flag = False
+            elif 'spreadsheets' in request.POST.get('document_etcid'):
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
+                official_template_flag = False
+            else:
+                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
+                box_document_name = '임의 템플릿 문서'
+                box_document_mimetype = 'application/vnd.google-apps.presentation'
                 official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(title=box_title, document_id=box_document_id, document_name=box_document_name, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(title=box_title, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         return redirect('box:read', box.id)
     return render(
         request,
@@ -836,10 +966,10 @@ def updateimage(request, id):
             folders_list_H.append(tuple((folder_id, folder_name)))
     drive_response = drive_service.files().list(
         corpora='allDrives',
-        fields="files(id, name)",
+        fields="files(id, name, mimeType)",
         includeItemsFromAllDrives=True,
         orderBy="name",
-        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.google-apps.spreadsheet') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
+        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
         supportsAllDrives=True,
     ).execute()
     all_templates = drive_response.get('files')
@@ -847,7 +977,8 @@ def updateimage(request, id):
     for template in all_templates:
         template_id = template['id']
         template_name = template['name']
-        templates_list.append(tuple((template_id, template_name)))
+        template_mimetype = template['mimeType']
+        templates_list.append(tuple((template_id, template_name, template_mimetype)))
     # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
@@ -2903,7 +3034,7 @@ def reject_doc(request, doc_id):
     ##### INSIDE 클라이언트일 경우 #####
     ###################################
     if doc.user.profile.level == 'bluemover':
-        # 01. INSIDE 클라이언트 Google Drive, 서비스 계정 Gmail API 호출
+        # 01. INSIDE 클라이언트 Google Drive 호출
         token = SocialToken.objects.get(account__user=request.user, account__provider='google')
         credentials = Credentials(
             client_id=client_id,
@@ -2918,15 +3049,6 @@ def reject_doc(request, doc_id):
         except:
             logout(request)
             return redirect('users:login_cancelled_no_token')
-        INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
-        SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-        gmail_credentials = service_account.Credentials.from_service_account_file(
-            service_account_creds,
-            scopes = SERVICE_ACCOUNT_GMAIL_SCOPES,
-        )
-        credentials_delegated = gmail_credentials.with_subject(INSIDE_CLIENT)
-        mail_service = build('gmail', 'v1', credentials = credentials_delegated)
         # 02. 문서 잠금 해제
         drive_response = drive_service.files().update(
             fileId=file_id,
@@ -4014,7 +4136,7 @@ def return_doc(request, doc_id):
             fields="files(name)",
             includeItemsFromAllDrives=True,
             orderBy="name desc",
-            q="mimeType='application/vnd.google-apps.document' and trashed = false and '" + doc.box.folder_id + "' in parents and name contains '" + doc.box.folder_name[0:3] + "_" + doc.box.title.replace(" ","") + "'",
+            q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation') and trashed = false and '" + doc.box.folder_id + "' in parents and name contains '" + doc.box.folder_name[0:3] + "_" + doc.box.title.replace(" ","") + "'",
             supportsAllDrives=True,
         ).execute()
         all_before_files = drive_response.get('files')
@@ -4285,7 +4407,7 @@ def return_doc(request, doc_id):
                         "readOnly": "true",
                         "reason": "문서가 반환되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
                     }
-                ]
+                ],
             }
         ).execute()
         # 07. 서비스 계정 권한 삭제 writer 2 none
@@ -5119,7 +5241,7 @@ def return_doc_before_submit(request, doc_id):
         body = {
                 'name': '블루무브_' + doc.box.title.replace(" ","") + doc.user.last_name + doc.user.first_name + doc.user.profile.sub_id + '_' + datetime.date.today().strftime('%y%m%d'),
                 'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.title.replace(' ','') + '입니다.\n' +
-                            '기한이 초과되어 문서가 제출되지 않고 반환되었습니다.\n\n' +
+                            '기한을 초과하여 문서가 제출되지 않고 반환되었습니다.\n\n' +
                             '📧 생성일: ' + doc.creation_date + '\n' +
                             '📩 반환일: ' + datetime.date.today().strftime('%Y-%m-%d'),
             },
@@ -5373,7 +5495,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 valign="top"
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                                                                                기한이 초과되어 문서가 제출되지 않고 반환되었습니다.<br>
+                                                                                기한을 초과하여 문서가 제출되지 않고 반환되었습니다.<br>
                                                                                 문서의 소유 권한이 """ + doc.user.last_name + doc.user.first_name + """님에게 이전되어 더 이상 블루무브 닥스에서 액세스할 수 없습니다.<br>
                                                                                 Google 드라이브에서 문서명을 검색하시거나 '<a href="https://drive.google.com/drive/recent" style="color:#007DC5;">최근 문서함</a>'을 확인하시기 바랍니다.<br>
                                                                                 감사합니다.<br><br>
@@ -5715,7 +5837,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 valign="top"
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                                                                                기한이 초과되어 문서가 제출되지 않고 반환되었습니다.<br>
+                                                                                기한을 초과하여 문서가 제출되지 않고 반환되었습니다.<br>
                                                                                 문서의 소유 권한이 """ + doc.user.last_name + doc.user.first_name + """님에게 이전되어 더 이상 블루무브 닥스에서 액세스할 수 없습니다.<br>
                                                                                 Google 드라이브에서 문서명을 검색하시거나 '<a href="https://drive.google.com/drive/recent" style="color:#007DC5;">최근 문서함</a>'을 확인하시기 바랍니다.<br>
                                                                                 감사합니다.<br><br>

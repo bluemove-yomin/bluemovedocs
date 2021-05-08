@@ -2,7 +2,7 @@
 {% block meta %}
     <meta name="description" content="블루무브 닥스의 문서함입니다.">
     <meta name="subject" content="블루무브 닥스 문서함">
-    <meta property="og:url" content="{% url 'box:read' notice.id %}">
+    <meta property="og:url" content="{% url 'box:read' box.id %}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="문서함 | 블루무브 닥스">
     <meta property="og:image" content="https://docs.bluemove.or.kr/static/images/slide01.png">
@@ -149,10 +149,10 @@
             <div class="form-group mb-3">
                 <label for="document_id" class="form-label">템플릿 문서<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <select class="form-select" name="document_id" id="document_id" onchange="document_idChange(this)" placeholder="템플릿 문서를 선택하세요." required>
-                    <option value="{{ box.document_id }}#{{ box.document_name }}" selected hidden>{{ box.document_name }}</option>
+                    <option value="{{ box.document_id }}#{{ box.document_name }}#{{ box.document_mimetype }}" selected hidden>{{ box.document_name }}</option>
                     <option value="" disabled>템플릿 문서를 선택하세요.</option>
-                    {% for template_id, template_name in templates_list %}
-                        <option value="{{ template_id }}#{{ template_name }}">{{ template_name }}</option>
+                    {% for template_id, template_name, template_mimetype in templates_list %}
+                        <option value="{{ template_id }}#{{ template_name }}#{{ template_mimetype }}">{{ template_name }}</option>
                     {% empty %}
                         <option value="" id="template_empty" disabled>템플릿 문서를 불러올 수 없습니다.</option>
                     {% endfor %}
@@ -166,7 +166,13 @@
                 <div class="form-group mb-3" id="document_etcid_DIV">
             {% endif %}
                 <label for="document_etcid" class="form-label">임의 템플릿 문서 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" required>
+                {% if 'document' in box.document_mimetype %}
+                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" required>
+                {% elif 'spreadsheet' in box.document_mimetype %}
+                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" required>
+                {% else %}
+                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/presentation/d/{{ box.document_id }}" required>
+                {% endif %}
                 <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_etcidHelp" class="form-text">
                     <p id="document_etcidHelpText" class="mb-2"></p>
@@ -233,7 +239,7 @@
                     };
                 </script>
                 <div id="deadlineHelp" class="form-text" onload="">
-                    <p class="mb-2">기한이 초과되면 문서함이 자동으로 닫힙니다.</p>
+                    <p class="mb-2">기한을 초과하면 문서함이 자동으로 닫힙니다.</p>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지<br>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내 텍스트</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트 표시
                 </div>

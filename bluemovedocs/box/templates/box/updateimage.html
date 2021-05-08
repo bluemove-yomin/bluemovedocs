@@ -2,7 +2,7 @@
 {% block meta %}
     <meta name="description" content="블루무브 닥스의 문서함입니다.">
     <meta name="subject" content="블루무브 닥스 문서함">
-    <meta property="og:url" content="{% url 'box:read' notice.id %}">
+    <meta property="og:url" content="{% url 'box:read' box.id %}">
     <meta property="og:type" content="website">
     <meta property="og:title" content="문서함 | 블루무브 닥스">
     <meta property="og:image" content="https://docs.bluemove.or.kr/static/images/slide01.png">
@@ -161,7 +161,13 @@
             </div>
             <div class="form-group mb-3">
                 <label for="document_id" class="form-label">템플릿 문서 링크</label>
-                <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
+                {% if 'document' in box.document_mimetype %}
+                    <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
+                {% elif 'spreadsheet' in box.document_mimetype %}
+                    <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" disabled>
+                {% else %}
+                    <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/presentation/d/{{ box.document_id }}" disabled>
+                {% endif %}
                 <div class="invalid-feedback">유효한 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_idHelp" class="form-text">템플릿 문서 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>

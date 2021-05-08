@@ -55,26 +55,29 @@
                 <button type="submit" class="btn btn-outline-primary hide submit">등록하기</button>
             </div>
             <script>
-                setInterval(function userdata_expired_button() {
-                    if (Date.now() >= {{ userdata_expired_datetime_ms }}) {
-                        document.querySelector(".submit").innerText = "⛔ 등록 불가";
-                        document.querySelector(".submit").disabled = true;
-                    }
+                (function userdata_expiration_time_first() {
+                    document.querySelector("#remaining").innerText = Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000));
+                })();
+                setInterval(function userdata_expiration_time() {
                     document.querySelector("#remaining").innerText = Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000));
                     if (Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000)) == 0) {
                         window.location.href="{% url 'users:login_cancelled_delete' user.id %}"
+                    }
+                    if (Date.now() >= {{ userdata_expired_datetime_ms }}) {
+                        document.querySelector(".submit").innerText = "⛔ 등록 불가";
+                        document.querySelector(".submit").disabled = true;
                     }
                 }, 1000);
             </script>
         </form>
 
         <!-- 로그인 자동 취소 안내 -->
-        <script>
+        <!-- <script>
             (function signUp() {
                 var user_email = document.querySelector("#user_email").innerText
                 alert("어서오세요! 👋\n" + user_email + " 계정의 블루무브 닥스 첫 로그인입니다.\n계속하려면 회원 정보를 등록하세요.\n\n{{ userdata_expired_datetime | date:'DATE_FORMAT' }} {{ userdata_expired_datetime | time:'a h:i:s' }}까지 회원 정보가 등록되지 않을 경우 자동으로 로그인이 취소됩니다.");
             })();
-        </script>
+        </script> -->
 
         <!-- Forms Validation -->
         <script>

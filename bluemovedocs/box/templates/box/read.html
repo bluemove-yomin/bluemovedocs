@@ -141,14 +141,26 @@
                 <small style="color: #6C757D;">
                     {% if box.category == 'bluemover' %}
                         ⊙ 최종 디렉토리: {{ box.drive_name }} > <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_name }}</a><br>
-                        ⊙ 템플릿 문서: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a><br>
+                        {% if 'document' in box.document_mimetype %}
+                            ⊙ 템플릿 문서: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a> (Google Docs)<br>
+                        {% elif 'spreadsheet' in box.document_mimetype %}
+                            ⊙ 템플릿 문서: <a href="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a> (Google Sheets)<br>
+                        {% else %}
+                            ⊙ 템플릿 문서: <a href="https://docs.google.com/presentation/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a> (Google Slides)<br>
+                        {% endif %}
                         {% if box.channel_id == request.user.profile.slack_user_id %}
                             ⊙ 연동 Slack 채널: <a href="https://slack.com/app_redirect?app=A01LQ17SFQ8" target="_blank">블루무브 닥스 DM</a><br>
                         {% else %}
                             ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                         {% endif %}
                     {% else %}
-                        ⊙ 템플릿 문서: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a><br>
+                        {% if 'document' in box.document_mimetype %}
+                            ⊙ 템플릿 문서: <a href="https://docs.google.com/document/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a> (Google Docs)<br>
+                        {% elif 'spreadsheet' in box.document_mimetype %}
+                            ⊙ 템플릿 문서: <a href="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a> (Google Sheets)<br>
+                        {% else %}
+                            ⊙ 템플릿 문서: <a href="https://docs.google.com/presentation/d/{{ box.document_id }}" target="_blank">{{ box.document_name }}</a> (Google Slides)<br>
+                        {% endif %}
                         ⊙ 연동 Slack 채널: <a href="https://app.slack.com/client/T2EH6PN00/{{ box.channel_id }}" target="_blank">#{{ box.channel_name }}</a><br>
                     {% endif %}
                         ⊙ 문서 수: 총 {{ valid_docs | length }}부 = 미제출 {{ created_valid_docs | length }}부 + 제출 {{ all_docs|length }}부 + 반려 {{ rejected_valid_docs | length }}부 +
@@ -233,7 +245,7 @@
             <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                 {% if box.deadline_is_over %}
                     <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-hourglass-end"></i></span><br>
-                    <span style="color: #58595B;">기한이 초과되어 새 문서를 생성할 수 없습니다.</span>
+                    <span style="color: #58595B;">기한을 초과하여 새 문서를 생성할 수 없습니다.</span>
                 {% else %}
                     <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
                     <span style="color: #58595B;">새 문서를 생성하려면 로그인하세요.</span>
@@ -255,7 +267,13 @@
                 <div class="list-group-item px-0 py-3">
                     <!-- PC 환경 -->
                     <div class="d-flex justify-content-between align-items-center" id="boxSubmitted4Large">
-                        <a class="container m-0 p-0" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                        {% if 'document' in box.document_mimetype %}
+                            <a class="container m-0 p-0" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                        {% elif 'spreadsheet' in box.document_mimetype %}
+                            <a class="container m-0 p-0" href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">
+                        {% else %}
+                            <a class="container m-0 p-0" href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">
+                        {% endif %}
                             <table style="border: none; margin-top: .25rem;">
                                 <tr>
                                     <td class="p-0 m-0" rowspan="2">
@@ -309,7 +327,13 @@
                                 </td>
                                 <td class="p-0 m-0">
                                     <h6 class="card-title my-0" style="color: #58595B; margin-left: 10px;">
-                                        <a href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">{{ doc.name }}</a>
+                                        {% if 'document' in box.document_mimetype %}
+                                            <a href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">{{ doc.name }}</a>
+                                        {% elif 'spreadsheet' in box.document_mimetype %}
+                                            <a href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">{{ doc.name }}</a>
+                                        {% else %}
+                                            <a href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">{{ doc.name }}</a>
+                                        {% endif %}
                                     </h6>
                                 </td>
                             </tr>
@@ -493,7 +517,13 @@
                             {% else %}
                                 <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
                                     <div class="d-flex justify-content-between">
-                                        <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                        {% if 'document' in box.document_mimetype %}
+                                            <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                        {% elif 'spreadsheet' in box.document_mimetype %}
+                                            <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">
+                                        {% else %}
+                                            <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">
+                                        {% endif %}
                                             <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                             <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                             <small class="text-muted" style="font-weight: 300;">{{ doc.return_date }} 승인</small>
@@ -532,13 +562,19 @@
                     {% if box.deadline_is_over %}
                         <div class="callout callout-dark my-0 mb-3" style="word-break: break-word;">
                             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 초과</span><br>
-                            <small style="color: #6C757D;">기한이 초과되어 문서를 다시 제출할 수 없습니다.</small>
+                            <small style="color: #6C757D;">기한을 초과하여 문서를 다시 제출할 수 없습니다.</small>
                         </div>
                     {% endif %}
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
                         <div class="d-flex justify-content-between">
                             <div></div>
-                            <a class="container no-pointer" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                            {% if 'document' in box.document_mimetype %}
+                                <a class="container no-pointer" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                            {% elif 'spreadsheet' in box.document_mimetype %}
+                                <a class="container no-pointer" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">
+                            {% else %}
+                                <a class="container no-pointer" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">
+                            {% endif %}
                                 <span style="color: #58595B; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.rejection_date }} 반려<br>(사유: {{ doc.reject_reason }})</small>
@@ -638,7 +674,13 @@
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
                         {% if doc.user.profile.level == 'bluemover' %}
                             <div class="d-flex justify-content-between">
-                                <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                {% if 'document' in box.document_mimetype %}
+                                    <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                {% elif 'spreadsheet' in box.document_mimetype %}
+                                    <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">
+                                {% else %}
+                                    <a class="container" style="padding-left: 0px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">
+                                {% endif %}
                                     <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                     <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                     <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
@@ -647,7 +689,13 @@
                         {% else %}
                             <div class="d-flex justify-content-between">
                                 <div></div>
-                                <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                {% if 'document' in box.document_mimetype %}
+                                    <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                                {% elif 'spreadsheet' in box.document_mimetype %}
+                                    <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">
+                                {% else %}
+                                    <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">
+                                {% endif %}
                                     <span style="color: #007DC5; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                     <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                     <small class="text-muted" style="font-weight: 300;">{{ doc.submission_date }} 제출</small>
@@ -695,14 +743,20 @@
                     {% if box.deadline_is_over %}
                         <div class="callout callout-dark my-0 mb-3" style="word-break: break-word;">
                             <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 초과</span><br>
-                            <small style="color: #6C757D;">기한이 초과되어 문서를 제출할 수 없습니다.</small>
+                            <small style="color: #6C757D;">기한을 초과하여 문서를 제출할 수 없습니다.</small>
                         </div>
                     {% endif %}
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
                         <div class="d-flex justify-content-between">
                             <div></div>
-                            <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
-                                <span style="color: #58595B; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
+                            {% if 'document' in box.document_mimetype %}
+                                <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/document/d/{{ doc.file_id }}" target="_blank">
+                            {% elif 'spreadsheet' in box.document_mimetype %}
+                                <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/spreadsheets/d/{{ doc.file_id }}" target="_blank">
+                            {% else %}
+                                <a class="container" style="padding-left: 24px; padding-right: 0; padding-top: 1.7rem; padding-bottom: 2.9rem;" href="https://docs.google.com/presentation/d/{{ doc.file_id }}" target="_blank">
+                            {% endif %}
+                                    <span style="color: #58595B; font-size: 4rem;"><i class="fas fa-file-alt"></i></span><br>
                                 <span style="color: #58595B; font-weight: 600;">{{ doc.name }}</span><br>
                                 <small class="text-muted" style="font-weight: 300;">{{ doc.creation_date }} 생성</small>
                             </a>
@@ -822,7 +876,7 @@
                         </div>
                         <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                             <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-hourglass-end"></i></span><br>
-                            <span style="color: #58595B;">기한이 초과되어 새 문서를 생성할 수 없습니다.</span>
+                            <span style="color: #58595B;">기한을 초과하여 새 문서를 생성할 수 없습니다.</span>
                         </div>
                     </div>
                 </div>
@@ -852,7 +906,7 @@
                                         </div>
                                         <div class="modal-body">
                                             {% if box.deadline_is_over %}
-                                                기한이 초과되어 새 문서를 생성할 수 없습니다.<br>페이지가 새로고침됩니다.
+                                                기한을 초과하여 새 문서를 생성할 수 없습니다.<br>페이지가 새로고침됩니다.
                                             {% else %}
                                                 {{ user.last_name }}{{ user.first_name }}님의 문서를 생성하고 있습니다.<br>작업이 완료될 때까지 브라우저를 닫지 마세요.<br><br>
                                                 <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>
