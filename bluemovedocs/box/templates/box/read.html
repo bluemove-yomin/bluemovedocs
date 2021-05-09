@@ -245,7 +245,7 @@
             <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                 {% if box.deadline_is_over %}
                     <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-hourglass-end"></i></span><br>
-                    <span style="color: #58595B;">기한을 초과하여 새 문서를 생성할 수 없습니다.</span>
+                    <span style="color: #58595B;">기한이 만료되어 새 문서를 생성할 수 없습니다.</span>
                 {% else %}
                     <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
                     <span style="color: #58595B;">새 문서를 생성하려면 로그인하세요.</span>
@@ -561,8 +561,8 @@
                     </div>
                     {% if box.deadline_is_over %}
                         <div class="callout callout-dark my-0 mb-3" style="word-break: break-word;">
-                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 초과</span><br>
-                            <small style="color: #6C757D;">기한을 초과하여 문서를 다시 제출할 수 없습니다.</small>
+                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 만료</span><br>
+                            <small style="color: #6C757D;">기한이 만료되어 문서를 다시 제출할 수 없습니다.</small>
                         </div>
                     {% endif %}
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
@@ -592,7 +592,7 @@
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</button>
+                            <button type="button" id="reSubmitModalBtn" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">다시 제출하기</button>
                         </div>
                     {% endif %}
                     <!-- docSubmitModal -->
@@ -742,8 +742,8 @@
                     </div>
                     {% if box.deadline_is_over %}
                         <div class="callout callout-dark my-0 mb-3" style="word-break: break-word;">
-                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 초과</span><br>
-                            <small style="color: #6C757D;">기한을 초과하여 문서를 제출할 수 없습니다.</small>
+                            <span style="font-weight: 600; color: #58595B;"><i class="fas fa-exclamation-triangle"></i> 기한 만료</span><br>
+                            <small style="color: #6C757D;">기한이 만료되어 문서를 제출할 수 없습니다.</small>
                         </div>
                     {% endif %}
                     <div class="container-md btn border rounded text-center mb-2 shadow-sm" href="#" id="docButton">
@@ -773,7 +773,7 @@
                         </div>
                     {% else %}
                         <div class="container-md d-flex p-0 my-2">
-                            <button type="button" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</button>
+                            <button type="button" id="submitModalBtn" class="container btn btn-primary" data-bs-toggle="modal" data-bs-target="#docSubmitModal">제출하기</button>
                         </div>
                     {% endif %}
                     <!-- docSubmitModal -->
@@ -876,7 +876,7 @@
                         </div>
                         <div class="container-md border rounded text-center mb-2" style="background-color: rgba(0,0,0,.03); padding-top: 2rem; padding-bottom: 3.2rem;">
                             <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-hourglass-end"></i></span><br>
-                            <span style="color: #58595B;">기한을 초과하여 새 문서를 생성할 수 없습니다.</span>
+                            <span style="color: #58595B;">기한이 만료되어 새 문서를 생성할 수 없습니다.</span>
                         </div>
                     </div>
                 </div>
@@ -899,14 +899,14 @@
                                     <div class="modal-content">
                                         <div class="modal-header">
                                             {% if box.deadline_is_over %}
-                                                <h5 class="modal-title" id="docCreateModalLabel" style="font-weight: 600;">⛔ 기한 초과</h5>
+                                                <h5 class="modal-title" id="docCreateModalLabel" style="font-weight: 600;">⛔ 기한 만료</h5>
                                             {% else %}
                                                 <h5 class="modal-title" id="docCreateModalLabel" style="font-weight: 600;">⏳ 작업 중</h5>
                                             {% endif %}
                                         </div>
                                         <div class="modal-body">
                                             {% if box.deadline_is_over %}
-                                                기한을 초과하여 새 문서를 생성할 수 없습니다.<br>페이지가 새로고침됩니다.
+                                                기한이 만료되어 새 문서를 생성할 수 없습니다.<br>페이지가 새로고침됩니다.
                                             {% else %}
                                                 {{ user.last_name }}{{ user.first_name }}님의 문서를 생성하고 있습니다.<br>작업이 완료될 때까지 브라우저를 닫지 마세요.<br><br>
                                                 <small class="align-middle" style="color: #6C757D;"><i class="fas fa-info-circle"></i> 60초 이내에 작업이 완료되지 않으면 새로고침 후 다시 시도해주세요.</small>

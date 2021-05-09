@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
+from django.db.models import Q
 import datetime
 from ckeditor.fields import RichTextField
 from allauth.socialaccount.models import SocialAccount
@@ -165,7 +166,7 @@ def send_noti(sender, instance, **kwargs):
                                             "text": "문서함 열기"
                                         },
                                         "value": "open_notice",
-                                        "url": "http://docs.bluemove.or.kr/box/" + str(obj.id)
+                                        "url": "https://docs.bluemove.or.kr/box/" + str(obj.id)
                                     }
                                 ]
                             }
@@ -434,7 +435,7 @@ def send_noti(sender, instance, **kwargs):
                                                                             align="center"
                                                                             class="mcnButtonBlockInner">
                                                                             <a
-                                                                                href="http://docs.bluemove.or.kr/box/""" + str(obj.id) + """"
+                                                                                href="https://docs.bluemove.or.kr/box/""" + str(obj.id) + """"
                                                                                 target="_blank"
                                                                                 style="text-decoration:none;">
                                                                                 <table
@@ -454,7 +455,7 @@ def send_noti(sender, instance, **kwargs):
                                                                                                 <a
                                                                                                     class="mcnButton"
                                                                                                     title="블루무브 닥스 문서함 열기"
-                                                                                                    href="http://docs.bluemove.or.kr/box/""" + str(obj.id) + """"
+                                                                                                    href="https://docs.bluemove.or.kr/box/""" + str(obj.id) + """"
                                                                                                     target="_blank"
                                                                                                     style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">블루무브 닥스 문서함 열기</a>
                                                                                             </td>

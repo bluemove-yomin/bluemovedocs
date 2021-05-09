@@ -2163,7 +2163,7 @@ def submit_doc(request, doc_id):
                 ],
                 text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
             )
-        elif 'spreadsheet' in doc.box.document_miemtype:
+        elif 'spreadsheet' in doc.box.document_mimetype:
             slack = client.chat_postMessage(
                 channel = doc.box.channel_id,
                 link_names = True,
@@ -6107,7 +6107,7 @@ def return_doc_before_submit(request, doc_id):
         body = {
                 'name': '블루무브_' + doc.box.title.replace(" ","") + doc.user.last_name + doc.user.first_name + doc.user.profile.sub_id + '_' + datetime.date.today().strftime('%y%m%d'),
                 'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.title.replace(' ','') + '입니다.\n' +
-                            '기한을 초과하여 문서가 제출되지 않고 반환되었습니다.\n\n' +
+                            '기한이 만료되어 문서가 제출되지 않고 반환되었습니다.\n\n' +
                             '📧 생성일: ' + doc.creation_date + '\n' +
                             '📩 반환일: ' + datetime.date.today().strftime('%Y-%m-%d'),
             },
@@ -6361,7 +6361,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 valign="top"
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                                                                                기한을 초과하여 문서가 제출되지 않고 반환되었습니다.<br>
+                                                                                기한이 만료되어 문서가 제출되지 않고 반환되었습니다.<br>
                                                                                 문서의 소유 권한이 """ + doc.user.last_name + doc.user.first_name + """님에게 이전되어 더 이상 블루무브 닥스에서 액세스할 수 없습니다.<br>
                                                                                 Google 드라이브에서 문서명을 검색하시거나 '<a href="https://drive.google.com/drive/recent" style="color:#007DC5;">최근 문서함</a>'을 확인하시기 바랍니다.<br>
                                                                                 감사합니다.<br><br>
@@ -6703,7 +6703,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 valign="top"
                                                                                 class="mcnTextContent"
                                                                                 style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
-                                                                                기한을 초과하여 문서가 제출되지 않고 반환되었습니다.<br>
+                                                                                기한이 만료되어 문서가 제출되지 않고 반환되었습니다.<br>
                                                                                 문서의 소유 권한이 """ + doc.user.last_name + doc.user.first_name + """님에게 이전되어 더 이상 블루무브 닥스에서 액세스할 수 없습니다.<br>
                                                                                 Google 드라이브에서 문서명을 검색하시거나 '<a href="https://drive.google.com/drive/recent" style="color:#007DC5;">최근 문서함</a>'을 확인하시기 바랍니다.<br>
                                                                                 감사합니다.<br><br>
