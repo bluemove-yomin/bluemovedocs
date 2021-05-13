@@ -78,7 +78,7 @@ def write_info(request, id):
         profile.level = 'admin'
         user.last_name = '사'
         user.first_name = '무국'
-        profile.phone = '02-3296-0613'
+        profile.phone = safelock.AESCipher().encrypt_str( '02-3296-0613' )
         profile.info_update_flag = True
         profile.sub_id = 'B' + random_sub_id
         user.save(update_fields=['last_name', 'first_name'])
