@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block meta %}
-    <meta name="robots" content="index,follow">
+    <meta name="robots" content="noindex,nofollow">
     <meta name="description" content="{{ box.content | truncatechars:150 }}">
     <meta name="subject" content="블루무브 닥스 문서함">
     <meta property="og:url" content="{% url 'box:read' box.id %}">
@@ -22,11 +22,11 @@
         <div class="d-flex align-items-sm-center justify-content-between">
             <p style="font-weight: 600;">
                 {% if box.category == 'bluemover' %}
-                    📂 블루무버
+                    📁 블루무버
                 {% elif box.category == 'guest' %}
-                    📂 게스트
+                    📁 게스트
                 {% else %}
-                    📂 알 수 없음
+                    📁 알 수 없음
                 {% endif %}
             </p>
             {% if user.is_authenticated %}

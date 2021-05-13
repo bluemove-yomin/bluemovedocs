@@ -19,6 +19,7 @@ from slack_sdk import WebClient
 import string
 import random
 import datetime
+import safelock
 from django.conf import settings
 
 
@@ -41,6 +42,7 @@ def myaccount(request, id):
         None
     # 회원가입 정보등록 끝
     user = get_object_or_404(User, pk=id)
+    phone = safelock.AESCipher().decrypt_str(user.profile.phone)
     favorites = request.user.favorite_user_set.all().order_by('-id')
     box_favorites = request.user.box_favorite_user_set.all().order_by('-id')
     page = request.GET.get('page', 1)
@@ -59,7 +61,7 @@ def myaccount(request, id):
         box_favorites = box_paginator.page(1)
     except EmptyPage:
         box_favorites = box_paginator.page(box_paginator.num_pages)
-    return render(request, 'users/myaccount.html', {'user': user, 'favorites': favorites, 'box_favorites': box_favorites})
+    return render(request, 'users/myaccount.html', {'user': user, 'phone': phone, 'favorites': favorites, 'box_favorites': box_favorites})
 
 
 @login_required
@@ -144,11 +146,13 @@ def write_info(request, id):
         if request.method == "POST":
             user.last_name = request.POST.get("last_name")
             user.first_name = request.POST.get("first_name")
-            profile.phone = request.POST.get("phone")
+            # profile.phone = request.POST.get("phone")
+            profile.phone = safelock.AESCipher().encrypt_str( request.POST.get("phone") )
             profile.info_update_flag = True
             profile.sub_id = 'B' + random_sub_id
             user.save(update_fields=['last_name', 'first_name'])
             profile.save(update_fields=['level', 'phone', 'slack_user_id', 'info_update_flag', 'sub_id'])
+            phone = safelock.AESCipher().decrypt_str(user.profile.phone)
             # 슬랙 메시지 발신
             client = WebClient(token=slack_bot_token)
             client.chat_postMessage(
@@ -174,7 +178,7 @@ def write_info(request, id):
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": "*실명:* " + user.last_name + user.first_name + "\n*회원 구분:* 블루무버\n*이메일 주소:* " + user.email + "\n*휴대전화 번호:* " + user.profile.phone[0:5] + "***" + user.profile.phone[8:10] + "***\n\n이제 블루무브 닥스에서 공지사항 및 댓글을 작성하시거나, 문서함 및 새 문서를 생성하실 수 있습니다."
+                            "text": "*실명:* " + user.last_name + user.first_name + "\n*회원 구분:* 블루무버\n*이메일 주소:* " + user.email + "\n*휴대전화 번호:* " + phone[0:5] + "***" + phone[8:10] + "***\n\n이제 블루무브 닥스에서 공지사항 및 댓글을 작성하시거나, 문서함 및 새 문서를 생성하실 수 있습니다."
                         }
                     },
                     {
@@ -203,11 +207,13 @@ def write_info(request, id):
         if request.method == "POST":
             user.last_name = request.POST.get("last_name")
             user.first_name = request.POST.get("first_name")
-            profile.phone = request.POST.get("phone")
+            # profile.phone = request.POST.get("phone")
+            profile.phone = safelock.AESCipher().encrypt_str( request.POST.get("phone") )
             profile.info_update_flag = True
             profile.sub_id = 'B' + random_sub_id
             user.save(update_fields=['last_name', 'first_name'])
             profile.save(update_fields=['level', 'phone', 'info_update_flag', 'sub_id'])
+            phone = safelock.AESCipher().decrypt_str(user.profile.phone)
             # 01. 서비스 계정 Gmail API 호출
             INSIDE_CLIENT = 'docs@bluemove.or.kr'
             user_id = 'docs@bluemove.or.kr'
@@ -394,7 +400,7 @@ def write_info(request, id):
                                                                                                     <strong style="color:#222222;">실명</strong>: """ + user.last_name + user.first_name + """<br>
                                                                                                     <strong style="color:#222222;">회원 구분</strong>: 게스트<br>
                                                                                                     <strong style="color:#222222;">이메일 주소</strong>: """ + user.email + """<br>
-                                                                                                    <strong style="color:#222222;">휴대전화 번호</strong>: """ + user.profile.phone[0:5] + """***""" + user.profile.phone[8:10] + """***
+                                                                                                    <strong style="color:#222222;">휴대전화 번호</strong>: """ + phone[0:5] + """***""" + phone[8:10] + """***
                                                                                                 </td>
                                                                                             </tr>
                                                                                         </tbody>
@@ -596,15 +602,17 @@ def edit_info(request, id):
         None
     # 회원가입 정보등록 끝
     user = get_object_or_404(User, pk=id)
+    phone = safelock.AESCipher().decrypt_str(user.profile.phone)
     profile = Profile.objects.get(user=user)
     if request.method == "POST":
         user.last_name = request.POST.get("last_name")
         user.first_name = request.POST.get("first_name")
-        profile.phone = request.POST.get("phone")
+        # profile.phone = request.POST.get("phone")
+        profile.phone = safelock.AESCipher().encrypt_str( request.POST.get("phone") )
         user.save(update_fields=['last_name', 'first_name'])
         profile.save(update_fields=['phone'])
         return redirect('users:myaccount', id=user.id)
-    return render(request, 'users/edit_info.html')
+    return render(request, 'users/edit_info.html', {'phone': phone})
 
 
 @login_required

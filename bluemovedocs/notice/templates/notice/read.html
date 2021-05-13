@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block meta %}
-    <meta name="robots" content="index,follow">
+    <meta name="robots" content="noindex,nofollow">
     <meta name="description" content="{{ notice.content | truncatechars:150 }}">
     <meta name="subject" content="블루무브 닥스 공지사항">
     <meta property="og:url" content="{% url 'notice:read' notice.id %}">

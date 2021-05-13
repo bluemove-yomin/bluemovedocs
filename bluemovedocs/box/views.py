@@ -18,6 +18,7 @@ from allauth.socialaccount.models import SocialToken, SocialApp, SocialAccount
 from oauth2client.service_account import ServiceAccountCredentials
 from users.models import Profile
 from slack_sdk import WebClient
+import safelock
 from django.conf import settings
 
 
@@ -329,7 +330,7 @@ def create_doc(request, id):
                                         'text': '{{user-phone}}',
                                         'matchCase':  'true'
                                     },
-                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'replaceText': safelock.AESCipher().decrypt_str(request.user.profile.phone), ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
                                 }
                             },
                             {
@@ -359,7 +360,7 @@ def create_doc(request, id):
                             {
                                 'findReplace': {
                                     'find': '{{user-phone}}',
-                                    'replacement': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'replacement': safelock.AESCipher().decrypt_str(request.user.profile.phone), ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
                                     'allSheets': True
                                 }
                             },
@@ -393,7 +394,7 @@ def create_doc(request, id):
                                         'text': '{{user-phone}}',
                                         'matchCase':  'true'
                                     },
-                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'replaceText': safelock.AESCipher().decrypt_str(request.user.profile.phone), ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
                                 }
                             },
                             {
@@ -482,7 +483,7 @@ def create_doc(request, id):
                                         'text': '{{user-phone}}',
                                         'matchCase':  'true'
                                     },
-                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'replaceText': safelock.AESCipher().decrypt_str(request.user.profile.phone), ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
                                 }
                             },
                             {
@@ -512,7 +513,7 @@ def create_doc(request, id):
                             {
                                 'findReplace': {
                                     'find': '{{user-phone}}',
-                                    'replacement': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'replacement': safelock.AESCipher().decrypt_str(request.user.profile.phone), ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
                                     'allSheets': True
                                 }
                             },
@@ -546,7 +547,7 @@ def create_doc(request, id):
                                         'text': '{{user-phone}}',
                                         'matchCase':  'true'
                                     },
-                                    'replaceText': request.user.profile.phone, ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                                    'replaceText': safelock.AESCipher().decrypt_str(request.user.profile.phone), ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
                                 }
                             },
                             {
@@ -3531,7 +3532,7 @@ def reject_doc(request, doc_id):
         drive_response = drive_service.files().update(
             fileId = file_id,
             body = {
-                'name': doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + '_' + datetime.date.today().strftime('%y%m%d'),
+                'name': doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + '_' + doc.submission_date[2:4] + doc.submission_date[5:7] + doc.submission_date[8:10],
                 'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + '입니다.\n' +
                             doc.box.writer.last_name + doc.box.writer.first_name + '님의 검토 후 반려되었습니다.\n\n' +
                             '📧 생성일: ' + doc.creation_date + '\n' +
@@ -3885,7 +3886,7 @@ def reject_doc(request, doc_id):
         drive_response = drive_service.files().update(
             fileId = file_id,
             body = {
-                'name': '블루무브_' + doc.box.title.replace(" ","") + doc.user.last_name + doc.user.first_name + doc.user.profile.sub_id + '_' + datetime.date.today().strftime('%y%m%d'),
+                'name': '블루무브_' + doc.box.title.replace(" ","") + doc.user.last_name + doc.user.first_name + doc.user.profile.sub_id + '_' + doc.submission_date[2:4] + doc.submission_date[5:7] + doc.submission_date[8:10],
                 'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.title.replace(" ","") + '입니다.\n\n' +
                             '📧 생성일: ' + doc.creation_date + '\n' +
                             '📨 제출일: ' + doc.submission_date + '\n' +

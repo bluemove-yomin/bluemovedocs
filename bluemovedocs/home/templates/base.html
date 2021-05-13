@@ -146,8 +146,20 @@
                 padding-left: 1.25rem;
                 margin-bottom: 0;
             }
+            ol {
+                padding-left: 1rem;
+                margin-bottom: 0;
+            }
             li {
                 margin-top: .25rem;
+            }
+            ol > li {
+                margin-top: .25rem;
+                padding-left: .3rem;
+            }
+            ol > ul {
+                padding-left: 1.55rem;
+                margin-bottom: 0;
             }
             a {
                 color: #007DC5;
@@ -450,11 +462,11 @@
                 var navbarNotice = document.querySelector("#navbarNotice");
                 var navbarBox = document.querySelector("#navbarBox");
                 var navbarHelp = document.querySelector("#navbarHelp");
-                if (document.querySelector("head > title").innerText.indexOf("공지사항") !== -1) {
+                if (document.querySelector("head > title").innerText.indexOf("공지사항") !== -1 || window.location.href.indexOf("notice") !== -1) {
                     navbarNotice.setAttribute("class", "nav-link p-2 active")
-                } else if (document.querySelector("head > title").innerText.indexOf("문서함") !== -1) {
+                } else if (document.querySelector("head > title").innerText.indexOf("문서함") !== -1 || window.location.href.indexOf("box") !== -1) {
                     navbarBox.setAttribute("class", "nav-link p-2 active")
-                } else if (document.querySelector("head > title").innerText.indexOf("도움말") !== -1) {
+                } else if (document.querySelector("head > title").innerText.indexOf("도움말") !== -1 || window.location.href.indexOf("help") !== -1) {
                     navbarHelp.setAttribute("class", "nav-link p-2 active")
                 } else {
                     

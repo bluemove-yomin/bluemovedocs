@@ -60,7 +60,7 @@
                 })();
                 setInterval(function userdata_expiration_time() {
                     document.querySelector("#remaining").innerText = Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000));
-                    if (Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000)) == 0) {
+                    if (Math.floor(String({{ userdata_expired_datetime_ms }}/1000 - Date.now()/1000)) <= 0) {
                         window.location.href="{% url 'users:login_cancelled_delete' user.id %}"
                     }
                     if (Date.now() >= {{ userdata_expired_datetime_ms }}) {

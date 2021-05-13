@@ -115,16 +115,16 @@
                                 <p class="card-text">
                                     <span id="hidePhone">
                                         {% for account in user.socialaccount_set.all %}
-                                            {{ user.profile.phone }}
+                                            {{ phone }}
                                         {% empty %}
-                                            02-3296-0613
+                                            알 수 없음
                                         {% endfor %}
                                     </span>
                                     <span id="showPhone" style="display: none;">
                                         {% for account in user.socialaccount_set.all %}
-                                            {{ user.profile.phone }}
+                                            {{ phone }}
                                         {% empty %}
-                                            02-3296-0613
+                                            알 수 없음
                                         {% endfor %}
                                     </span>
                                 </p>
