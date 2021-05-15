@@ -16,6 +16,8 @@ class BoxContentForm(forms.ModelForm):
         box.writer = kwargs.get('writer', None)
         box.category = kwargs.get('category', None)
         box.prefix = kwargs.get('prefix', None)
+        box.project_id = kwargs.get('project_id', None)
+        box.project_name = kwargs.get('project_name', None)
         box.title = kwargs.get('title', None)
         box.drive_name = kwargs.get('drive_name', None)
         box.folder_name = kwargs.get('folder_name', None)
@@ -36,6 +38,8 @@ class BoxContentForm(forms.ModelForm):
     def update(self, **kwargs):
         box = super().save(commit=False)
         box.prefix = kwargs.get('prefix', None)
+        box.project_id = kwargs.get('project_id', None)
+        box.project_name = kwargs.get('project_name', None)
         box.title = kwargs.get('title', None)
         box.drive_name = kwargs.get('drive_name', None)
         box.folder_name = kwargs.get('folder_name', None)

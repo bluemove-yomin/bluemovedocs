@@ -13,5 +13,6 @@ urlpatterns = [
     path('login_cancelled_no_token/', login_cancelled_no_token, name="login_cancelled_no_token"),
     path('login_cancelled_no_drive/', login_cancelled_no_drive, name="login_cancelled_no_drive"),
     path('login_cancelled_no_slack/', login_cancelled_no_slack, name="login_cancelled_no_slack"),
+    path('login_cancelled_no_notion/', login_cancelled_no_notion, name="login_cancelled_no_notion"),
     path('<int:id>/login_cancelled_delete/', login_cancelled_delete, name="login_cancelled_delete"),
 ]

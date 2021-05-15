@@ -31,6 +31,18 @@
                 <div class="invalid-feedback">대상을 선택하세요.</div>
                 <div class="form-text">대상은 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
+            <div class="form-group mb-3">
+                <label for="project_id" class="form-label">소속 프로젝트<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <select class="form-select" name="project_id" id="project_id" placeholder="소속 프로젝트를 선택하세요." required>
+                    <option value="" selected disabled>소속 프로젝트를 선택하세요.</option>
+                    {% for project_name, project_id in projects_list %}
+                        <option value="{{ project_id }}▩{{ project_name }}">{{ project_name }}</option>
+                    {% empty %}
+                        <option value="" disabled>Notion 데이터베이스 또는 프로젝트를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">소속 프로젝트를 선택하세요.</div>
+            </div>
             <div class="form-group mb-3" id="drive_id_DIV" style="display: none;">
                 <label for="drive_id" class="form-label">해당 공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="해당 공유 드라이브를 선택하세요." disabled>
@@ -38,7 +50,7 @@
                     {% for drive_name in drives_list %}
                         <option value="{{ drive_name }}">{{ drive_name }}</option>
                     {% empty %}
-                        <option value="" disabled>Google 공유 드라이브를 불러올 수 없습니다.</option>
+                        <option value="" disabled>Google 드라이브 공유 드라이브를 불러올 수 없습니다.</option>
                     {% endfor %}
                 </select>
                 <div class="invalid-feedback">해당 공유 드라이브를 선택하세요.</div>
@@ -822,6 +834,9 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
+                            }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("해당 공유 드라이브를 선택하세요.")
                             }
@@ -869,6 +884,9 @@
                         else {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
+                            }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("해당 공유 드라이브를 선택하세요.")
@@ -936,6 +954,9 @@
                 else {
                     if ( !document.querySelector("#category").value ) {
                         alert("대상을 선택하세요.")
+                    }
+                    else if ( !document.querySelector("#project_id").value ) {
+                        alert("소속 프로젝트를 선택하세요.")
                     }
                     else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                         alert("해당 공유 드라이브를 선택하세요.")

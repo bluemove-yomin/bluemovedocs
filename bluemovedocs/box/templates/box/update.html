@@ -40,6 +40,19 @@
                 <div class="invalid-feedback">대상을 선택하세요.</div>
                 <div class="form-text">대상은 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
+            <div class="form-group mb-3">
+                <label for="project_id" class="form-label">소속 프로젝트<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <select class="form-select" name="project_id" id="project_id" placeholder="소속 프로젝트를 선택하세요." required>
+                    <option value="{{ box.project_id }}▩{{ box.project_name }}" selected hidden>{{ box.project_name }}</option>
+                    <option value="" disabled>소속 프로젝트를 선택하세요.</option>
+                    {% for project_name, project_id in projects_list %}
+                        <option value="{{ project_id }}▩{{ project_name }}">{{ project_name }}</option>
+                    {% empty %}
+                        <option value="" disabled>Notion 데이터베이스 또는 프로젝트를 불러올 수 없습니다.</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">소속 프로젝트를 선택하세요.</div>
+            </div>
             {% if box.category == 'bluemover' %}
                 <div class="form-group mb-3" id="drive_id_DIV">
                     <label for="drive_id" class="form-label">해당 공유 드라이브<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -167,11 +180,11 @@
             {% endif %}
                 <label for="document_etcid" class="form-label">임의 템플릿 문서 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 {% if 'document' in box.document_mimetype %}
-                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" required>
+                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
                 {% elif 'spreadsheet' in box.document_mimetype %}
-                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" required>
+                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" disabled>
                 {% else %}
-                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/presentation/d/{{ box.document_id }}" required>
+                    <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/presentation/d/{{ box.document_id }}" disabled>
                 {% endif %}
                 <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_etcidHelp" class="form-text">
@@ -920,6 +933,9 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
+                            }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("해당 공유 드라이브를 선택하세요.")
                             }
@@ -967,6 +983,9 @@
                         else {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
+                            }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("해당 공유 드라이브를 선택하세요.")
@@ -1031,6 +1050,9 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
+                            }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -1072,6 +1094,9 @@
                         else {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
+                            }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
                             }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
@@ -1132,6 +1157,9 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
+                            }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("해당 공유 드라이브를 선택하세요.")
                             }
@@ -1179,6 +1207,9 @@
                         else {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
+                            }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
                             }
                             else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
                                 alert("해당 공유 드라이브를 선택하세요.")
@@ -1243,6 +1274,9 @@
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
                             }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
+                            }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")
                             }
@@ -1284,6 +1318,9 @@
                         else {
                             if ( !document.querySelector("#category").value ) {
                                 alert("대상을 선택하세요.")
+                            }
+                            else if ( !document.querySelector("#project_id").value ) {
+                                alert("소속 프로젝트를 선택하세요.")
                             }
                             else if ( !document.querySelector("#title").value ) {
                                 alert("문서명을 입력하세요.")

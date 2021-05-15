@@ -37,6 +37,7 @@ SECRET_KEY = get_secret("SECRET_KEY")
 CLIENT_ID = get_secret("CLIENT_ID")
 CLIENT_SECRET = get_secret("CLIENT_SECRET")
 SLACK_BOT_TOKEN = get_secret("SLACK_BOT_TOKEN")
+NOTION_TOKEN = get_secret("NOTION_TOKEN")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False

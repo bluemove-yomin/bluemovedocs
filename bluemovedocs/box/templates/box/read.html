@@ -139,6 +139,7 @@
             <div class="callout" style="word-break: break-word;">
                 <span style="font-weight: 600; color: #58595B;"><i class="far fa-file-alt"></i> 문서함 정보</span><br>
                 <small style="color: #6C757D;">
+                    ⊙ 소속 프로젝트: <a href="https://www.notion.so/bluemove/50669927849b4835bef676aa511ca2b3?p={{ box.project_id | cut:'-' }}">{{ box.project_name }}</a><br>
                     {% if box.category == 'bluemover' %}
                         ⊙ 최종 디렉토리: {{ box.drive_name }} > <a href="https://drive.google.com/drive/folders/{{ box.folder_id }}" target="_blank">{{ box.folder_name }}</a><br>
                         {% if 'document' in box.document_mimetype %}

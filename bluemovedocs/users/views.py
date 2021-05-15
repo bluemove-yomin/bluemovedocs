@@ -20,13 +20,21 @@ import string
 import random
 import datetime
 import safelock
+import requests
+import json
 from django.conf import settings
 
 
 client_id = getattr(settings, 'CLIENT_ID', 'CLIENT_ID')
 client_secret = getattr(settings, 'CLIENT_SECRET', 'CLIENT_SECRET')
-slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
 service_account_creds = "bluemove-docs-9f4ec6cf5006.json"
+slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
+notion_token = getattr(settings, 'NOTION_TOKEN', 'NOTION_TOKEN')
+notion_headers = {
+    'Authorization': f"Bearer " + notion_token,
+    'Content-Type': 'application/json',
+    'Notion-Version': '2021-05-13',
+}
 
 
 @login_required
@@ -139,6 +147,21 @@ def write_info(request, id):
         except:
             user.delete()
             return redirect('users:login_cancelled_no_slack')
+        try:
+            notion_response = requests.get('https://api.notion.com/v1/users', headers=notion_headers)
+            notion_response = json.loads(notion_response.text)
+            notion_response = notion_response['results']
+            notion_users_list = []
+            for i in range(len(notion_response)):
+                notion_user_type = notion_response[i]['type']
+                if notion_user_type == "person":
+                    notion_user_email = notion_response[i]['person']['email']
+                    notion_user_id = notion_response[i]['id']
+                    notion_users_list.append(tuple((notion_user_email, notion_user_id)))
+            profile.notion_user_id = notion_user_id = dict(notion_users_list)[str(user.email).lower()]
+        except:
+            user.delete()
+            return redirect('users:login_cancelled_no_notion')
         if datetime.datetime.now() >= userdata_expired_datetime:
             user.delete()
             return render(request, 'users/login_cancelled_delete.html')
@@ -151,7 +174,7 @@ def write_info(request, id):
             profile.info_update_flag = True
             profile.sub_id = 'B' + random_sub_id
             user.save(update_fields=['last_name', 'first_name'])
-            profile.save(update_fields=['level', 'phone', 'slack_user_id', 'info_update_flag', 'sub_id'])
+            profile.save(update_fields=['level', 'phone', 'slack_user_id', 'notion_user_id', 'info_update_flag', 'sub_id'])
             phone = safelock.AESCipher().decrypt_str(user.profile.phone)
             # 슬랙 메시지 발신
             client = WebClient(token=slack_bot_token)
@@ -988,6 +1011,10 @@ def login_cancelled_no_drive(request):
 
 def login_cancelled_no_slack(request):
     return render(request, 'users/login_cancelled_no_slack.html')
+
+
+def login_cancelled_no_notion(request):
+    return render(request, 'users/login_cancelled_no_notion.html')
 
 
 def login_cancelled_delete(request, id):

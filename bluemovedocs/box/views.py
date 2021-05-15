@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from pyasn1.type.univ import Null
 from .models import *
 from django.db.models import Q
 from django.contrib.auth import logout
@@ -14,18 +13,28 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.oauth2 import service_account
 from email.mime.text import MIMEText
-from allauth.socialaccount.models import SocialToken, SocialApp, SocialAccount
+from allauth.socialaccount.models import SocialToken, SocialAccount
 from oauth2client.service_account import ServiceAccountCredentials
 from users.models import Profile
 from slack_sdk import WebClient
 import safelock
+import requests
+import json
 from django.conf import settings
 
 
 client_id = getattr(settings, 'CLIENT_ID', 'CLIENT_ID')
 client_secret = getattr(settings, 'CLIENT_SECRET', 'CLIENT_SECRET')
-slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
 service_account_creds = "bluemove-docs-9f4ec6cf5006.json"
+slack_bot_token = getattr(settings, 'SLACK_BOT_TOKEN', 'SLACK_BOT_TOKEN')
+notion_token = getattr(settings, 'NOTION_TOKEN', 'NOTION_TOKEN')
+notion_projects_db_id = "d17acacd-fb64-4e0d-9f75-462424c7cb81"
+notion_tasks_db_id = "45e43f3f-dfb3-4d34-8b02-1c95a745719d"
+notion_headers = {
+    'Authorization': f"Bearer " + notion_token,
+    'Content-Type': 'application/json',
+    'Notion-Version': '2021-05-13',
+}
 
 
 @login_required
@@ -144,6 +153,20 @@ def write(request):
         channels_list.append(tuple((channels_id, channels_name)))
     channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
     # Slack 채널 불러오기 끝
+    # Notion 프로젝트 DB 불러오기 시작
+    notion_response = requests.post('https://api.notion.com/v1/search', headers=notion_headers)
+    notion_response = json.loads(notion_response.text)
+    notion_response = notion_response['results']
+    notion_projects_list = []
+    for i in range(len(notion_response)):
+        notion_object = notion_response[i]['object']
+        if notion_object == "page":
+            if notion_response[i]['parent']['database_id'] == notion_projects_db_id:
+                notion_project_name = notion_response[i]['properties']['프로젝트']['title'][0]['text']['content']
+                notion_project_id = notion_response[i]['id']
+                notion_projects_list.append(tuple((notion_project_name, notion_project_id)))
+    projects_list = sorted(notion_projects_list, key=lambda tup: (tup[0]))
+    # Notion 프로젝트 DB 불러오기 끝
     return render(
         request,
         'box/write.html',
@@ -159,6 +182,7 @@ def write(request):
             'folders_list_F': folders_list_F,
             'folders_list_G': folders_list_G,
             'folders_list_H': folders_list_H,
+            'projects_list': projects_list,
             'channels_list': channels_list,
         }
     )
@@ -174,6 +198,8 @@ def create(request):
         ##################################
         if form.is_valid() and request.POST.get('category') == 'bluemover':
             box_category = request.POST.get('category')
+            box_project_id = request.POST.get('project_id').split('▩')[0]
+            box_project_name = request.POST.get('project_id').split('▩')[1]
             box_drive_name = request.POST.get('drive_id')
             box_folder_id = request.POST.get('folder_id').split('#')[0]
             box_folder_name = request.POST.get('folder_id').split('#')[1]
@@ -204,12 +230,14 @@ def create(request):
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, folder_name=box_folder_name, folder_prefix=box_folder_prefix, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
+            form.save(category=box_category, project_id=box_project_id, project_name=box_project_name, folder_name=box_folder_name, folder_prefix=box_folder_prefix, drive_name=box_drive_name, title=box_title, writer=box_writer, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
         ##############################
         ##### 대상이 guest일 경우 #####
         ##############################
         elif form.is_valid() and request.POST.get('category') == 'guest':
             box_category = request.POST.get('category')
+            box_project_id = request.POST.get('project_id').split('▩')[0]
+            box_project_name = request.POST.get('project_id').split('▩')[1]
             box_title = request.POST.get('title')
             box_writer = request.user
             if request.POST.get('document_etcid') == None:
@@ -236,7 +264,7 @@ def create(request):
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
             box_image = request.FILES.get('image')
-            form.save(category=box_category, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
+            form.save(category=box_category, project_id=box_project_id, project_name=box_project_name, title=box_title, writer=box_writer, document_id=box_document_id, channel_id=box_channel_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_name=box_channel_name, deadline=box_deadline, image=box_image, official_template_flag=official_template_flag)
     return redirect('box:main') # POST와 GET 모두 box:main으로 redirect
 
 
@@ -409,7 +437,46 @@ def create_doc(request, id):
                         ]
                     }
                 ).execute()
-            # 07. OUTSIDE 클라이언트 권한 ID 조회
+            # 07. OUTSIDE 클라이언트 Notion 태스크 추가
+            payload = json.dumps({
+                "parent": {
+                    "database_id": notion_tasks_db_id
+                },
+                "properties": {
+                    "태스크": {
+                        "title": [
+                            {
+                                "text": {
+                                    "content": "'" + name + "' 제출"
+                                }
+                            }
+                        ]
+                    },
+                    "태스크 담당자": {
+                        "people": [
+                            {
+                                "object": "user",
+                                "id": profile.notion_user_id
+                            }
+                        ]
+                    },
+                    "소속 프로젝트": {
+                        "relation": [
+                            {
+                                "id": box.project_id
+                            }
+                        ]
+                    },
+                    "마감일": {
+                        "date": {
+                            "start": box.deadline.strftime('%Y-%m-%d')
+                        }
+                    }
+                }
+            })
+            notion_response = requests.request("POST", 'https://api.notion.com/v1/pages/', headers=notion_headers, data=payload.encode('utf-8'))
+            doc_notion_page_id = json.loads(notion_response.text)['id']
+            # 08. OUTSIDE 클라이언트 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId = file_id,
                 supportsAllDrives = True,
@@ -417,7 +484,7 @@ def create_doc(request, id):
             permissions_list = drive_response.get('permissions')
             for permissions_data in permissions_list:
                 outside_permission_id = permissions_data['id'] ##### OUTSIDE 클라이언트 권한 ID OUTPUT #####
-                # 08. 문서 데이터 DB 반영
+                # 09. 문서 데이터 DB 반영
                 doc_user = request.user
                 doc_name = name
                 doc_file_id = file_id
@@ -427,7 +494,7 @@ def create_doc(request, id):
                     doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
                 else:
                     doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
-                Doc.objects.create(user=doc_user, name=doc_name, mimetype=mimetype, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
+                Doc.objects.create(user=doc_user, name=doc_name, mimetype=mimetype, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, notion_page_id=doc_notion_page_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
                 if 'next' in request.GET:
                     return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
                 else:
@@ -876,9 +943,25 @@ def update(request, id):
         channels_list.append(tuple((channels_id, channels_name)))
     channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
     # Slack 채널 불러오기 끝
+    # Notion 프로젝트 DB 불러오기 시작
+    notion_response = requests.post('https://api.notion.com/v1/search', headers=notion_headers)
+    notion_response = json.loads(notion_response.text)
+    notion_response = notion_response['results']
+    notion_projects_list = []
+    for i in range(len(notion_response)):
+        notion_object = notion_response[i]['object']
+        if notion_object == "page":
+            if notion_response[i]['parent']['database_id'] == notion_projects_db_id:
+                notion_project_name = notion_response[i]['properties']['프로젝트']['title'][0]['text']['content']
+                notion_project_id = notion_response[i]['id']
+                notion_projects_list.append(tuple((notion_project_name, notion_project_id)))
+    projects_list = sorted(notion_projects_list, key=lambda tup: (tup[0]))
+    # Notion 프로젝트 DB 불러오기 끝
     if request.method == "POST":
         form = BoxContentForm(request.POST, instance=box)
         if form.is_valid() and box.category == 'bluemover':
+            box_project_id = request.POST.get('project_id').split('▩')[0]
+            box_project_name = request.POST.get('project_id').split('▩')[1]
             box_folder_id = request.POST.get('folder_id').split('#')[0]
             box_folder_name = request.POST.get('folder_id').split('#')[1]
             box_folder_prefix = box_folder_name[0:3]
@@ -907,8 +990,10 @@ def update(request, id):
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(folder_name=box_folder_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(folder_name=box_folder_name, project_id=box_project_id, project_name=box_project_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         elif form.is_valid() and box.category == 'guest':
+            box_project_id = request.POST.get('project_id').split('▩')[0]
+            box_project_name = request.POST.get('project_id').split('▩')[1]
             box_title = request.POST.get('title')
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
@@ -933,7 +1018,7 @@ def update(request, id):
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(title=box_title, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(title=box_title, project_id=box_project_id, project_name=box_project_name, projects_list=projects_list, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
         return redirect('box:read', box.id)
     return render(
         request,
@@ -951,6 +1036,7 @@ def update(request, id):
             'folders_list_F': folders_list_F,
             'folders_list_G': folders_list_G,
             'folders_list_H': folders_list_H,
+            'projects_list': projects_list,
             'channels_list': channels_list
         }
     )
@@ -961,107 +1047,6 @@ def update(request, id):
 def updateimage(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
-    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 시작
-    token = SocialToken.objects.get(account__user=request.user, account__provider='google')
-    credentials = Credentials(
-        client_id=client_id,
-        client_secret=client_secret,
-        token_uri='https://oauth2.googleapis.com/token',
-        refresh_token=token.token_secret,
-        token=token.token
-    )
-    drive_service = build('drive', 'v3', credentials=credentials)
-    try:
-        drive_response = drive_service.drives().list().execute()
-    except:
-        logout(request)
-        return redirect('users:login_cancelled_no_token')
-    all_drives = drive_response.get('drives')
-    drives_list = []
-    for drive in all_drives:
-        drive_id = drive['id']
-        drive_name = drive['name']
-        if 'A' in drive_name:
-            Adrive = drive_id
-        if 'B' in drive_name:
-            Bdrive = drive_id
-        if 'C' in drive_name:
-            Cdrive = drive_id
-        if 'D' in drive_name:
-            Ddrive = drive_id
-        if 'E' in drive_name:
-            Edrive = drive_id
-        if 'F' in drive_name:
-            Fdrive = drive_id
-        if 'G' in drive_name:
-            Gdrive = drive_id
-        if 'H' in drive_name:
-            Hdrive = drive_id
-        drives_list.append(drive_name)
-    drive_response = drive_service.files().list(
-        fields="files(id, name)",
-        includeItemsFromAllDrives=True,
-        orderBy="name",
-        q="mimeType='application/vnd.google-apps.folder' and trashed = false and ('" + Adrive + "' in parents or '" + Bdrive + "' in parents or '" + Cdrive + "' in parents or '" + Ddrive + "' in parents or '" + Edrive + "' in parents or '" + Fdrive + "' in parents or '" + Gdrive + "' in parents or '" + Hdrive + "' in parents)",
-        supportsAllDrives=True,
-    ).execute()
-    all_folders = drive_response.get('files')
-    folders_list_A = []
-    folders_list_B = []
-    folders_list_C = []
-    folders_list_D = []
-    folders_list_E = []
-    folders_list_F = []
-    folders_list_G = []
-    folders_list_H = []
-    for folder in all_folders:
-        folder_id = folder['id']
-        folder_name = folder['name']
-        if re.match('A+\d+', folder_name):
-            folders_list_A.append(tuple((folder_id, folder_name)))
-        if re.match('B+\d+', folder_name):
-            folders_list_B.append(tuple((folder_id, folder_name)))
-        if re.match('C+\d+', folder_name):
-            folders_list_C.append(tuple((folder_id, folder_name)))
-        if re.match('D+\d+', folder_name):
-            folders_list_D.append(tuple((folder_id, folder_name)))
-        if re.match('E+\d+', folder_name):
-            folders_list_E.append(tuple((folder_id, folder_name)))
-        if re.match('F+\d+', folder_name):
-            folders_list_F.append(tuple((folder_id, folder_name)))
-        if re.match('G+\d+', folder_name):
-            folders_list_G.append(tuple((folder_id, folder_name)))
-        if re.match('H+\d+', folder_name):
-            folders_list_H.append(tuple((folder_id, folder_name)))
-    drive_response = drive_service.files().list(
-        corpora='allDrives',
-        fields="files(id, name, mimeType)",
-        includeItemsFromAllDrives=True,
-        orderBy="name",
-        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
-        supportsAllDrives=True,
-    ).execute()
-    all_templates = drive_response.get('files')
-    templates_list = []
-    for template in all_templates:
-        template_id = template['id']
-        template_name = template['name']
-        template_mimetype = template['mimeType']
-        templates_list.append(tuple((template_id, template_name, template_mimetype)))
-    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
-    # Slack 채널 불러오기 시작
-    client = WebClient(token=slack_bot_token)
-    slack_response = client.conversations_list(
-        team_id = 'T2EH6PN00'
-    )
-    all_channels = slack_response.get('channels')
-    channels_list = []
-    for channels_data in all_channels:
-        channels_id = channels_data.get('id')
-        channels_name = channels_data.get('name')
-        channels_list.append(tuple((channels_id, channels_name)))
-    channels_list = sorted(channels_list, key=lambda tup: (tup[1]))
-    # Slack 채널 불러오기 끝
     if request.method == "POST":
         box.image = request.FILES.get('image')
         box.save(update_fields=['image'])
@@ -1071,18 +1056,7 @@ def updateimage(request, id):
         'box/updateimage.html',
         {
             'box': box,
-            'form': form,
-            'drives_list': drives_list,
-            'templates_list': templates_list,
-            'folders_list_A': folders_list_A,
-            'folders_list_B': folders_list_B,
-            'folders_list_C': folders_list_C,
-            'folders_list_D': folders_list_D,
-            'folders_list_E': folders_list_E,
-            'folders_list_F': folders_list_F,
-            'folders_list_G': folders_list_G,
-            'folders_list_H': folders_list_H,
-            'channels_list': channels_list
+            'form': form
         }
     )
 
@@ -1482,7 +1456,7 @@ def delete_doc(request, doc_id):
                                                                                         style="padding: 0px 18px 9px; text-align: left;">
                                                                                         <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                         <small style="color: #58595B;">
-                                                                                            이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                            이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                             ⓒ 파란물결 블루무브
                                                                                         </small>
                                                                                     </td>
@@ -1825,7 +1799,7 @@ def delete_doc(request, doc_id):
                                                                                         style="padding: 0px 18px 9px; text-align: left;">
                                                                                         <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                         <small style="color: #58595B;">
-                                                                                            이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                            이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                             ⓒ 파란물결 블루무브
                                                                                         </small>
                                                                                     </td>
@@ -1856,7 +1830,7 @@ def delete_doc(request, doc_id):
             message['to'] = to
             message['subject'] = subject
             message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-            # 04. 메일 발신
+            # 04. 메일 발송
             message = (
                 mail_service.users().messages().send(
                     userId = user_id,
@@ -1924,7 +1898,7 @@ def delete_doc(request, doc_id):
                 )
             except:
                 None
-            # 06. 슬랙 메시지 발신
+            # 06. 슬랙 메시지 발송
             try:
                 client.conversations_join(
                     channel = doc.box.channel_id
@@ -2090,7 +2064,7 @@ def submit_doc(request, doc_id):
         doc.submit_flag = True
         doc.reject_flag = False
         doc.save()
-        # 08. 슬랙 메시지 발신
+        # 08. 슬랙 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(
@@ -2297,7 +2271,7 @@ def submit_doc(request, doc_id):
                 text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 접수됨",
             )
         doc.slack_ts = slack['ts']
-        # 09. OUTSIDE 클라이언트 슬랙 메시지 발신
+        # 09. OUTSIDE 클라이언트 슬랙 메시지 발송
         if 'document' in doc.box.document_mimetype:
             client.chat_postMessage(
                 channel = doc.user.profile.slack_user_id,
@@ -2496,7 +2470,57 @@ def submit_doc(request, doc_id):
                 ],
                 text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 제출됨",
             )
+        # 10. OUTSIDE 클라이언트 Notion 태스크 수정
+        payload = json.dumps({
+            "properties": {
+                "완료": {
+                    "checkbox": True
+                }
+            }
+        })
+        notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
+        # 11. INSIDE 클라이언트 Notion 태스크 추가
+        d_minus_three = datetime.date.today() + datetime.timedelta(days=3)
+        payload = json.dumps({
+            "parent": {
+                "database_id": notion_tasks_db_id
+            },
+            "properties": {
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.name + "' 검토"
+                            }
+                        }
+                    ]
+                },
+                "태스크 담당자": {
+                    "people": [
+                        {
+                            "object": "user",
+                            "id": doc.box.writer.profile.notion_user_id
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": d_minus_three.strftime('%Y-%m-%d')
+                    }
+                }
+            }
+        })
+        notion_response = requests.request("POST", 'https://api.notion.com/v1/pages/', headers=notion_headers, data=payload.encode('utf-8'))
+        doc.box.notion_page_id = json.loads(notion_response.text)['id']
         doc.save()
+        doc.box.save()
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -2897,7 +2921,7 @@ def submit_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -3239,7 +3263,7 @@ def submit_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -3270,14 +3294,14 @@ def submit_doc(request, doc_id):
         message['to'] = to
         message['subject'] = subject
         message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-        # 09. 메일 발신
+        # 09. 메일 발송
         message = (
             mail_service.users().messages().send(
                 userId = user_id,
                 body = message,
             ).execute()
         )
-        # 10. 슬랙 메시지 발신
+        # 10. 슬랙 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(
@@ -3484,7 +3508,48 @@ def submit_doc(request, doc_id):
                 text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(" ","") + "' 접수됨",
             )
         doc.slack_ts = slack['ts']
+        # 11. INSIDE 클라이언트 Notion 태스크 추가
+        d_minus_three = datetime.date.today() + datetime.timedelta(days=3)
+        payload = json.dumps({
+            "parent": {
+                "database_id": notion_tasks_db_id
+            },
+            "properties": {
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.name + "' 검토"
+                            }
+                        }
+                    ]
+                },
+                "태스크 담당자": {
+                    "people": [
+                        {
+                            "object": "user",
+                            "id": doc.box.writer.profile.notion_user_id
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": d_minus_three.strftime('%Y-%m-%d')
+                    }
+                }
+            }
+        })
+        notion_response = requests.request("POST", 'https://api.notion.com/v1/pages/', headers=notion_headers, data=payload.encode('utf-8'))
+        doc.box.notion_page_id = json.loads(notion_response.text)['id']
         doc.save()
+        doc.box.save()
         return redirect('box:read', id=doc.box.id)
 
 
@@ -3575,7 +3640,7 @@ def reject_doc(request, doc_id):
         doc.reject_reason = request.POST.get('reject_reason')
         doc.rejection_date = datetime.date.today().strftime('%Y-%m-%d')
         doc.save()
-        # 08. 슬랙 메시지 발신
+        # 08. 슬랙 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(
@@ -3638,7 +3703,7 @@ def reject_doc(request, doc_id):
             ],
             text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
         )
-        # 09. OUTSIDE 클라이언트 슬랙 메시지 발신
+        # 09. OUTSIDE 클라이언트 슬랙 메시지 발송
         if 'document' in doc.box.document_mimetype:
             client.chat_postMessage(
                 channel = doc.user.profile.slack_user_id,
@@ -3837,6 +3902,55 @@ def reject_doc(request, doc_id):
                 ],
                 text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
             )
+        # 10. INSIDE 클라이언트 Notion 태스크 수정
+        payload = json.dumps({
+            "properties": {
+                "완료": {
+                    "checkbox": True
+                }
+            }
+        })
+        notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
+        # 11. OUTSIDE 클라이언트 Notion 태스크 추가
+        payload = json.dumps({
+            "parent": {
+                "database_id": notion_tasks_db_id
+            },
+            "properties": {
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.name + "' 제출"
+                            }
+                        }
+                    ]
+                },
+                "태스크 담당자": {
+                    "people": [
+                        {
+                            "object": "user",
+                            "id": doc.user.profile.notion_user_id
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": doc.box.deadline.strftime('%Y-%m-%d')
+                    }
+                }
+            }
+        })
+        notion_response = requests.request("POST", 'https://api.notion.com/v1/pages/', headers=notion_headers, data=payload.encode('utf-8'))
+        doc.notion_page_id = json.loads(notion_response.text)['id']
+        doc.save()
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -4235,7 +4349,7 @@ def reject_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -4579,7 +4693,7 @@ def reject_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -4610,7 +4724,7 @@ def reject_doc(request, doc_id):
         message['to'] = to
         message['subject'] = subject
         message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-        # 09. 메일 발신
+        # 09. 메일 발송
         message = (
             mail_service.users().messages().send(
                 userId = user_id,
@@ -4618,7 +4732,7 @@ def reject_doc(request, doc_id):
             ).execute()
         )
         # message_id = message['id']
-        # 10. 슬랙 메시지 발신
+        # 10. 슬랙 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(
@@ -4681,6 +4795,15 @@ def reject_doc(request, doc_id):
             ],
             text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "' 반려됨",
         )
+        # 11. INSIDE 클라이언트 Notion 태스크 수정
+        payload = json.dumps({
+            "properties": {
+                "완료": {
+                    "checkbox": True
+                }
+            }
+        })
+        notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
         return redirect('box:read', id=doc.box.id)
 
 
@@ -4801,7 +4924,7 @@ def return_doc(request, doc_id):
         doc.outside_permission_id = None
         doc.inside_permission_id = None
         doc.save()
-        # 07. 슬랙 메시지 발신
+        # 07. 슬랙 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(
@@ -5007,7 +5130,7 @@ def return_doc(request, doc_id):
                 ],
                 text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
             )
-        # 08. OUTSIDE 클라이언트 슬랙 메시지 발신
+        # 08. OUTSIDE 클라이언트 슬랙 메시지 발송
         if 'document' in doc.box.document_mimetype:
             client.chat_postMessage(
                 channel = doc.user.profile.slack_user_id,
@@ -5206,6 +5329,15 @@ def return_doc(request, doc_id):
                 ],
                 text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
             )
+        # 09. INSIDE 클라이언트 Notion 태스크 수정
+        payload = json.dumps({
+            "properties": {
+                "완료": {
+                    "checkbox": True
+                }
+            }
+        })
+        notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
         return redirect('box:read', id=doc.box.id)
     ###########################################
     ##### OUTSIDE 클라이언트가 guest일 경우 #####
@@ -5611,7 +5743,7 @@ def return_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -5954,7 +6086,7 @@ def return_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -5985,7 +6117,7 @@ def return_doc(request, doc_id):
         message['to'] = to
         message['subject'] = subject
         message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-        # 10. 메일 발신
+        # 10. 메일 발송
         message = (
             mail_service.users().messages().send(
                 userId = user_id,
@@ -5993,7 +6125,7 @@ def return_doc(request, doc_id):
             ).execute()
         )
         # message_id = message['id']
-        # 11. 슬랙 메시지 발신
+        # 11. 슬랙 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(
@@ -6056,6 +6188,15 @@ def return_doc(request, doc_id):
             ],
             text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "' 반환됨",
         )
+        # 12. INSIDE 클라이언트 Notion 태스크 수정
+        payload = json.dumps({
+            "properties": {
+                "완료": {
+                    "checkbox": True
+                }
+            }
+        })
+        notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
         return redirect('box:read', id=doc.box.id)
 
 
@@ -6459,7 +6600,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 style="padding: 0px 18px 9px; text-align: left;">
                                                                                 <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                 <small style="color: #58595B;">
-                                                                                    이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                    이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                     ⓒ 파란물결 블루무브
                                                                                 </small>
                                                                             </td>
@@ -6801,7 +6942,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 style="padding: 0px 18px 9px; text-align: left;">
                                                                                 <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                 <small style="color: #58595B;">
-                                                                                    이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                    이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                     ⓒ 파란물결 블루무브
                                                                                 </small>
                                                                             </td>
@@ -6832,7 +6973,7 @@ def return_doc_before_submit(request, doc_id):
     message['to'] = to
     message['subject'] = subject
     message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-    # 09. 메일 발신
+    # 09. 메일 발송
     message = (
         mail_service.users().messages().send(
             userId = user_id,

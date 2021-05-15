@@ -30,7 +30,7 @@
             <div class="form-group mb-3">
                 <label for="category" class="form-label">대상</label>
                 <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." aria-describedby="categoryHelp" disabled>
-                    <option value="{{ box.category }}" selected hidden>
+                    <option selected hidden>
                         {% if box.category == 'bluemover' %}
                             블루무버
                         {% elif box.category == 'guest' %}
@@ -39,24 +39,23 @@
                             알 수 없음
                         {% endif %}
                     </option>
-                    <option value="" disabled>대상을 선택하세요.</option>
-                    <option value="bluemover">블루무버</option>
-                    <option value="guest">게스트</option>
                 </select>
                 <div class="invalid-feedback">대상을 선택하세요.</div>
                 <div id="categoryHelp" class="form-text">대상은 문서함 생성 이후 수정할 수 없습니다.</div>
+            </div>
+            <div class="form-group mb-3">
+                <label for="project_id" class="form-label">소속 프로젝트</label>
+                <select class="form-select" name="project_id" id="project_id" placeholder="소속 프로젝트를 선택하세요." disabled>
+                    <option selected hidden>{{ box.project_name }}</option>
+                </select>
+                <div class="invalid-feedback">소속 프로젝트를 선택하세요.</div>
+                <div class="form-text">소속 프로젝트를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             {% if box.category == 'bluemover' %}
                 <div class="form-group mb-3" id="drive_id_DIV">
                     <label for="drive_id" class="form-label">해당 공유 드라이브</label>
                     <select class="form-select" name="drive_id" id="drive_id" onchange="drive_idChange(this)" placeholder="해당 공유 드라이브를 선택하세요." disabled>
-                        <option value="{{ box.drive_name }}" selected hidden>{{ box.drive_name }}</option>
-                        <option value="" disabled>해당 공유 드라이브를 선택하세요.</option>
-                        {% for drive_name in drives_list %}
-                            <option value="{{ drive_name }}">{{ drive_name }}</option>
-                        {% empty %}
-                            <option value="" disabled>Google 공유 드라이브를 불러올 수 없습니다.</option>
-                        {% endfor %}
+                        <option selected hidden>{{ box.drive_name }}</option>
                     </select>
                     <div class="invalid-feedback">해당 공유 드라이브를 선택하세요.</div>
                     <div class="form-text">해당 공유 드라이브를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
@@ -64,95 +63,34 @@
                 <div class="form-group mb-3" id="folder_id_DIV">
                     <label for="folder_id" class="form-label">최종 디렉토리</label>
                     <select class="form-select" name="folder_id" id="folder_id" placeholder="최종 디렉토리를 선택하세요." disabled>
-                        <option value="{{ box.folder_id }}#{{ box.folder_name }}" selected hidden>
-                            {% for folder_id, folder_name in folders_list_A %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_B %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_C %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_D %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_E %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_F %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_G %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                            {% for folder_id, folder_name in folders_list_H %}
-                                {% if box.folder_id == folder_id %}
-                                    {{ folder_name }}
-                                {% endif %}
-                            {% endfor %}
-                        </option>
-                        <option value="" id="placeholder" style="display: none;" disabled>최종 디렉토리를 선택하세요.</option>
-                        <option value="" id="hint01" disabled>해당 공유 드라이브를 먼저 선택하세요.</option>
-                        {% for folder_id, folder_name in folders_list_A %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_A{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_A_empty" style="display: none;" disabled>A 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_B %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_B{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_B_empty" style="display: none;" disabled>B 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_C %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_C{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_C_empty" style="display: none;" disabled>C 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_D %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_D{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_D_empty" style="display: none;" disabled>D 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_E %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_E{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_E_empty" style="display: none;" disabled>E 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_F %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_F{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_F_empty" style="display: none;" disabled>F 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_G %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_G{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_G_empty" style="display: none;" disabled>G 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
-                        {% for folder_id, folder_name in folders_list_H %}
-                            <option value="{{ folder_id }}#{{ folder_name }}" id="option_H{{ folder_id }}" style="display: none;">{{ folder_name }}</option>
-                        {% empty %}
-                            <option value="" id="option_H_empty" style="display: none;" disabled>H 드라이브 디렉토리를 불러올 수 없습니다.</option>
-                        {% endfor %}
+                        <option selected hidden>{{ box.folder_name }}</option>
                     </select>
                     <div class="invalid-feedback">최종 디렉토리를 선택하세요.</div>
                     <div class="form-text">최종 디렉토리를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
                 </div>
             {% endif %}
+            <div class="form-group mb-3">
+                <label for="document_id" class="form-label">템플릿 문서</label>
+                <select class="form-select" name="document_id" id="document_id" onchange="document_idChange(this)" placeholder="템플릿 문서를 선택하세요." disabled>
+                    <option selected hidden>{{ box.document_name }}</option>
+                </select>
+                <div class="invalid-feedback">템플릿 문서를 선택하세요.</div>
+                <div class="form-text">템플릿 문서를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
+            {% if box.official_template_flag == True %}
+                <div class="form-group mb-3" id="document_etcid_DIV" style="display: none;">
+            {% else %}
+                <div class="form-group mb-3" id="document_etcid_DIV">
+            {% endif %}
+                <label for="document_etcid" class="form-label">임의 템플릿 문서 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
+                <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
+                <div id="document_etcidHelp" class="form-text">
+                    <p id="document_etcidHelpText" class="mb-2"></p>
+                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/11LA-0FQJX11wBPlvg58lPLZfTOxMRd56k8r7xz_JSYo</span>
+                </div>
+                <div class="form-text">임의 템플릿 문서 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+            </div>
             <div class="form-group mb-3">
                 <label for="title" class="form-label">문서명</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="문서명을 입력하세요." aria-describedby="titleHelp" value="{{ box.title }}" disabled>
@@ -160,38 +98,9 @@
                 <div id="titleHelp" class="form-text">문서명을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
             </div>
             <div class="form-group mb-3">
-                <label for="document_id" class="form-label">템플릿 문서 링크</label>
-                {% if 'document' in box.document_mimetype %}
-                    <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
-                {% elif 'spreadsheet' in box.document_mimetype %}
-                    <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/spreadsheets/d/{{ box.document_id }}" disabled>
-                {% else %}
-                    <input type="text" class="form-control" name="document_id" id="document_id" minlength="79" placeholder="템플릿 문서 링크를 입력하세요." aria-describedby="document_idHelp" value="https://docs.google.com/presentation/d/{{ box.document_id }}" disabled>
-                {% endif %}
-                <div class="invalid-feedback">유효한 템플릿 문서 링크를 입력하세요.</div>
-                <div id="document_idHelp" class="form-text">템플릿 문서 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
-            </div>
-            <div class="form-group mb-3">
                 <label for="channel_id" class="form-label">연동 Slack 채널</label>
                 <select class="form-select" name="channel_id" id="channel_id" placeholder="연동 Slack 채널을 선택하세요." disabled>
-                    <option value="{{ box.channel_id }}" selected hidden>
-                        {% if box.channel_id == box.writer.profile.slack_user_id %}
-                            {{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널
-                        {% else %}
-                            {% for channel_id, channel_name in channels_list %}
-                                {% if box.channel_id == channel_id %}
-                                    #{{ channel_name }}
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </option>
-                    <option value="" disabled>연동 Slack 채널을 선택하세요.</option>
-                    {% for channel_id, channel_name in channels_list %}
-                        <option value="{{ channel_id }}">#{{ channel_name }}</option>
-                    {% empty %}
-                        <option value="" disabled>Slack 공개 채널을 불러올 수 없습니다.</option>
-                    {% endfor %}
-                    <option value="{{ box.writer.profile.slack_user_id }}">{{ request.user.last_name }}{{ request.user.first_name }}님의 다이렉트 메시지 채널</option>
+                    <option selected hidden>{{ box.channel_name }}</option>
                 </select>
                 <div class="invalid-feedback">연동 Slack 채널을 입력하세요.</div>
                 <div id="channel_idHelp" class="form-text">연동 Slack 채널을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>

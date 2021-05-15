@@ -38,6 +38,9 @@ class Box(models.Model):
     document_name = models.CharField(max_length = 50, null = True, blank = True)
     document_id = models.CharField(max_length = 300)
     document_mimetype = models.CharField(max_length = 300, null = True, blank = True)
+    project_id = models.CharField(max_length = 100, null = True, blank = True)
+    project_name = models.CharField(max_length = 100, null = True, blank = True)
+    notion_page_id = models.CharField(max_length = 100, null = True, blank = True)
     channel_id = models.CharField(max_length = 50)
     channel_name = models.CharField(max_length = 50)
     deadline = models.DateField()
@@ -502,7 +505,7 @@ def send_noti(sender, instance, **kwargs):
                                                                                             style="padding: 0px 18px 9px; text-align: left;">
                                                                                             <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                             <small style="color: #58595B;">
-                                                                                                이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                                이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
                                                                                                 ⓒ 파란물결 블루무브
                                                                                             </small>
                                                                                         </td>
@@ -533,7 +536,7 @@ def send_noti(sender, instance, **kwargs):
                     message['to'] = to
                     message['subject'] = subject
                     message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-                    # 03. 메일 발신
+                    # 03. 메일 발송
                     message = (
                         mail_service.users().messages().send(
                             userId = user_id,
@@ -552,6 +555,7 @@ class Doc(models.Model):
     outside_permission_id = models.CharField(max_length = 300, null=True, blank=True)
     permission_id = models.CharField(max_length = 300, null=True, blank=True)
     inside_permission_id = models.CharField(max_length = 300, null=True, blank=True)
+    notion_page_id = models.CharField(max_length = 100, null=True, blank=True)
     slack_ts = models.CharField(max_length = 200, null=True, blank=True)
     reject_reason = models.CharField(max_length = 100, null=True, blank=True)
     creation_date = models.CharField(max_length = 100, null=True, blank=True)
