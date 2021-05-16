@@ -1456,7 +1456,7 @@ def delete_doc(request, doc_id):
                                                                                         style="padding: 0px 18px 9px; text-align: left;">
                                                                                         <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                         <small style="color: #58595B;">
-                                                                                            이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                            이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                             ⓒ 파란물결 블루무브
                                                                                         </small>
                                                                                     </td>
@@ -1799,7 +1799,7 @@ def delete_doc(request, doc_id):
                                                                                         style="padding: 0px 18px 9px; text-align: left;">
                                                                                         <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                         <small style="color: #58595B;">
-                                                                                            이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                            이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                             ⓒ 파란물결 블루무브
                                                                                         </small>
                                                                                     </td>
@@ -2480,7 +2480,7 @@ def submit_doc(request, doc_id):
         })
         notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
         # 11. INSIDE 클라이언트 Notion 태스크 추가
-        d_minus_three = datetime.date.today() + datetime.timedelta(days=3)
+        d_minus_three = doc.box.deadline + datetime.timedelta(days=3)
         payload = json.dumps({
             "parent": {
                 "database_id": notion_tasks_db_id
@@ -2921,7 +2921,7 @@ def submit_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -3263,7 +3263,7 @@ def submit_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -3509,7 +3509,7 @@ def submit_doc(request, doc_id):
             )
         doc.slack_ts = slack['ts']
         # 11. INSIDE 클라이언트 Notion 태스크 추가
-        d_minus_three = datetime.date.today() + datetime.timedelta(days=3)
+        d_minus_three = doc.box.deadline + datetime.timedelta(days=3)
         payload = json.dumps({
             "parent": {
                 "database_id": notion_tasks_db_id
@@ -4349,7 +4349,7 @@ def reject_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -4693,7 +4693,7 @@ def reject_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -5743,7 +5743,7 @@ def return_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -6086,7 +6086,7 @@ def return_doc(request, doc_id):
                                                                                     style="padding: 0px 18px 9px; text-align: left;">
                                                                                     <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                     <small style="color: #58595B;">
-                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                        이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                         ⓒ 파란물결 블루무브
                                                                                     </small>
                                                                                 </td>
@@ -6600,7 +6600,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 style="padding: 0px 18px 9px; text-align: left;">
                                                                                 <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                 <small style="color: #58595B;">
-                                                                                    이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                    이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                     ⓒ 파란물결 블루무브
                                                                                 </small>
                                                                             </td>
@@ -6942,7 +6942,7 @@ def return_doc_before_submit(request, doc_id):
                                                                                 style="padding: 0px 18px 9px; text-align: left;">
                                                                                 <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                 <small style="color: #58595B;">
-                                                                                    이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금하신 점이 있을 경우 이 주소로 회신해주시거나 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                    이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 이 주소로 회신해주시거나 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                     ⓒ 파란물결 블루무브
                                                                                 </small>
                                                                             </td>

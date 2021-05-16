@@ -81,6 +81,12 @@ def create_comment(request, id):
                     comment_writer_level = '알 수 없음'
                 if user.profile.level == 'bluemover':
                     client = WebClient(token=slack_bot_token)
+                    try:
+                        client.conversations_join(
+                            channel = notice.channel_id
+                        )
+                    except:
+                        None
                     client.chat_postMessage(
                         channel = user.profile.slack_user_id,
                         link_names = True,
@@ -464,7 +470,7 @@ def create_comment(request, id):
                                                                                             style="padding: 0px 18px 9px; text-align: left;">
                                                                                             <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                             <small style="color: #58595B;">
-                                                                                                이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금하신 점이 있을 경우 사무국 연락처로 문의해주시기 바랍니다.<br>
+                                                                                                이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금한 점이 있으실 경우 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                                 ⓒ 파란물결 블루무브
                                                                                             </small>
                                                                                         </td>
@@ -504,6 +510,12 @@ def create_comment(request, id):
                     )
         # 연동 Slack 채널에 메시지 발신
         client = WebClient(token=slack_bot_token)
+        try:
+            client.conversations_join(
+                channel = notice.channel_id
+            )
+        except:
+            None
         if mentioned_users != '' and notice.writer != comment_writer:
             client.chat_postMessage(
                 channel = notice.channel_id,
