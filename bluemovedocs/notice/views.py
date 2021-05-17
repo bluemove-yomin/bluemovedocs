@@ -67,7 +67,7 @@ def create_comment(request, id):
         comment_writer = request.user
         comment_content = request.POST.get('content')
         mentioned_users = request.POST.get('mention_name')[0:-1]
-        # 댓글에 멘션된 유저에게 알림 발신
+        # 댓글에 멘션된 유저에게 알림 발송
         if not request.POST.get('mention') == '':
             mentioned_users_id_list = request.POST.get('mention').split('@')
             for i in range(1, len(mentioned_users_id_list)):
@@ -375,7 +375,7 @@ def create_comment(request, id):
                                                                                             class="mcnTextContent"
                                                                                             style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
-                                                                                            댓글의 수정 및 삭제 내역에 대해서는 별도의 알림이 발신되지 않습니다.<br>
+                                                                                            댓글의 수정 및 삭제 내역에 대해서는 별도의 알림이 발송되지 않습니다.<br>
                                                                                             감사합니다.<br><br>
                                                                                         </td>
                                                                                     </tr>
@@ -470,7 +470,7 @@ def create_comment(request, id):
                                                                                             style="padding: 0px 18px 9px; text-align: left;">
                                                                                             <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                             <small style="color: #58595B;">
-                                                                                                이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금한 점이 있으실 경우 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
+                                                                                                이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                                 ⓒ 파란물결 블루무브
                                                                                             </small>
                                                                                         </td>
@@ -501,14 +501,14 @@ def create_comment(request, id):
                     message['to'] = to
                     message['subject'] = subject
                     message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-                    # 03. 메일 발신
+                    # 03. 메일 발송
                     message = (
                         mail_service.users().messages().send(
                             userId = user_id,
                             body = message,
                         ).execute()
                     )
-        # 연동 Slack 채널에 메시지 발신
+        # 연동 Slack 채널에 메시지 발송
         client = WebClient(token=slack_bot_token)
         try:
             client.conversations_join(

@@ -445,7 +445,7 @@ def send_noti(sender, instance, **kwargs):
                                                                                             style="padding: 0px 18px 9px; text-align: left;">
                                                                                             <hr style="border:0;height:.5px;background-color:#EEEEEE;">
                                                                                             <small style="color: #58595B;">
-                                                                                                이 메일은 블루무브 닥스에서 자동 발신되었습니다. 궁금한 점이 있으실 경우 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
+                                                                                                이 메일은 블루무브 닥스에서 자동 발송되었습니다. 궁금한 점이 있으실 경우 <a href="mailto:management@bluemove.or.kr">management@bluemove.or.kr</a>로 문의해주시기 바랍니다.<br>
                                                                                                 ⓒ 파란물결 블루무브
                                                                                             </small>
                                                                                         </td>
@@ -476,7 +476,7 @@ def send_noti(sender, instance, **kwargs):
                     message['to'] = to
                     message['subject'] = subject
                     message = {'raw': base64.urlsafe_b64encode(message.as_bytes()).decode('utf8')}
-                    # 03. 메일 발신
+                    # 03. 메일 발송
                     message = (
                         mail_service.users().messages().send(
                             userId = user_id,

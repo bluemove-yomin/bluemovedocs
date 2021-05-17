@@ -115,13 +115,14 @@
                     <option value="option_etc">임의 템플릿 문서</option>
                 </select>
                 <div class="invalid-feedback">템플릿 문서를 선택하세요.</div>
+                <div class="form-text">템플릿 문서는 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
             <div class="form-group mb-3" id="document_etcid_DIV" style="display: none;">
                 <label for="document_etcid" class="form-label">임의 템플릿 문서 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" disabled>
                 <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
                 <div id="document_etcidHelp" class="form-text">
-                    <p id="document_etcidHelpText" class="mb-2"></p>
+                    <p id="document_etcidHelpText" class="mb-2">임의 템플릿 문서 링크는 문서함 생성 이후 수정할 수 없습니다.</p>
                     <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/11LA-0FQJX11wBPlvg58lPLZfTOxMRd56k8r7xz_JSYo</span>
                 </div>
             </div>
@@ -129,6 +130,7 @@
                 <label for="title" class="form-label">문서명<span class="bluestar" style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="템플릿 문서를 먼저 선택하세요." required readonly>
                 <div class="invalid-feedback">문서명을 입력하세요.</div>
+                <div class="form-text">문서명은 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="channel_id" class="form-label">연동 Slack 채널<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -246,7 +248,8 @@
                     drive_id.disabled = false;
                     option_dm.setAttribute("style", "");
                     option_dm.disabled = false;
-                    helpText.innerText = "블루무버를 대상으로 할 경우 '파란물결 블루무브 링크가 있는 이 그룹의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다."
+                    // helpText.innerText = "블루무버를 대상으로 할 경우 '파란물결 블루무브 링크가 있는 이 그룹의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다."
+                    helpText.innerText = "임의 템플릿 문서 링크는 문서함 생성 이후 수정할 수 없습니다."
                 }
                 if ($(obj).val() == "guest" && channel_id.value == "{{ request.user.profile.slack_user_id }}") {
                     drive_idDiv.setAttribute("style", "display:none;");
@@ -259,7 +262,7 @@
                     option_dm.disabled = true;
                     option_dm.selected = false;
                     channel_id.value = "";
-                    helpText.innerText = "게스트를 대상으로 할 경우 '링크가 있는 인터넷상의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다.";
+                    helpText.innerText = "게스트를 대상으로 할 경우 '링크가 있는 인터넷상의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다. 임의 템플릿 문서 링크는 문서함 생성 이후 수정할 수 없습니다.";
                 }
                 if ($(obj).val() == "guest") {
                     drive_idDiv.setAttribute("style", "display:none;");
@@ -271,7 +274,7 @@
                     option_dm.setAttribute("style", "display:none;");
                     option_dm.disabled = true;
                     option_dm.selected = false;
-                    helpText.innerText = "게스트를 대상으로 할 경우 '링크가 있는 인터넷상의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다.";
+                    helpText.innerText = "게스트를 대상으로 할 경우 '링크가 있는 인터넷상의 모든 사용자'가 템플릿 문서를 볼 수 있어야 합니다. 임의 템플릿 문서 링크는 문서함 생성 이후 수정할 수 없습니다.";
                 }
             }
         </script>

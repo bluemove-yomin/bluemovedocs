@@ -75,27 +75,23 @@
                     <option selected hidden>{{ box.document_name }}</option>
                 </select>
                 <div class="invalid-feedback">템플릿 문서를 선택하세요.</div>
-                <div class="form-text">템플릿 문서를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <div class="form-text">템플릿 문서는 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
             {% if box.official_template_flag == True %}
                 <div class="form-group mb-3" id="document_etcid_DIV" style="display: none;">
             {% else %}
                 <div class="form-group mb-3" id="document_etcid_DIV">
             {% endif %}
-                <label for="document_etcid" class="form-label">임의 템플릿 문서 링크<span style="color: #007DC5; font-weight: 600;"> *</span></label>
+                <label for="document_etcid" class="form-label">임의 템플릿 문서 링크</label>
                 <input type="text" class="form-control" name="document_etcid" id="document_etcid" minlength="79" placeholder="임의 템플릿 문서 링크를 입력하세요." aria-describedby="document_etcidHelp" value="https://docs.google.com/document/d/{{ box.document_id }}" disabled>
                 <div class="invalid-feedback">유효한 임의 템플릿 문서 링크를 입력하세요.</div>
-                <div id="document_etcidHelp" class="form-text">
-                    <p id="document_etcidHelpText" class="mb-2"></p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 예시</span><span style="word-break: break-word;">: https://docs.google.com/document/d/11LA-0FQJX11wBPlvg58lPLZfTOxMRd56k8r7xz_JSYo</span>
-                </div>
-                <div class="form-text">임의 템플릿 문서 링크를 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <div class="form-text">임의 템플릿 문서 링크는 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="title" class="form-label">문서명</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="문서명을 입력하세요." aria-describedby="titleHelp" value="{{ box.title }}" disabled>
                 <div class="invalid-feedback">문서명을 입력하세요.</div>
-                <div id="titleHelp" class="form-text">문서명을 수정하려면 현재 작업 취소 후 '수정하기'를 누르세요.</div>
+                <div id="titleHelp" class="form-text">문서명은 문서함 생성 이후 수정할 수 없습니다.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="channel_id" class="form-label">연동 Slack 채널</label>

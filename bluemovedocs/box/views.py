@@ -437,46 +437,7 @@ def create_doc(request, id):
                         ]
                     }
                 ).execute()
-            # 07. OUTSIDE 클라이언트 Notion 태스크 추가
-            payload = json.dumps({
-                "parent": {
-                    "database_id": notion_tasks_db_id
-                },
-                "properties": {
-                    "태스크": {
-                        "title": [
-                            {
-                                "text": {
-                                    "content": "'" + name + "' 제출"
-                                }
-                            }
-                        ]
-                    },
-                    "태스크 담당자": {
-                        "people": [
-                            {
-                                "object": "user",
-                                "id": profile.notion_user_id
-                            }
-                        ]
-                    },
-                    "소속 프로젝트": {
-                        "relation": [
-                            {
-                                "id": box.project_id
-                            }
-                        ]
-                    },
-                    "마감일": {
-                        "date": {
-                            "start": box.deadline.strftime('%Y-%m-%d')
-                        }
-                    }
-                }
-            })
-            notion_response = requests.request("POST", 'https://api.notion.com/v1/pages/', headers=notion_headers, data=payload.encode('utf-8'))
-            doc_notion_page_id = json.loads(notion_response.text)['id']
-            # 08. OUTSIDE 클라이언트 권한 ID 조회
+            # 07. OUTSIDE 클라이언트 권한 ID 조회
             drive_response = drive_service.permissions().list(
                 fileId = file_id,
                 supportsAllDrives = True,
@@ -484,7 +445,7 @@ def create_doc(request, id):
             permissions_list = drive_response.get('permissions')
             for permissions_data in permissions_list:
                 outside_permission_id = permissions_data['id'] ##### OUTSIDE 클라이언트 권한 ID OUTPUT #####
-                # 09. 문서 데이터 DB 반영
+                # 08. 문서 데이터 DB 반영
                 doc_user = request.user
                 doc_name = name
                 doc_file_id = file_id
@@ -494,6 +455,45 @@ def create_doc(request, id):
                     doc_avatar_src = SocialAccount.objects.filter(user=request.user)[0].extra_data['picture']
                 else:
                     doc_avatar_src = '/static/images/favicons/favicon-96x96.png'
+                # 09. OUTSIDE 클라이언트 Notion 태스크 추가
+                payload = json.dumps({
+                    "parent": {
+                        "database_id": notion_tasks_db_id
+                    },
+                    "properties": {
+                        "태스크": {
+                            "title": [
+                                {
+                                    "text": {
+                                        "content": "'" + name + "' 제출"
+                                    }
+                                }
+                            ]
+                        },
+                        "태스크 담당자": {
+                            "people": [
+                                {
+                                    "object": "user",
+                                    "id": profile.notion_user_id
+                                }
+                            ]
+                        },
+                        "소속 프로젝트": {
+                            "relation": [
+                                {
+                                    "id": box.project_id
+                                }
+                            ]
+                        },
+                        "마감일": {
+                            "date": {
+                                "start": box.deadline.strftime('%Y-%m-%d')
+                            }
+                        }
+                    }
+                })
+                notion_response = requests.request("POST", 'https://api.notion.com/v1/pages/', headers=notion_headers, data=payload.encode('utf-8'))
+                doc_notion_page_id = json.loads(notion_response.text)['id']
                 Doc.objects.create(user=doc_user, name=doc_name, mimetype=mimetype, file_id=doc_file_id, outside_permission_id=doc_outside_permission_id, notion_page_id=doc_notion_page_id, creation_date=doc_creation_date, avatar_src=doc_avatar_src, box=box)
                 if 'next' in request.GET:
                     return redirect(request.GET['next']) # 나중에 next 파라미터로 뭐 받을 수도 있을 거 같아서 일단 넣어둠
@@ -755,6 +755,20 @@ def read(request, id):
         ##### OUTSIDE 클라이언트가 bluemover일 경우 #####
         ###############################################
         elif request.user.profile.level == 'bluemover':
+            token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+            credentials = Credentials(
+                client_id=client_id,
+                client_secret=client_secret,
+                token_uri='https://oauth2.googleapis.com/token',
+                refresh_token=token.token_secret,
+                token=token.token
+            )
+            drive_service = build('drive', 'v3', credentials=credentials)
+            try:
+                drive_response = drive_service.drives().list().execute()
+            except:
+                logout(request)
+                return redirect('users:login_cancelled_no_token')
             valid_docs = None
             created_valid_docs = None
             submitted_valid_docs = None
@@ -792,6 +806,76 @@ def read(request, id):
                     #         return redirect('box:read', id=doc.box.id)
                     # else:
                     #     None
+                # 문서명 및 설명 변경
+                if doc.name[0:3] != doc.box.folder_prefix:
+                    # 문서 잠금 해제
+                    drive_response = drive_service.files().update(
+                        fileId=doc.file_id,
+                        body={
+                            "contentRestrictions": [
+                                {
+                                    "readOnly": "false",
+                                }
+                            ]
+                        }
+                    ).execute()
+                    if doc.submit_flag == False and doc.reject_flag == False and doc.return_flag == False:
+                        drive_response = drive_service.files().update(
+                            fileId = doc.file_id,
+                            body = {
+                                'name': box.folder_prefix + '_' + box.title.replace(" ","") + '_' + doc.name[-6] + doc.name[-5] + doc.name[-4] + doc.name[-3] + doc.name[-2] + doc.name[-1],
+                                'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + box.folder_prefix + '_' + box.title.replace(" ","") + '입니다.\n\n' +
+                                            '📧 생성일: ' + doc.creation_date,
+                            },
+                            fields = 'name'
+                        ).execute()
+                        doc.name = drive_response.get('name')
+                        doc.save()
+                    elif doc.submit_flag == True and doc.reject_flag == False and doc.return_flag == False:
+                        drive_response = drive_service.files().update(
+                            fileId = doc.file_id,
+                            body = {
+                                'name': box.folder_prefix + '_' + box.title.replace(" ","") + '_' + doc.name[-6] + doc.name[-5] + doc.name[-4] + doc.name[-3] + doc.name[-2] + doc.name[-1],
+                                'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + box.folder_prefix + '_' + box.title.replace(" ","") + '입니다.\n' +
+                                            box.writer.last_name + box.writer.first_name + '님이 검토 중입니다.\n\n' +
+                                            '📧 생성일: ' + doc.creation_date + '\n' +
+                                            '📨 제출일: ' + doc.submission_date,
+                            },
+                            fields = 'name'
+                        ).execute()
+                        doc.name = drive_response.get('name')
+                        doc.save()
+                    elif doc.submit_flag == False and doc.reject_flag == True and doc.return_flag == False:
+                        drive_response = drive_service.files().update(
+                            fileId = doc.file_id,
+                            body = {
+                                'name': doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + '_' + doc.submission_date[2:4] + doc.submission_date[5:7] + doc.submission_date[8:10],
+                                'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + doc.box.folder_prefix + '_' + doc.box.title.replace(" ","") + '입니다.\n' +
+                                            doc.box.writer.last_name + doc.box.writer.first_name + '님의 검토 후 반려되었습니다.\n\n' +
+                                            '📧 생성일: ' + doc.creation_date + '\n' +
+                                            '📨 제출일: ' + doc.submission_date + '\n' +
+                                            '📩 반려일: ' + datetime.date.today().strftime('%Y-%m-%d'),
+                            },
+                            fields = 'name'
+                        ).execute()
+                        doc.name = drive_response.get('name')
+                        doc.save()
+                    else:
+                        None
+                    # 문서 잠금
+                    drive_response = drive_service.files().update(
+                        fileId=doc.file_id,
+                        body={
+                            "contentRestrictions": [
+                                {
+                                    "readOnly": "true",
+                                    "reason": "문서 정보가 자동으로 업데이트 되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                                }
+                            ]
+                        }
+                    ).execute()
+                else:
+                    None
         ###########################################
         ##### OUTSIDE 클라이언트가 guest일 경우 #####
         ###########################################
@@ -831,7 +915,7 @@ def box_favorite(request, id):
 def update(request, id):
     box = get_object_or_404(Box, pk=id)
     form = BoxContentForm(instance=box)
-    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 시작
+    # Google Drive 공유 드라이브 폴더 불러오기 시작
     token = SocialToken.objects.get(account__user=request.user, account__provider='google')
     credentials = Credentials(
         client_id=client_id,
@@ -914,22 +998,7 @@ def update(request, id):
             folders_list_G.append(tuple((folder_id, folder_name)))
         if re.match('H+\d+', folder_name):
             folders_list_H.append(tuple((folder_id, folder_name)))
-    drive_response = drive_service.files().list(
-        corpora='allDrives',
-        fields="files(id, name, mimeType)",
-        includeItemsFromAllDrives=True,
-        orderBy="name",
-        q="(mimeType='application/vnd.google-apps.document' or mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.google-apps.presentation') and trashed = false and '1aZll5junx2Rw9XoBIXCQD7wou8iS17Hb' in parents", # 210424 기준 'D03_템플릿' 폴더 ID
-        supportsAllDrives=True,
-    ).execute()
-    all_templates = drive_response.get('files')
-    templates_list = []
-    for template in all_templates:
-        template_id = template['id']
-        template_name = template['name']
-        template_mimetype = template['mimeType']
-        templates_list.append(tuple((template_id, template_name, template_mimetype)))
-    # Google Drive 공유 드라이브 폴더 불러오기, 템플릿 문서 불러오기 끝
+    # Google Drive 공유 드라이브 폴더 불러오기 끝
     # Slack 채널 불러오기 시작
     client = WebClient(token=slack_bot_token)
     slack_response = client.conversations_list(
@@ -966,59 +1035,126 @@ def update(request, id):
             box_folder_name = request.POST.get('folder_id').split('#')[1]
             box_folder_prefix = box_folder_name[0:3]
             box_drive_name = request.POST.get('drive_id')
-            box_title = request.POST.get('title').replace(' ', '')
-            if request.POST.get('document_etcid') == None:
-                box_document_id = request.POST.get('document_id').split('#')[0]
-                box_document_name = request.POST.get('document_id').split('#')[1]
-                box_document_mimetype = request.POST.get('document_id').split('#')[2]
-                official_template_flag = True
-            elif 'document' in request.POST.get('document_etcid'):
-                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
-                box_document_mimetype = 'application/vnd.google-apps.document'
-                official_template_flag = False
-            elif 'spreadsheets' in request.POST.get('document_etcid'):
-                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
-                box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
-                official_template_flag = False
-            else:
-                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
-                box_document_mimetype = 'application/vnd.google-apps.presentation'
-                official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(folder_name=box_folder_name, project_id=box_project_id, project_name=box_project_name, drive_name=box_drive_name, title=box_title, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(folder_name=box_folder_name, project_id=box_project_id, project_name=box_project_name, drive_name=box_drive_name, folder_id=box_folder_id, folder_prefix=box_folder_prefix, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline)
         elif form.is_valid() and box.category == 'guest':
             box_project_id = request.POST.get('project_id').split('▩')[0]
             box_project_name = request.POST.get('project_id').split('▩')[1]
-            box_title = request.POST.get('title')
-            if request.POST.get('document_etcid') == None:
-                box_document_id = request.POST.get('document_id').split('#')[0]
-                box_document_name = request.POST.get('document_id').split('#')[1]
-                box_document_mimetype = request.POST.get('document_id').split('#')[2]
-                official_template_flag = True
-            elif 'document' in request.POST.get('document_etcid'):
-                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
-                box_document_mimetype = 'application/vnd.google-apps.document'
-                official_template_flag = False
-            elif 'spreadsheets' in request.POST.get('document_etcid'):
-                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
-                box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
-                official_template_flag = False
-            else:
-                box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
-                box_document_mimetype = 'application/vnd.google-apps.presentation'
-                official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
             box_deadline = request.POST.get('deadline')
-            form.update(title=box_title, project_id=box_project_id, project_name=box_project_name, projects_list=projects_list, document_id=box_document_id, document_name=box_document_name, document_mimetype=box_document_mimetype, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline, official_template_flag=official_template_flag)
+            form.update(project_id=box_project_id, project_name=box_project_name, projects_list=projects_list, channel_id=box_channel_id, channel_name=box_channel_name, deadline=box_deadline)
+        all_docs = box.docs.all()
+        if all_docs.count() > 0 and box.category == 'bluemover':
+            for i in range(all_docs.count()):
+                doc_id = all_docs.values()[i]['id']
+                doc = Doc.objects.get(pk=doc_id)
+                name = box.folder_prefix + '_' + box.title.replace(" ","") + '_' + doc.name[-6] + doc.name[-5] + doc.name[-4] + doc.name[-3] + doc.name[-2] + doc.name[-1]
+                if doc.name[0:3] != doc.box.folder_prefix and doc.submit_flag == True and doc.reject_flag == False and doc.return_flag == False:
+                    # 문서 잠금 해제
+                    drive_response = drive_service.files().update(
+                        fileId=doc.file_id,
+                        body={
+                            "contentRestrictions": [
+                                {
+                                    "readOnly": "false",
+                                }
+                            ]
+                        }
+                    ).execute()
+                    # 문서명 및 설명 변경
+                    drive_response = drive_service.files().update(
+                        fileId = doc.file_id,
+                        body = {
+                            'name': box.folder_prefix + '_' + box.title.replace(" ","") + '_' + doc.name[-6] + doc.name[-5] + doc.name[-4] + doc.name[-3] + doc.name[-2] + doc.name[-1],
+                            'description': '블루무브 닥스에서 ' + doc.user.last_name + doc.user.first_name + '님이 생성한 ' + box.folder_prefix + '_' + box.title.replace(" ","") + '입니다.\n' +
+                                        box.writer.last_name + box.writer.first_name + '님이 검토 중입니다.\n\n' +
+                                        '📧 생성일: ' + doc.creation_date + '\n' +
+                                        '📨 제출일: ' + doc.submission_date,
+                        },
+                        fields = 'name'
+                    ).execute()
+                    doc.name = drive_response.get('name')
+                    doc.save()
+                    # 문서 잠금
+                    drive_response = drive_service.files().update(
+                        fileId=doc.file_id,
+                        body={
+                            "contentRestrictions": [
+                                {
+                                    "readOnly": "true",
+                                    "reason": "문서가 제출되었습니다. 내용 수정 방지를 위해 잠금 설정되었습니다."
+                                }
+                            ]
+                        }
+                    ).execute()
+                else:
+                    None
+                # OUTSIDE 클라이언트 Notion 태스크 수정
+                if doc.notion_page_id:
+                    payload = json.dumps({
+                        "properties": {
+                            "태스크": {
+                                "title": [
+                                    {
+                                        "text": {
+                                            "content": "'" + name + "' 제출"
+                                        }
+                                    }
+                                ]
+                            },
+                            "소속 프로젝트": {
+                                "relation": [
+                                    {
+                                        "id": box.project_id
+                                    }
+                                ]
+                            },
+                            "마감일": {
+                                "date": {
+                                    "start": box.deadline
+                                }
+                            }
+                        }
+                    })
+                    notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
+                else:
+                    None
+        else:
+            None
+        # INSIDE 클라이언트 Notion 태스크 수정
+        if box.notion_page_id:
+            d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
+            payload = json.dumps({
+                "properties": {
+                    "태스크": {
+                        "title": [
+                            {
+                                "text": {
+                                    "content": "'" + name + "' 검토"
+                                }
+                            }
+                        ]
+                    },
+                    "소속 프로젝트": {
+                        "relation": [
+                            {
+                                "id": box.project_id
+                            }
+                        ]
+                    },
+                    "마감일": {
+                        "date": {
+                            "start": d_minus_one.strftime('%Y-%m-%d')
+                        }
+                    }
+                }
+            })
+            notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
+        else:
+            None
         return redirect('box:read', box.id)
     return render(
         request,
@@ -1027,7 +1163,6 @@ def update(request, id):
             'box': box,
             'form': form,
             'drives_list': drives_list,
-            'templates_list': templates_list,
             'folders_list_A': folders_list_A,
             'folders_list_B': folders_list_B,
             'folders_list_C': folders_list_C,
@@ -2475,12 +2610,33 @@ def submit_doc(request, doc_id):
             "properties": {
                 "완료": {
                     "checkbox": True
+                },
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + name + "' 제출"
+                            }
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": doc.box.deadline.strftime('%Y-%m-%d')
+                    }
                 }
             }
         })
         notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
         # 11. INSIDE 클라이언트 Notion 태스크 추가
-        d_minus_three = doc.box.deadline + datetime.timedelta(days=3)
+        d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
         payload = json.dumps({
             "parent": {
                 "database_id": notion_tasks_db_id
@@ -2512,7 +2668,7 @@ def submit_doc(request, doc_id):
                 },
                 "마감일": {
                     "date": {
-                        "start": d_minus_three.strftime('%Y-%m-%d')
+                        "start": d_minus_one.strftime('%Y-%m-%d')
                     }
                 }
             }
@@ -3509,7 +3665,7 @@ def submit_doc(request, doc_id):
             )
         doc.slack_ts = slack['ts']
         # 11. INSIDE 클라이언트 Notion 태스크 추가
-        d_minus_three = doc.box.deadline + datetime.timedelta(days=3)
+        d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
         payload = json.dumps({
             "parent": {
                 "database_id": notion_tasks_db_id
@@ -3541,7 +3697,7 @@ def submit_doc(request, doc_id):
                 },
                 "마감일": {
                     "date": {
-                        "start": d_minus_three.strftime('%Y-%m-%d')
+                        "start": d_minus_one.strftime('%Y-%m-%d')
                     }
                 }
             }
@@ -3903,10 +4059,32 @@ def reject_doc(request, doc_id):
                 text = f"📩 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 반려됨",
             )
         # 10. INSIDE 클라이언트 Notion 태스크 수정
+        d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
         payload = json.dumps({
             "properties": {
                 "완료": {
                     "checkbox": True
+                },
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.name + "' 검토"
+                            }
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": d_minus_one.strftime('%Y-%m-%d')
+                    }
                 }
             }
         })
@@ -4796,10 +4974,40 @@ def reject_doc(request, doc_id):
             text = f"📨 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "' 반려됨",
         )
         # 11. INSIDE 클라이언트 Notion 태스크 수정
+        d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
         payload = json.dumps({
             "properties": {
                 "완료": {
                     "checkbox": True
+                },
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.name + "' 검토"
+                            }
+                        }
+                    ]
+                },
+                "태스크 담당자": {
+                    "people": [
+                        {
+                            "object": "user",
+                            "id": doc.box.writer.profile.notion_user_id
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": d_minus_one.strftime('%Y-%m-%d')
+                    }
                 }
             }
         })
@@ -5330,10 +5538,32 @@ def return_doc(request, doc_id):
                 text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "' 승인됨",
             )
         # 09. INSIDE 클라이언트 Notion 태스크 수정
+        d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
         payload = json.dumps({
             "properties": {
                 "완료": {
                     "checkbox": True
+                },
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.box.folder_prefix + '_' + doc.box.title.replace(' ','') + "_" + datetime.date.today().strftime('%y%m%d') + "' 검토"
+                            }
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": d_minus_one.strftime('%Y-%m-%d')
+                    }
                 }
             }
         })
@@ -6189,10 +6419,40 @@ def return_doc(request, doc_id):
             text = f"🙆 " + doc.user.last_name + doc.user.first_name + "님의 '" + doc.box.title.replace(' ','') + "' 반환됨",
         )
         # 12. INSIDE 클라이언트 Notion 태스크 수정
+        d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
         payload = json.dumps({
             "properties": {
                 "완료": {
                     "checkbox": True
+                },
+                "태스크": {
+                    "title": [
+                        {
+                            "text": {
+                                "content": "'" + doc.name + "' 검토"
+                            }
+                        }
+                    ]
+                },
+                "태스크 담당자": {
+                    "people": [
+                        {
+                            "object": "user",
+                            "id": doc.box.writer.profile.notion_user_id
+                        }
+                    ]
+                },
+                "소속 프로젝트": {
+                    "relation": [
+                        {
+                            "id": doc.box.project_id
+                        }
+                    ]
+                },
+                "마감일": {
+                    "date": {
+                        "start": d_minus_one.strftime('%Y-%m-%d')
+                    }
                 }
             }
         })
