@@ -95,26 +95,195 @@
                                 </div>
                                 <div class="card-text d-grid gap-2 border-top">
                                     <span style="margin-bottom: .2rem!important;"></span>
-                                    {% for box in all_boxes|slice:":5" %}
-                                        <div class="d-flex justify-content-start" style="overflow: hidden;">
-                                            {% if box.category == 'bluemover' %}
-                                                <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
-                                            {% elif box.category == 'guest' %}
-                                                <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
-                                            {% else %}
-                                                알 수 없음
-                                            {% endif %}
-                                            <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                                {% if box.folder_prefix != None %}
-                                                    {{ box.folder_prefix }}_{{ box.title }}
+                                    {% if opened_boxes.count >= 5 %}
+                                        {% for box in opened_boxes|slice:":5" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
                                                 {% else %}
-                                                    {{ box.title }}
+                                                    알 수 없음
                                                 {% endif %}
-                                            </a>
-                                        </div>
-                                    {% empty %}
-                                        <div class="text-center"><br><h4 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h4><p class="mb-4">문서함이 없습니다.</p></div>
-                                    {% endfor %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% empty %}
+                                            <div class="text-center"><br><h4 style="color: #CCCCCC; font-weight: 600;"><i class="far fa-folder-open"></i> 비어 있어요!</h4><p class="mb-4">문서함이 없습니다.</p></div>
+                                        {% endfor %}
+                                    {% elif opened_boxes.count >= 4 %}
+                                        {% for box in opened_boxes|slice:":4" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                        {% for box in closed_boxes|slice:":1" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    {% elif opened_boxes.count >= 3 %}
+                                        {% for box in opened_boxes|slice:":3" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                        {% for box in closed_boxes|slice:":2" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    {% elif opened_boxes.count >= 2 %}
+                                        {% for box in opened_boxes|slice:":2" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                        {% for box in closed_boxes|slice:":3" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    {% elif opened_boxes.count >= 1 %}
+                                        {% for box in opened_boxes|slice:":1" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                        {% for box in closed_boxes|slice:":4" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    {% elif opened_boxes.count == 0 %}
+                                        {% for box in closed_boxes|slice:":5" %}
+                                            <div class="d-flex justify-content-start" style="overflow: hidden;">
+                                                {% if box.category == 'bluemover' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 8px;">블루무버</span>
+                                                {% elif box.category == 'guest' %}
+                                                    <span style="font-weight: 600; word-break: keep-all; margin-right: 22.8px;">게스트</span>
+                                                {% else %}
+                                                    알 수 없음
+                                                {% endif %}
+                                                <a href="{% url 'box:read' box.id %}" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                                    {% if box.folder_prefix != None %}
+                                                        {{ box.folder_prefix }}_{{ box.title }}
+                                                    {% else %}
+                                                        {{ box.title }}
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

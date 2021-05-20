@@ -3,6 +3,7 @@ from .models import *
 from users.models import Profile
 from notice.models import Notice
 from box.models import Box
+import datetime
 
 
 def home(request):
@@ -18,7 +19,9 @@ def home(request):
     # 회원가입 정보등록 끝
     all_noticies = Notice.objects.all().order_by('-id')
     all_boxes = Box.objects.all().order_by('deadline')
-    return render(request, 'home/home.html', {'all_noticies': all_noticies, 'all_boxes': all_boxes})
+    opened_boxes = Box.objects.filter(deadline__gte=datetime.date.today()).order_by('deadline')
+    closed_boxes = Box.objects.filter(deadline__lt=datetime.date.today()).order_by('deadline')
+    return render(request, 'home/home.html', {'all_noticies': all_noticies, 'all_boxes': all_boxes, 'opened_boxes': opened_boxes, 'closed_boxes': closed_boxes})
 
 
 def handler500(request):
