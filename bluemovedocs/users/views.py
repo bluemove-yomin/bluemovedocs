@@ -78,7 +78,7 @@ def write_info(request, id):
     profile = Profile.objects.get(user=user)
     string_pool = string.ascii_letters + string.digits
     random_sub_id = ''
-    userdata_expired_datetime = user.date_joined + datetime.timedelta(minutes = 1)
+    userdata_expired_datetime = user.date_joined + datetime.timedelta(minutes = 3)
     userdata_expired_datetime_ms = int(userdata_expired_datetime.timestamp() * 1000)
     for i in range(9):
         random_sub_id += random.choice(string_pool)
