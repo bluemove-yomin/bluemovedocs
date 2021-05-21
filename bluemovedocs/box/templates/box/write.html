@@ -130,7 +130,7 @@
                 <label for="title" class="form-label">문서명<span class="bluestar" style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="템플릿 문서를 먼저 선택하세요." required readonly>
                 <div class="invalid-feedback">문서명을 입력하세요.</div>
-                <div class="form-text">문서명은 문서함 생성 이후 수정할 수 없습니다.</div>
+                <div class="form-text">문서명은 블루무브 닥스가 자동으로 인식 및 제어하며 임의로 수정할 수 없습니다.</div>
             </div>
             <div class="form-group mb-3">
                 <label for="channel_id" class="form-label">연동 Slack 채널<span style="color: #007DC5; font-weight: 600;"> *</span></label>
@@ -754,9 +754,10 @@
                     document_etcid.required = true;
                     document_etcid.disabled = false;
                     bluestar.setAttribute("style", "color: #007DC5; font-weight: 600;")
-                    title.placeholder = '문서명을 입력하세요.'
+                    title.placeholder = '문서함 생성 시 자동으로 설정됩니다.'
                     title.value = '';
                     title.readOnly = false;
+                    title.disabled = true;
                 }
                 else {
                     document_etcidDiv.setAttribute("style", "display: none;");
@@ -766,6 +767,7 @@
                     title.placeholder = '템플릿 문서를 먼저 선택하세요.'
                     title.value = document.querySelector("#document_id").value.split('#')[1].split('_')[1];
                     title.readOnly = true;
+                    title.disabled = false;
                 }
             }
         </script>

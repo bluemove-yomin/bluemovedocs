@@ -197,6 +197,22 @@ def create(request):
         ##### 대상이 bluemover일 경우 #####
         ##################################
         if form.is_valid() and request.POST.get('category') == 'bluemover':
+            # INSIDE CLIENT Google Drive API 불러오기 시작
+            token = SocialToken.objects.get(account__user=request.user, account__provider='google')
+            credentials = Credentials(
+                client_id=client_id,
+                client_secret=client_secret,
+                token_uri='https://oauth2.googleapis.com/token',
+                refresh_token=token.token_secret,
+                token=token.token
+            )
+            drive_service = build('drive', 'v3', credentials=credentials)
+            try:
+                drive_service.drives().list().execute()
+            except:
+                logout(request)
+                return redirect('users:login_cancelled_no_token')
+            # INSIDE CLIENT Google Drive API 불러오기 끝
             box_category = request.POST.get('category')
             box_project_id = request.POST.get('project_id').split('▩')[0]
             box_project_name = request.POST.get('project_id').split('▩')[1]
@@ -204,27 +220,45 @@ def create(request):
             box_folder_id = request.POST.get('folder_id').split('#')[0]
             box_folder_name = request.POST.get('folder_id').split('#')[1]
             box_folder_prefix = box_folder_name[0:3]
-            box_title = request.POST.get('title').replace(' ', '')
             box_writer = request.user
             if request.POST.get('document_etcid') == None:
                 box_document_id = request.POST.get('document_id').split('#')[0]
                 box_document_name = request.POST.get('document_id').split('#')[1]
                 box_document_mimetype = request.POST.get('document_id').split('#')[2]
+                box_title = request.POST.get('title').replace(' ', '')
                 official_template_flag = True
             elif 'document' in request.POST.get('document_etcid'):
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/document/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
+                drive_response = drive_service.files().get(
+                    fileId = box_document_id,
+                    fields = "name",
+                    supportsAllDrives = True
+                ).execute()
+                box_document_name = drive_response.get("name")
                 box_document_mimetype = 'application/vnd.google-apps.document'
+                box_title = box_document_name.split('_')[1]
                 official_template_flag = False
             elif 'spreadsheets' in request.POST.get('document_etcid'):
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/spreadsheets/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
+                drive_response = drive_service.files().get(
+                    fileId = box_document_id,
+                    fields = "name",
+                    supportsAllDrives = True
+                ).execute()
+                box_document_name = drive_response.get("name")
                 box_document_mimetype = 'application/vnd.google-apps.spreadsheet'
+                box_title = box_document_name.split('_')[1]
                 official_template_flag = False
             else:
                 box_document_id = request.POST.get('document_etcid').replace("https://docs.google.com/presentation/d/","")[0:44]
-                box_document_name = '임의 템플릿 문서'
+                drive_response = drive_service.files().get(
+                    fileId = box_document_id,
+                    fields = "name",
+                    supportsAllDrives = True
+                ).execute()
+                box_document_name = drive_response.get("name")
                 box_document_mimetype = 'application/vnd.google-apps.presentation'
+                box_title = box_document_name.split('_')[1]
                 official_template_flag = False
             box_channel_id = request.POST.get('channel_id').split('#')[0]
             box_channel_name = request.POST.get('channel_id').split('#')[1]
@@ -1258,7 +1292,6 @@ def delete_doc(request, doc_id):
         )
         drive_service = build('drive', 'v3', credentials=credentials)
         INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
             service_account_creds,
@@ -1968,7 +2001,7 @@ def delete_doc(request, doc_id):
             # 04. 메일 발송
             message = (
                 mail_service.users().messages().send(
-                    userId = user_id,
+                    userId = INSIDE_CLIENT,
                     body = message,
                 ).execute()
             )
@@ -2128,7 +2161,6 @@ def submit_doc(request, doc_id):
             logout(request)
             return redirect('users:login_cancelled_no_token')
         INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
             service_account_creds,
@@ -2690,7 +2722,6 @@ def submit_doc(request, doc_id):
         )
         drive_service = build('drive', 'v3', credentials=credentials)
         INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
             service_account_creds,
@@ -3453,7 +3484,7 @@ def submit_doc(request, doc_id):
         # 09. 메일 발송
         message = (
             mail_service.users().messages().send(
-                userId = user_id,
+                userId = INSIDE_CLIENT,
                 body = message,
             ).execute()
         )
@@ -4142,7 +4173,6 @@ def reject_doc(request, doc_id):
         )
         drive_service = build('drive', 'v3', credentials=credentials)
         INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
             service_account_creds,
@@ -4905,7 +4935,7 @@ def reject_doc(request, doc_id):
         # 09. 메일 발송
         message = (
             mail_service.users().messages().send(
-                userId = user_id,
+                userId = INSIDE_CLIENT,
                 body = message,
             ).execute()
         )
@@ -5043,7 +5073,6 @@ def return_doc(request, doc_id):
             logout(request)
             return redirect('users:login_cancelled_no_token')
         INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
             service_account_creds,
@@ -5581,7 +5610,6 @@ def return_doc(request, doc_id):
         )
         drive_service = build('drive', 'v3', credentials=credentials)
         INSIDE_CLIENT = doc.box.writer.email
-        user_id = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
             service_account_creds,
@@ -6350,7 +6378,7 @@ def return_doc(request, doc_id):
         # 10. 메일 발송
         message = (
             mail_service.users().messages().send(
-                userId = user_id,
+                userId = INSIDE_CLIENT,
                 body = message,
             ).execute()
         )
@@ -6475,7 +6503,6 @@ def return_doc_before_submit(request, doc_id):
     )
     drive_service = build('drive', 'v3', credentials=credentials)
     INSIDE_CLIENT = doc.box.writer.email
-    user_id = doc.box.writer.email
     SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
     gmail_credentials = service_account.Credentials.from_service_account_file(
         service_account_creds,
@@ -7236,7 +7263,7 @@ def return_doc_before_submit(request, doc_id):
     # 09. 메일 발송
     message = (
         mail_service.users().messages().send(
-            userId = user_id,
+            userId = INSIDE_CLIENT,
             body = message,
         ).execute()
     )
