@@ -23,7 +23,7 @@
             {% csrf_token %}
             <div class="form-group mb-3">
                 <label for="category" class="form-label">대상</label>
-                <select class="form-select" name="category" id="category" onchange="categoryChange(this)" placeholder="대상을 선택하세요." disabled>
+                <select class="form-select" name="category" id="category" placeholder="대상을 선택하세요." disabled>
                     <option selected hidden>
                         {% if box.category == 'bluemover' %}
                             블루무버
@@ -158,7 +158,7 @@
             {% endif %}
             <div class="form-group mb-3">
                 <label for="document_id" class="form-label">템플릿 문서</label>
-                <select class="form-select" name="document_id" id="document_id" onchange="document_idChange(this)" placeholder="템플릿 문서를 선택하세요." disabled>
+                <select class="form-select" name="document_id" id="document_id" placeholder="템플릿 문서를 선택하세요." disabled>
                     <option selected hidden>{{ box.document_name }}</option>
                 </select>
                 <div class="invalid-feedback">템플릿 문서를 선택하세요.</div>
@@ -305,57 +305,6 @@
                 <button type="submit" class="btn btn-outline-primary submit">수정 등록하기</button>
             </div>
         </form>
-
-        <!-- 문서명에 기호 input되지 않도록 -->
-        <script>
-            $(document).on("keyup", "#title", function() {
-                $(this).val(
-                    $(this).val().replace(/[^0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]/g, "")
-                );
-            });
-        </script>
-
-        <!-- 대상에 따라 일부 input field의 display, required 변경 -->
-        <script>
-            function categoryChange(obj) {
-                var drive_idDiv = document.querySelector("#drive_id_DIV")
-                var drive_id = document.querySelector("#drive_id")
-                var folder_idDiv = document.querySelector("#folder_id_DIV")
-                var folder_id = document.querySelector("#folder_id")
-                var channel_id = document.querySelector("#channel_id")
-                var option_dm = document.querySelector("#option_dm")
-                if ($(obj).val() == "bluemover") {
-                    drive_idDiv.setAttribute("style", "");
-                    drive_id.required = true;
-                    drive_id.disabled = false;
-                    option_dm.setAttribute("style", "");
-                    option_dm.disabled = false;
-                }
-                if ($(obj).val() == "guest" && channel_id.value == "{{ request.user.profile.slack_user_id }}") {
-                    drive_idDiv.setAttribute("style", "display:none;");
-                    drive_id.required = false;
-                    drive_id.value = "";
-                    folder_idDiv.setAttribute("style", "display:none;");
-                    folder_id.required = false;
-                    folder_id.value = "";
-                    option_dm.setAttribute("style", "display:none;");
-                    option_dm.disabled = true;
-                    option_dm.selected = false;
-                    channel_id.value = "";
-                }
-                if ($(obj).val() == "guest") {
-                    drive_idDiv.setAttribute("style", "display:none;");
-                    drive_id.required = false;
-                    drive_id.value = "";
-                    folder_idDiv.setAttribute("style", "display:none;");
-                    folder_id.required = false;
-                    folder_id.value = "";
-                    option_dm.setAttribute("style", "display:none;");
-                    option_dm.disabled = true;
-                    option_dm.selected = false;
-                }
-            }
-        </script>
 
         <script>
             function drive_idChange(obj) {
@@ -837,33 +786,6 @@
                     {% endfor %}
                 }
             };
-        </script>
-
-        <script>
-            function document_idChange(obj) {
-                var document_etcidDiv = document.querySelector("#document_etcid_DIV")
-                var document_etcid = document.querySelector("#document_etcid")
-                var title = document.querySelector("#title")
-                var bluestar = document.querySelector(".bluestar")
-                if ($(obj).val() == "option_etc") {
-                    document_etcidDiv.setAttribute("style", "");
-                    document_etcid.required = true;
-                    document_etcid.disabled = false;
-                    bluestar.setAttribute("style", "color: #007DC5; font-weight: 600;")
-                    title.placeholder = '문서명을 입력하세요.'
-                    title.value = '{{ box.title }}';
-                    title.readOnly = false;
-                }
-                else {
-                    document_etcidDiv.setAttribute("style", "display: none;");
-                    document_etcid.required = false;
-                    document_etcid.disabled = true;
-                    bluestar.setAttribute("style", "display: none;")
-                    title.placeholder = '템플릿 문서를 먼저 선택하세요.'
-                    title.value = document.querySelector("#document_id").value.split('#')[1].split('_')[1];
-                    title.readOnly = true;
-                }
-            }
         </script>
 
         <!-- Forms Validation -->
