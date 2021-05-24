@@ -13,9 +13,17 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.oauth2 import service_account
 from email.mime.text import MIMEText
+from googleapiclient.http import MediaFileUpload
 from allauth.socialaccount.models import SocialToken, SocialAccount
 from oauth2client.service_account import ServiceAccountCredentials
 from users.models import Profile
+from svgpathtools import wsvg, Line, QuadraticBezier, Path
+from freetype import Face
+from bs4 import BeautifulSoup
+from wand.api import library
+import wand.color
+import wand.image
+import os
 from slack_sdk import WebClient
 import safelock
 import requests
@@ -1156,37 +1164,37 @@ def update(request, id):
                     notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + doc.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
                 else:
                     None
-        else:
-            None
-        # INSIDE 클라이언트 Notion 태스크 수정
-        if box.notion_page_id:
-            d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
-            payload = json.dumps({
-                "properties": {
-                    "태스크": {
-                        "title": [
-                            {
-                                "text": {
-                                    "content": "'" + name + "' 검토"
+                # INSIDE 클라이언트 Notion 태스크 수정
+                if box.notion_page_id:
+                    d_minus_one = doc.box.deadline + datetime.timedelta(days=1)
+                    payload = json.dumps({
+                        "properties": {
+                            "태스크": {
+                                "title": [
+                                    {
+                                        "text": {
+                                            "content": "'" + name + "' 검토"
+                                        }
+                                    }
+                                ]
+                            },
+                            "소속 프로젝트": {
+                                "relation": [
+                                    {
+                                        "id": box.project_id
+                                    }
+                                ]
+                            },
+                            "마감일": {
+                                "date": {
+                                    "start": d_minus_one.strftime('%Y-%m-%d')
                                 }
                             }
-                        ]
-                    },
-                    "소속 프로젝트": {
-                        "relation": [
-                            {
-                                "id": box.project_id
-                            }
-                        ]
-                    },
-                    "마감일": {
-                        "date": {
-                            "start": d_minus_one.strftime('%Y-%m-%d')
                         }
-                    }
-                }
-            })
-            notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
+                    })
+                    notion_response = requests.request("PATCH", 'https://api.notion.com/v1/pages/' + box.notion_page_id, headers=notion_headers, data=payload.encode('utf-8'))
+                else:
+                    None
         else:
             None
         return redirect('box:read', box.id)
@@ -2145,7 +2153,7 @@ def submit_doc(request, doc_id):
     ##### OUTSIDE 클라이언트가 bluemover일 경우 #####
     ###############################################
     if doc.user.profile.level == 'bluemover':
-        # 01. OUTSIDE 클라이언트 Google Drive, 서비스 계정 Gmail API 호출
+        # 01. OUTSIDE 클라이언트 Google Drive, Google Docs, 서비스 계정 Gmail API 호출
         token = SocialToken.objects.get(account__user=request.user, account__provider='google')
         credentials = Credentials(
             client_id=client_id,
@@ -2155,6 +2163,7 @@ def submit_doc(request, doc_id):
             token=token.token
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        docs_service = build('docs', 'v1', credentials=credentials)
         try:
             drive_response = drive_service.drives().list().execute()
         except:
@@ -2179,6 +2188,154 @@ def submit_doc(request, doc_id):
                 ]
             }
         ).execute()
+        ####################
+        try:
+            def tuple_to_imag(t):
+                return t[0] + t[1] * 1j
+
+            letter = []
+            stampName = str(doc.user.last_name + doc.user.first_name)
+            if len(stampName) == 3:
+                letter.append(stampName[0])
+                letter.append(stampName[1])
+                letter.append(stampName[2])
+                letter.append('인')
+            else:
+                letter.append(stampName[0])
+                letter.append(stampName[1])
+                letter.append(stampName[2])
+                letter.append(stampName[3])
+
+            face = Face('HJHanjeonseoB.ttf')
+            face.set_char_size(48 * 64)
+            dValueList = []
+            for i in letter:
+                face.load_char(i)
+                outline = face.glyph.outline
+                y = [t[1] for t in outline.points]
+                outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
+                start, end = 0, 0
+                paths = []
+
+                for i in range(len(outline.contours)):
+                    end = outline.contours[i]
+                    points = outline_points[start:end + 1]
+                    points.append(points[0])
+                    tags = outline.tags[start:end + 1]
+                    tags.append(tags[0])
+
+                    segments = [[points[0], ], ]
+                    for j in range(1, len(points)):
+                        segments[-1].append(points[j])
+                        if tags[j] and j < (len(points) - 1):
+                            segments.append([points[j], ])
+                    for segment in segments:
+                        if len(segment) == 2:
+                            paths.append(Line(start=tuple_to_imag(segment[0]),
+                                            end=tuple_to_imag(segment[1])))
+                        elif len(segment) == 3:
+                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                        control=tuple_to_imag(segment[1]),
+                                                        end=tuple_to_imag(segment[2])))
+                        elif len(segment) == 4:
+                            C = ((segment[1][0] + segment[2][0]) / 2.0,
+                                (segment[1][1] + segment[2][1]) / 2.0)
+
+                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                        control=tuple_to_imag(segment[1]),
+                                                        end=tuple_to_imag(C)))
+                            paths.append(QuadraticBezier(start=tuple_to_imag(C),
+                                                        control=tuple_to_imag(segment[2]),
+                                                        end=tuple_to_imag(segment[3])))
+                    start = end + 1
+
+                path = Path(*paths)
+                wsvg(path, filename=doc.user.profile.sub_id + "stamp.html")
+
+                with open(doc.user.profile.sub_id + 'stamp.html') as stampRaw:
+                    soup = BeautifulSoup(stampRaw.read(), features='html.parser')
+                    dValue = soup.find('path')['d']
+                    dValueList.append(dValue)
+
+            stampTemp = \
+            """<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" width="180px" height="180px" version="1.1" viewBox="0 0 3500 3500">
+                <svg width="3500" height="3500" viewBox="0 0 3500 3500" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="1750" cy="1750" fill="none" stroke="#C90000" stroke-width="100" r="1700"></circle>
+                    <svg x="500" y="530">
+                        <path id='stamp01' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[0] + """'/>
+                    </svg>
+                    <svg x="1750" y="530">
+                        <path id='stamp02' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[1] + """'/>
+                    </svg>
+                    <svg x="500" y="1780">
+                        <path id='stamp03' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[2] + """'/>
+                    </svg>
+                    <svg x="1750" y="1780">
+                        <path id='stamp04' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[3] + """'/>
+                    </svg>
+                </svg>
+            </svg>"""
+
+            with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
+                stampSVG.write(stampTemp)
+
+            with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
+                with wand.image.Image() as stampPNG:
+                    with wand.color.Color('transparent') as background_color:
+                        library.MagickSetBackgroundColor(stampPNG.wand,
+                                                        background_color.resource)
+                    svg_blob = stampSVG.read().encode('utf-8')
+                    stampPNG.read(blob=svg_blob, resolution = 72)
+                    png_image = stampPNG.make_blob("png32")
+
+            with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
+                out.write(png_image)
+
+            drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
+                                                        media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
+                                                        fields='id').execute()
+            stampFileId = drive_response.get('id')
+            drive_response = drive_service.files().get(
+                fileId = stampFileId,
+                fields = 'webContentLink'
+            ).execute()
+            stampUri = drive_response.get('webContentLink')
+            drive_response = drive_service.permissions().create(
+                fileId = stampFileId,
+                body = {
+                    'role': 'reader',
+                    'type': 'anyone'
+                }
+            ).execute()
+            docs_response = docs_service.documents().get(
+                documentId = file_id,
+            ).execute()
+            inlineObjects = docs_response.get('inlineObjects')
+            for stampId in inlineObjects:
+                docs_response = docs_service.documents().batchUpdate(
+                    documentId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'replaceImage': {
+                                    'imageObjectId': stampId,
+                                    'uri': stampUri,
+                                }
+                            }
+                        ]
+                    }
+                ).execute()
+            
+            drive_service.files().delete(
+                fileId = stampFileId
+            ).execute()
+
+            os.remove(doc.user.profile.sub_id + "stamp.html")
+            os.remove(doc.user.profile.sub_id + "stamp.svg")
+            os.remove(doc.user.profile.sub_id + "stamp.png")
+        except:
+            pass
+        ####################
         # 03. 문서명 및 설명 변경
         drive_response = drive_service.files().update(
             fileId = file_id,
@@ -2721,6 +2878,7 @@ def submit_doc(request, doc_id):
             SERVICE_ACCOUNT_SCOPES,
         )
         drive_service = build('drive', 'v3', credentials=credentials)
+        docs_service = build('docs', 'v1', credentials=credentials)
         INSIDE_CLIENT = doc.box.writer.email
         SERVICE_ACCOUNT_GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.send']
         gmail_credentials = service_account.Credentials.from_service_account_file(
@@ -2740,6 +2898,154 @@ def submit_doc(request, doc_id):
                 ]
             }
         ).execute()
+        ####################
+        try:
+            def tuple_to_imag(t):
+                return t[0] + t[1] * 1j
+
+            letter = []
+            stampName = str(doc.user.last_name + doc.user.first_name)
+            if len(stampName) == 3:
+                letter.append(stampName[0])
+                letter.append(stampName[1])
+                letter.append(stampName[2])
+                letter.append('인')
+            else:
+                letter.append(stampName[0])
+                letter.append(stampName[1])
+                letter.append(stampName[2])
+                letter.append(stampName[3])
+
+            face = Face('HJHanjeonseoB.ttf')
+            face.set_char_size(48 * 64)
+            dValueList = []
+            for i in letter:
+                face.load_char(i)
+                outline = face.glyph.outline
+                y = [t[1] for t in outline.points]
+                outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
+                start, end = 0, 0
+                paths = []
+
+                for i in range(len(outline.contours)):
+                    end = outline.contours[i]
+                    points = outline_points[start:end + 1]
+                    points.append(points[0])
+                    tags = outline.tags[start:end + 1]
+                    tags.append(tags[0])
+
+                    segments = [[points[0], ], ]
+                    for j in range(1, len(points)):
+                        segments[-1].append(points[j])
+                        if tags[j] and j < (len(points) - 1):
+                            segments.append([points[j], ])
+                    for segment in segments:
+                        if len(segment) == 2:
+                            paths.append(Line(start=tuple_to_imag(segment[0]),
+                                            end=tuple_to_imag(segment[1])))
+                        elif len(segment) == 3:
+                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                        control=tuple_to_imag(segment[1]),
+                                                        end=tuple_to_imag(segment[2])))
+                        elif len(segment) == 4:
+                            C = ((segment[1][0] + segment[2][0]) / 2.0,
+                                (segment[1][1] + segment[2][1]) / 2.0)
+
+                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                        control=tuple_to_imag(segment[1]),
+                                                        end=tuple_to_imag(C)))
+                            paths.append(QuadraticBezier(start=tuple_to_imag(C),
+                                                        control=tuple_to_imag(segment[2]),
+                                                        end=tuple_to_imag(segment[3])))
+                    start = end + 1
+
+                path = Path(*paths)
+                wsvg(path, filename=doc.user.profile.sub_id + "stamp.html")
+
+                with open(doc.user.profile.sub_id + 'stamp.html') as stampRaw:
+                    soup = BeautifulSoup(stampRaw.read(), features='html.parser')
+                    dValue = soup.find('path')['d']
+                    dValueList.append(dValue)
+
+            stampTemp = \
+            """<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" width="180px" height="180px" version="1.1" viewBox="0 0 3500 3500">
+                <svg width="3500" height="3500" viewBox="0 0 3500 3500" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="1750" cy="1750" fill="none" stroke="#C90000" stroke-width="100" r="1700"></circle>
+                    <svg x="500" y="530">
+                        <path id='stamp01' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[0] + """'/>
+                    </svg>
+                    <svg x="1750" y="530">
+                        <path id='stamp02' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[1] + """'/>
+                    </svg>
+                    <svg x="500" y="1780">
+                        <path id='stamp03' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[2] + """'/>
+                    </svg>
+                    <svg x="1750" y="1780">
+                        <path id='stamp04' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[3] + """'/>
+                    </svg>
+                </svg>
+            </svg>"""
+
+            with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
+                stampSVG.write(stampTemp)
+
+            with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
+                with wand.image.Image() as stampPNG:
+                    with wand.color.Color('transparent') as background_color:
+                        library.MagickSetBackgroundColor(stampPNG.wand,
+                                                        background_color.resource)
+                    svg_blob = stampSVG.read().encode('utf-8')
+                    stampPNG.read(blob=svg_blob, resolution = 72)
+                    png_image = stampPNG.make_blob("png32")
+
+            with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
+                out.write(png_image)
+
+            drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
+                                                        media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
+                                                        fields='id').execute()
+            stampFileId = drive_response.get('id')
+            drive_response = drive_service.files().get(
+                fileId = stampFileId,
+                fields = 'webContentLink'
+            ).execute()
+            stampUri = drive_response.get('webContentLink')
+            drive_response = drive_service.permissions().create(
+                fileId = stampFileId,
+                body = {
+                    'role': 'reader',
+                    'type': 'anyone'
+                }
+            ).execute()
+            docs_response = docs_service.documents().get(
+                documentId = file_id,
+            ).execute()
+            inlineObjects = docs_response.get('inlineObjects')
+            for stampId in inlineObjects:
+                docs_response = docs_service.documents().batchUpdate(
+                    documentId = file_id,
+                    body = {
+                        'requests': [
+                            {
+                                'replaceImage': {
+                                    'imageObjectId': stampId,
+                                    'uri': stampUri,
+                                }
+                            }
+                        ]
+                    }
+                ).execute()
+            
+            drive_service.files().delete(
+                fileId = stampFileId
+            ).execute()
+
+            os.remove(doc.user.profile.sub_id + "stamp.html")
+            os.remove(doc.user.profile.sub_id + "stamp.svg")
+            os.remove(doc.user.profile.sub_id + "stamp.png")
+        except:
+            pass
+        ####################
         # 03. OUTSIDE 클라이언트 권한 변경 writer 2 reader
         drive_response = drive_service.permissions().update(
             fileId = file_id,

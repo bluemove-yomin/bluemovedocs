@@ -74,93 +74,104 @@ def main():
 
     ##### 00. 테스트 파일 또는 폴더 삭제
     drive_response = drive_service.files().delete(
-        fileId = '1Lko0Xs4gIErUYqeDDW5xFP9AM0hs3cYIeO5ncj6iRq4',
+        fileId = '1MVNErhTHol4cuBKP5DfBFoUFTvYegf340V9hXFjDsOQ',
     ).execute()
     return print('00. 테스트 파일 또는 폴더 삭제에 성공했습니다.')
 
     ##### 00. 테스트 파일 또는 폴더 찾기 (서비스 계정 드라이브에 있는 것 모두 찾기)
-    drive_response = drive_service.files().list(
-        corpora='allDrives',
-        fields="files(id, name, mimeType)",
-        includeItemsFromAllDrives=True,
-        orderBy="name",
-        supportsAllDrives=True,
+    # drive_response = drive_service.files().list(
+    #     corpora='allDrives',
+    #     fields="files(id, name, mimeType)",
+    #     includeItemsFromAllDrives=True,
+    #     orderBy="name",
+    #     supportsAllDrives=True,
+    # ).execute()
+    # all_files_list = []
+    # all_files = drive_response.get('files')
+    # for this_file in all_files:
+    #     this_file_id = this_file['id']
+    #     this_file_name = this_file['name']
+    #     this_file_mimetype = this_file['mimeType']
+    #     all_files_list.append(tuple((this_file_id, this_file_name, this_file_mimetype)))
+    # return print("00. 테스트 파일 또는 폴더 찾기에 성공했습니다. 파일 정보: %s" % all_files_list)
+
+    # 02. 서비스 계정 My Drive 내 템플릿 문서 생성(복사)
+    application_id = '1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58' ##### 템플릿 문서 ID INPUT #####
+    drive_response = drive_service.files().copy(
+        fileId = application_id,
+        body = {
+            'name': '4기 블루무버 지원서 - ' + ##### 문서 이름 INPUT #####
+                    '성' + '이름', ##### OUTSIDE 클라이언트 성명 INPUT #####
+            'description': '블루무브 닥스에서 생성된 ' +
+                           '성' + '이름' + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           '님의 ' +
+                           '4기 블루무버 지원서' ##### 문서 이름 INPUT #####
+                           + '입니다.\n\n' + ##### OUTSIDE 클라이언트 성명 INPUT #####
+                           '📧 생성일자: ' + '2021-01-20', ##### 현재 일자 INPUT #####
+        },
+        fields = 'id, name'
     ).execute()
-    all_files_list = []
-    all_files = drive_response.get('files')
-    for this_file in all_files:
-        this_file_id = this_file['id']
-        this_file_name = this_file['name']
-        this_file_mimetype = this_file['mimeType']
-        all_files_list.append(tuple((this_file_id, this_file_name, this_file_mimetype)))
-    return print("00. 테스트 파일 또는 폴더 찾기에 성공했습니다. 파일 정보: %s" % all_files_list)
+    file_id = drive_response.get('id') ##### 문서 ID OUTPUT #####
+    name = drive_response.get('name') ##### 문서 이름 + OUTSIDE 클라이언트 성명 OUTPUT #####
+    if file_id:
+        print('02-A. 서비스 계정 My Drive 내 템플릿 문서 생성에 성공했습니다. 파일 ID: %s' % file_id)
+    else:
+        print('02-A. 서비스 계정 My Drive 내 템플릿 문서 생성에 실패했습니다!!!')
+    if name:
+        print('02-B. 서비스 계정 My Drive 내 템플릿 문서 생성에 성공했습니다. 문서 이름: %s' % name)
+    else:
+        print('02-B. 서비스 계정 My Drive 내 템플릿 문서 생성에 실패했습니다!!!')
 
-    # # 02. 서비스 계정 My Drive 내 템플릿 문서 생성(복사)
-    # application_id = '1mRPI5haxz1IrjDw5oXVIXYSd89HKB_8hOhGxC09sq58' ##### 템플릿 문서 ID INPUT #####
-    # drive_response = drive_service.files().copy(
-    #     fileId = application_id,
-    #     body = {
-    #         'name': '4기 블루무버 지원서 - ' + ##### 문서 이름 INPUT #####
-    #                 '성' + '이름', ##### OUTSIDE 클라이언트 성명 INPUT #####
-    #         'description': '블루무브 닥스에서 생성된 ' +
-    #                        '성' + '이름' + ##### OUTSIDE 클라이언트 성명 INPUT #####
-    #                        '님의 ' +
-    #                        '4기 블루무버 지원서' ##### 문서 이름 INPUT #####
-    #                        + '입니다.\n\n' + ##### OUTSIDE 클라이언트 성명 INPUT #####
-    #                        '📧 생성일자: ' + '2021-01-20', ##### 현재 일자 INPUT #####
-    #     },
-    #     fields = 'id, name'
-    # ).execute()
-    # file_id = drive_response.get('id') ##### 문서 ID OUTPUT #####
-    # name = drive_response.get('name') ##### 문서 이름 + OUTSIDE 클라이언트 성명 OUTPUT #####
-    # if file_id:
-    #     print('02-A. 서비스 계정 My Drive 내 템플릿 문서 생성에 성공했습니다. 파일 ID: %s' % file_id)
-    # else:
-    #     print('02-A. 서비스 계정 My Drive 내 템플릿 문서 생성에 실패했습니다!!!')
-    # if name:
-    #     print('02-B. 서비스 계정 My Drive 내 템플릿 문서 생성에 성공했습니다. 문서 이름: %s' % name)
-    # else:
-    #     print('02-B. 서비스 계정 My Drive 내 템플릿 문서 생성에 실패했습니다!!!')
-
-    # # 03. 문서 내 템플릿 태그 적용
-    # docs_response = docs_service.documents().batchUpdate(
-    #     documentId = file_id,
-    #     body = {
-    #         'requests': [
-    #             {
-    #                 'replaceAllText': {
-    #                     'containsText': {
-    #                         'text': '{{user-name}}',
-    #                         'matchCase':  'true'
-    #                     },
-    #                     'replaceText': '성' + '이름', ##### OUTSIDE 클라이언트 성명 INPUT #####
-    #                 }
-    #             },
-    #             {
-    #                 'replaceAllText': {
-    #                     'containsText': {
-    #                         'text': '{{user-phone}}',
-    #                         'matchCase':  'true'
-    #                     },
-    #                     'replaceText': '010-1234-5678', ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
-    #                 }
-    #             },
-    #             {
-    #                 'replaceAllText': {
-    #                     'containsText': {
-    #                         'text': '{{user-email}}',
-    #                         'matchCase':  'true'
-    #                     },
-    #                     'replaceText': 'example@example.com', ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
-    #                 }
-    #             }
-    #         ]
-    #     }
-    # ).execute()
-    # if docs_response:
-    #     print('03. 문서 내 템플릿 태그 적용에 성공했습니다.')
-    # else:
-    #     print('03. 문서 내 템플릿 태그 적용에 실패했습니다!!!')
+    # 03. 문서 내 템플릿 태그 적용
+    docs_response = docs_service.documents().get(
+        documentId = file_id,
+    ).execute()
+    inlineObjects = docs_response.get('inlineObjects')
+    for stampId in inlineObjects:
+        docs_response = docs_service.documents().batchUpdate(
+            documentId = file_id,
+            body = {
+                'requests': [
+                    {
+                        'replaceAllText': {
+                            'containsText': {
+                                'text': '{{user-name}}',
+                                'matchCase':  'true'
+                            },
+                            'replaceText': '성' + '이름', ##### OUTSIDE 클라이언트 성명 INPUT #####
+                        }
+                    },
+                    {
+                        'replaceAllText': {
+                            'containsText': {
+                                'text': '{{user-phone}}',
+                                'matchCase':  'true'
+                            },
+                            'replaceText': '010-1234-5678', ##### OUTSIDE 클라이언트 휴대전화 번호 INPUT #####
+                        }
+                    },
+                    {
+                        'replaceAllText': {
+                            'containsText': {
+                                'text': '{{user-email}}',
+                                'matchCase':  'true'
+                            },
+                            'replaceText': 'example@example.com', ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+                        }
+                    },
+                    {
+                        'replaceImage': {
+                            'imageObjectId': stampId,
+                            'uri': 'https://docs.bluemove.or.kr/static/images/stamp.png',
+                        }
+                    }
+                ]
+            }
+        ).execute()
+    if docs_response:
+        print('03. 문서 내 템플릿 태그 적용에 성공했습니다.')
+    else:
+        print('03. 문서 내 템플릿 태그 적용에 실패했습니다!!!')
 
     # # 04. 서비스 계정 권한 ID 조회
     # drive_response = drive_service.permissions().list(
@@ -174,20 +185,20 @@ def main():
     #     else:
     #         print('04. 서비스 계정 권한 ID 조회에 실패했습니다!!!')
 
-    # # 05. OUTSIDE 클라이언트 권한 추가 writer
-    # drive_response = drive_service.permissions().create(
-    #     fileId = file_id,
-    #     body = {
-    #         'type': 'user',
-    #         'role': 'writer',
-    #         'emailAddress': 'ssongyo@gmail.com', ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
-    #     },
-    # ).execute()
-    # outside_permission_id = drive_response.get('id') ##### OUTSIDE 클라이언트 권한 ID OUTPUT #####
-    # if outside_permission_id:
-    #     print('05. OUTSIDE 클라이언트 권한 추가 writer에 성공했습니다. OUTSIDE 클라이언트 권한 ID: %s' % outside_permission_id)
-    # else:
-    #     print('05. OUTSIDE 클라이언트 권한 추가 writer에 실패했습니다!!!')
+    # 05. OUTSIDE 클라이언트 권한 추가 writer
+    drive_response = drive_service.permissions().create(
+        fileId = file_id,
+        body = {
+            'type': 'user',
+            'role': 'writer',
+            'emailAddress': 'yomin@bluemove.or.kr', ##### OUTSIDE 클라이언트 이메일 주소 INPUT #####
+        },
+    ).execute()
+    outside_permission_id = drive_response.get('id') ##### OUTSIDE 클라이언트 권한 ID OUTPUT #####
+    if outside_permission_id:
+        print('05. OUTSIDE 클라이언트 권한 추가 writer에 성공했습니다. OUTSIDE 클라이언트 권한 ID: %s' % outside_permission_id)
+    else:
+        print('05. OUTSIDE 클라이언트 권한 추가 writer에 실패했습니다!!!')
 
     # # 06. 문서 잠그기
     # drive_response = drive_service.files().update(
