@@ -20,9 +20,14 @@ from users.models import Profile
 from svgpathtools import wsvg, Line, QuadraticBezier, Path
 from freetype import Face
 from bs4 import BeautifulSoup
-from wand.api import library
-import wand.color
-import wand.image
+##### START: Ubuntu(Production) only
+import cairosvg
+##### END!!: Ubuntu(Production) only
+##### START: Windows(Local) only
+# from wand.api import library
+# import wand.color
+# import wand.image
+##### END!!: Windows(Local) only
 import os
 from slack_sdk import WebClient
 import safelock
@@ -2279,17 +2284,23 @@ def submit_doc(request, doc_id):
             with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
                 stampSVG.write(stampTemp)
 
-            with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
-                with wand.image.Image() as stampPNG:
-                    with wand.color.Color('transparent') as background_color:
-                        library.MagickSetBackgroundColor(stampPNG.wand,
-                                                        background_color.resource)
-                    svg_blob = stampSVG.read().encode('utf-8')
-                    stampPNG.read(blob=svg_blob, resolution = 72)
-                    png_image = stampPNG.make_blob("png32")
+            ##### Ubuntu(Production) only
+            cairosvg.svg2png(url=doc.user.profile.sub_id + 'stamp.svg',
+                            write_to=doc.user.profile.sub_id + 'stamp.png',
+                            dpi=72)
 
-            with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
-                out.write(png_image)
+            ##### Windows(Local) only
+            # with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
+            #     with wand.image.Image() as stampPNG:
+            #         with wand.color.Color('transparent') as background_color:
+            #             library.MagickSetBackgroundColor(stampPNG.wand,
+            #                                             background_color.resource)
+            #         svg_blob = stampSVG.read().encode('utf-8')
+            #         stampPNG.read(blob=svg_blob, resolution = 72)
+            #         png_image = stampPNG.make_blob("png32")
+
+            # with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
+            #     out.write(png_image)
 
             drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
                                                         media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
@@ -2308,7 +2319,7 @@ def submit_doc(request, doc_id):
                 }
             ).execute()
             docs_response = docs_service.documents().get(
-                documentId = file_id,
+                documentId = file_id
             ).execute()
             inlineObjects = docs_response.get('inlineObjects')
             for stampId in inlineObjects:
@@ -2989,17 +3000,23 @@ def submit_doc(request, doc_id):
             with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
                 stampSVG.write(stampTemp)
 
-            with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
-                with wand.image.Image() as stampPNG:
-                    with wand.color.Color('transparent') as background_color:
-                        library.MagickSetBackgroundColor(stampPNG.wand,
-                                                        background_color.resource)
-                    svg_blob = stampSVG.read().encode('utf-8')
-                    stampPNG.read(blob=svg_blob, resolution = 72)
-                    png_image = stampPNG.make_blob("png32")
+            ##### Ubuntu(Production) only
+            cairosvg.svg2png(url=doc.user.profile.sub_id + "stamp.svg",
+                            write_to=doc.user.profile.sub_id + "stamp.png",
+                            dpi=72)
 
-            with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
-                out.write(png_image)
+            ##### Windows(Local) only
+            # with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
+            #     with wand.image.Image() as stampPNG:
+            #         with wand.color.Color('transparent') as background_color:
+            #             library.MagickSetBackgroundColor(stampPNG.wand,
+            #                                             background_color.resource)
+            #         svg_blob = stampSVG.read().encode('utf-8')
+            #         stampPNG.read(blob=svg_blob, resolution = 72)
+            #         png_image = stampPNG.make_blob("png32")
+
+            # with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
+            #     out.write(png_image)
 
             drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
                                                         media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
