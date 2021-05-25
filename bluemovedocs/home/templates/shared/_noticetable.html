@@ -153,7 +153,7 @@
 <!-- noticetable-list -->
 <div class="list-group list-group-flush" id="noticetable-list">
     {% for notice in all_notices %}
-    <div class="list-group-item px-0">
+    <div id="{{notice.id}}Header" class="list-group-item px-0">
         <div class="d-flex w-100 justify-content-between">
             <p class="mb-1" style="font-weight: 600;">
                 {% if notice.category == 'bluemover' %}
@@ -166,7 +166,7 @@
             </p>
             {% if user.is_authenticated %}
             <!-- Button trigger modal -->
-            <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#noticeTablePosition">
+            <a class="bookmark no-pointer" style="" href="{% url 'notice:notice_favorite' notice.id %}?next={{ request.get_full_path }}#{{notice.id}}Header">
                 {% if user in notice.favorite_user_set.all %}
                 <p class="mb-1"><i class="fas fa-bookmark"></i></p>
                 {% else %}

@@ -147,7 +147,7 @@
                         {% for account in user.socialaccount_set.all %}
                             <button type="submit" class="btn btn-secondary btn-sm comment" onclick="button_click();">등록</button>
                         {% empty %}
-                            <button type="submit" class="btn btn-secondary btn-sm comment" onclick="button_click();" disabled>등록</button>
+                            <button type="button" class="btn btn-secondary btn-sm comment" onclick="inProgress(); location.href='{% url 'account_login' %}?next={{ request.path }}'; innerText='⏳ 로그인';">로그인</button>
                         {% endfor %}
                     </div>
                 </div>

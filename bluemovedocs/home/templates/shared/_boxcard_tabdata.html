@@ -116,15 +116,15 @@
                 {% endif %}
             </a>
             {% else %}
-            <a type="button" class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#listloginModal">
+            <a class="bookmark no-pointer" style="" data-bs-toggle="modal" data-bs-target="#listloginModal{{box.id}}">
                 <p class="mb-1"><i class="far fa-bookmark"></i></p>
             </a>
             <!-- Modal -->
-            <div class="modal fade" id="listloginModal" tabindex="-1" aria-labelledby="listloginModalLabel" aria-hidden="true">
+            <div class="modal fade" id="listloginModal{{box.id}}" tabindex="-1" aria-labelledby="listloginModal{{box.id}}Label" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="listloginModalLabel" style="font-weight: 600;">🔑 로그인 필요</h5>
+                            <h5 class="modal-title" id="listloginModal{{box.id}}Label" style="font-weight: 600;">🔑 로그인 필요</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">

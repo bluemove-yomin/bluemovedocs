@@ -249,7 +249,7 @@
                     <span style="color: #58595B;">기한이 만료되어 새 문서를 생성할 수 없습니다.</span>
                 {% else %}
                     <span style="color: #CCCCCC; font-size: 4rem;"><i class="fas fa-file-medical"></i></span><br>
-                    <span style="color: #58595B;">새 문서를 생성하려면 로그인하세요.</span>
+                    <span style="color: #58595B;">새 문서를 생성하려면 <a href="{% url 'account_login' %}?next={{ request.path }}">로그인</a>하세요.</span>
                 {% endif %}
             </div>
         </div>
