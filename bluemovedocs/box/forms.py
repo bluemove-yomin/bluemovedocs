@@ -31,6 +31,7 @@ class BoxContentForm(forms.ModelForm):
         box.deadline = kwargs.get('deadline', None)
         box.image = kwargs.get('image', None)
         box.official_template_flag = kwargs.get('official_template_flag', None)
+        box.regular_flag = kwargs.get('regular_flag', None)
         box.save()
         return box
 
@@ -47,5 +48,6 @@ class BoxContentForm(forms.ModelForm):
         box.channel_id = kwargs.get('channel_id', None)
         box.channel_name = kwargs.get('channel_name', None)
         box.deadline = kwargs.get('deadline', None)
+        box.regular_flag = kwargs.get('regular_flag', None)
         box.save()
         return box

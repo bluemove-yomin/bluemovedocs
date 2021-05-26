@@ -1,4 +1,6 @@
-{% if box.deadline_is_tomorrow %}
+{% if box.regular_flag %}
+<div class="card h-100">
+{% elif box.deadline_is_tomorrow %}
 <div class="card h-100" style="border: 1px solid #FFD969;">
 {% elif box.deadline_is_today %}
 <div class="card h-100" style="border: 1px solid #F5B5BC;">
@@ -7,57 +9,63 @@
 {% else %}
 <div class="card h-100">
 {% endif %}
-    {% if box.deadline_is_tomorrow %}
-    <div class="card-header d-flex justify-content-center" style="background-color: #fff3cd; border-bottom: 1px solid #FFD969;">
-        <p class="m-0" style="font-weight: 600;">
-            <i class="fas fa-exclamation-triangle"></i>
-            {% if box.deadline_update_flag %}
-            내일 마감 (일정 변경)
-            {% else %}
-            내일 마감
-            {% endif %}
-        </p>
-    </div>
+    {% if box.regular_flag %}
+        <div class="card-header d-flex justify-content-center">
+            <p class="m-0" style="font-weight: 600;">
+                무기한
+            </p>
+        </div>
+    {% elif box.deadline_is_tomorrow %}
+        <div class="card-header d-flex justify-content-center" style="background-color: #fff3cd; border-bottom: 1px solid #FFD969;">
+            <p class="m-0" style="font-weight: 600;">
+                <i class="fas fa-exclamation-triangle"></i>
+                {% if box.deadline_update_flag %}
+                내일 마감 (일정 변경)
+                {% else %}
+                내일 마감
+                {% endif %}
+            </p>
+        </div>
     {% elif box.deadline_is_today %}
-    <div class="card-header d-flex justify-content-center" style="background-color: #f8d7da; border-bottom: 1px solid #F5B5BC;">
-        <p class="m-0" style="font-weight: 600;">
-            <i class="fas fa-exclamation-triangle"></i>
-            {% if box.deadline_update_flag %}
-            오늘 마감 (일정 변경)
-            {% else %}
-            오늘 마감
-            {% endif %}
-        </p>
-    </div>
+        <div class="card-header d-flex justify-content-center" style="background-color: #f8d7da; border-bottom: 1px solid #F5B5BC;">
+            <p class="m-0" style="font-weight: 600;">
+                <i class="fas fa-exclamation-triangle"></i>
+                {% if box.deadline_update_flag %}
+                오늘 마감 (일정 변경)
+                {% else %}
+                오늘 마감
+                {% endif %}
+            </p>
+        </div>
     {% elif box.deadline_is_over %}
-    <div class="card-header d-flex justify-content-center" style="background-color: #d3d3d4; border-bottom: 1px solid #bcbebf;">
-        <p class="m-0" style="font-weight: 600;">
-            <i class="fas fa-ban"></i>
-            {% if box.deadline_update_flag %}
-            {{ box.deadline|date:'Y-m-d' }} 마감 (일정 변경)
-            {% else %}
-            {{ box.deadline|date:'Y-m-d' }} 마감
-            {% endif %}
-        </p>
-    </div>
-    {% else %}
-    <div class="card-header d-flex justify-content-center">
-        <p class="m-0" style="font-weight: 600;">
-            {% if box.days_left_until_deadline.days > 7 %}
+        <div class="card-header d-flex justify-content-center" style="background-color: #d3d3d4; border-bottom: 1px solid #bcbebf;">
+            <p class="m-0" style="font-weight: 600;">
+                <i class="fas fa-ban"></i>
                 {% if box.deadline_update_flag %}
                 {{ box.deadline|date:'Y-m-d' }} 마감 (일정 변경)
                 {% else %}
                 {{ box.deadline|date:'Y-m-d' }} 마감
                 {% endif %}
-            {% else %}
-                {% if box.deadline_update_flag %}
-                {{ box.days_left_until_deadline.days }}일 후 마감 (일정 변경)
+            </p>
+        </div>
+    {% else %}
+        <div class="card-header d-flex justify-content-center">
+            <p class="m-0" style="font-weight: 600;">
+                {% if box.days_left_until_deadline.days > 7 %}
+                    {% if box.deadline_update_flag %}
+                    {{ box.deadline|date:'Y-m-d' }} 마감 (일정 변경)
+                    {% else %}
+                    {{ box.deadline|date:'Y-m-d' }} 마감
+                    {% endif %}
                 {% else %}
-                {{ box.days_left_until_deadline.days }}일 후 마감
+                    {% if box.deadline_update_flag %}
+                    {{ box.days_left_until_deadline.days }}일 후 마감 (일정 변경)
+                    {% else %}
+                    {{ box.days_left_until_deadline.days }}일 후 마감
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-        </p>
-    </div>
+            </p>
+        </div>
     {% endif %}
     <div class="ratio" style="--aspect-ratio: 50%; position: relative; text-align: center;">
         <a class="no-pointer" style="" href="{% url 'box:read' box.id %}{{ request.get_full_path|cut:request.path }}" onclick="openBox{{ box.id }}({{ box.id }}); inProgress();">

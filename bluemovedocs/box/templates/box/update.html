@@ -216,40 +216,141 @@
                 </select>
                 <div class="invalid-feedback">연동 Slack 채널을 입력하세요.</div>
             </div>
-            <div class="form-group mb-3">
-                <label for="deadline" class="form-label">기한<span style="color: #007DC5; font-weight: 600;"> *</span></label>
-                <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
-                <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
-                <script>
-                    var timezoneOffset = new Date().getTimezoneOffset() * 60000;
-                    var timezoneDate = new Date(Date.now() - timezoneOffset);
-                    var today = timezoneDate.toISOString().split('T')[0];
-                    document.getElementsByName("deadline")[0].setAttribute('min', today);
-                    function minDateWrite() {
-                        document.write(today);
-                    };
-                </script>
-                <script>
-                    var timezoneOffset2 = new Date().getTimezoneOffset() * 60000;
-                    var timezoneDate2 = new Date(Date.now() - timezoneOffset2);
-                    timezoneDate2.setDate(timezoneDate2.getDate() + 365);
-                    var oneYearFromToday = timezoneDate2.toISOString().split('T')[0];
-                    document.getElementsByName("deadline")[0].setAttribute('max', oneYearFromToday);
-                    function maxDateWrite() {
-                        document.write(oneYearFromToday);
-                    };
-                </script>
-                <div id="deadlineHelp" class="form-text" onload="">
-                    <p class="mb-2">기한이 만료되면 문서함이 자동으로 닫힙니다.</p>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지<br>
-                    <i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내 텍스트</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트 표시
+            {% if box.category == 'bluemover' %}
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="deadline" class="form-label">기한<span id="deadlineStar" style="color: #007DC5; font-weight: 600;"> *</span></label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input mx-0" type="checkbox" name="regular" id="regular" onclick="regularSwitch(this)" checked disabled>
+                        </div>
+                    </div>
+                    <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
+                    <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
+                    <script>
+                        var timezoneOffset = new Date().getTimezoneOffset() * 60000;
+                        var timezoneDate = new Date(Date.now() - timezoneOffset);
+                        var today = timezoneDate.toISOString().split('T')[0];
+                        document.getElementsByName("deadline")[0].setAttribute('min', today);
+                        function minDateWrite() {
+                            document.write(today);
+                        };
+                    </script>
+                    <script>
+                        var timezoneOffset2 = new Date().getTimezoneOffset() * 60000;
+                        var timezoneDate2 = new Date(Date.now() - timezoneOffset2);
+                        timezoneDate2.setDate(timezoneDate2.getDate() + 365);
+                        var oneYearFromToday = timezoneDate2.toISOString().split('T')[0];
+                        document.getElementsByName("deadline")[0].setAttribute('max', oneYearFromToday);
+                        function maxDateWrite() {
+                            document.write(oneYearFromToday);
+                        };
+                    </script>
+                    <div id="deadlineHelp" class="form-text" onload="">
+                        <p id="deadlineInfo" class="mb-2">기한이 만료되면 문서함이 자동으로 닫힙니다. 대상이 블루무버일 경우 반드시 기한을 설정해야 합니다.</p>
+                        <div id="deadlineDetail"><i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지</div>
+                        <div id="deadlineChangeInfo"><i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내 텍스트</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트 표시</div>
+                    </div>
                 </div>
-            </div>
-            {% if box.image %}
-            <div class="form-group mb-3">
+            {% elif not box.regular_flag %}
+            <!-- 일반 문서함일 경우 -->
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="deadline" class="form-label">기한<span id="deadlineStar" style="color: #007DC5; font-weight: 600;"> *</span></label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input mx-0" type="checkbox" name="regular" id="regular" onclick="regularSwitch(this)" checked>
+                        </div>
+                    </div>
+                    <input type="date" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" value="{{ box.deadline|date:'Y-m-d' }}" required>
+                    <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
+                    <script>
+                        var timezoneOffset = new Date().getTimezoneOffset() * 60000;
+                        var timezoneDate = new Date(Date.now() - timezoneOffset);
+                        var today = timezoneDate.toISOString().split('T')[0];
+                        document.getElementsByName("deadline")[0].setAttribute('min', today);
+                        function minDateWrite() {
+                            document.write(today);
+                        };
+                    </script>
+                    <script>
+                        var timezoneOffset2 = new Date().getTimezoneOffset() * 60000;
+                        var timezoneDate2 = new Date(Date.now() - timezoneOffset2);
+                        timezoneDate2.setDate(timezoneDate2.getDate() + 365);
+                        var oneYearFromToday = timezoneDate2.toISOString().split('T')[0];
+                        document.getElementsByName("deadline")[0].setAttribute('max', oneYearFromToday);
+                        function maxDateWrite() {
+                            document.write(oneYearFromToday);
+                        };
+                    </script>
+                    <div id="deadlineHelp" class="form-text" onload="">
+                        <p id="deadlineInfo" class="mb-2">기한이 만료되면 문서함이 자동으로 닫힙니다. 무기한으로 설정하려면 오른쪽 토글 스위치를 누르세요.</p>
+                        <div id="deadlineDetail"><i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지</div>
+                        <div id="deadlineChangeInfo"><i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내 텍스트</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트 표시</div>
+                    </div>
+                </div>
             {% else %}
-            <div class="form-group mb-5">
+            <!-- 무기한 문서함일 경우 -->
+                <div class="form-group mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="deadline" class="form-label">기한<span id="deadlineStar" style="display: none;"> *</span></label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input mx-0" type="checkbox" name="regular" id="regular" onclick="regularSwitch(this)">
+                        </div>
+                    </div>
+                    <input type="text" class="form-control" name="deadline" id="deadline" aria-describedby="deadlineHelp" placeholder="무기한" value="" disabled>
+                    <div class="invalid-feedback">유효 범위 내 기한을 입력하세요.</div>
+                    <script>
+                        var timezoneOffset = new Date().getTimezoneOffset() * 60000;
+                        var timezoneDate = new Date(Date.now() - timezoneOffset);
+                        var today = timezoneDate.toISOString().split('T')[0];
+                        document.getElementsByName("deadline")[0].setAttribute('min', today);
+                        function minDateWrite() {
+                            document.write(today);
+                        };
+                    </script>
+                    <script>
+                        var timezoneOffset2 = new Date().getTimezoneOffset() * 60000;
+                        var timezoneDate2 = new Date(Date.now() - timezoneOffset2);
+                        timezoneDate2.setDate(timezoneDate2.getDate() + 365);
+                        var oneYearFromToday = timezoneDate2.toISOString().split('T')[0];
+                        document.getElementsByName("deadline")[0].setAttribute('max', oneYearFromToday);
+                        function maxDateWrite() {
+                            document.write(oneYearFromToday);
+                        };
+                    </script>
+                    <div id="deadlineHelp" class="form-text" onload="">
+                        <p id="deadlineInfo" class="mb-2">기한이 만료되면 문서함이 자동으로 닫힙니다. 무기한으로 설정하려면 오른쪽 토글 스위치를 누르세요.</p>
+                        <div id="deadlineDetail"><i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 유효 범위</span>: 최소 <script>minDateWrite();</script>(오늘)부터 최대 <script>maxDateWrite();</script>(1년 후)까지</div>
+                        <div id="deadlineChangeInfo"><i class="fas fa-info-circle"></i><span style="font-weight: 600;"> 변경 안내 텍스트</span>: 기한 수정 시 본문과 목록에 '일정 변경' 텍스트 표시</div>
+                    </div>
+                </div>
             {% endif %}
+            <script>
+                function regularSwitch(obj) {
+                    if (obj.checked == false) {
+                        document.querySelector('#deadline').setAttribute("type", "text");
+                        document.querySelector('#deadline').value = '';
+                        document.querySelector('#deadline').setAttribute("placeholder", "무기한");
+                        document.querySelector('#deadline').disabled = true;
+                        document.querySelector('#deadline').required = false;
+                        document.querySelector('#deadlineStar').setAttribute('style', 'display: none;');
+                        document.querySelector('#deadlineInfo').innerText = '무기한 설정을 취소하려면 오른쪽 토글 스위치를 누르세요.'
+                        document.querySelector('#deadlineDetail').setAttribute('style', 'display: none;');
+                        document.querySelector('#deadlineChangeInfo').setAttribute('style', 'display: none;');
+                    }
+                    if (obj.checked) {
+                        document.querySelector('#deadline').removeAttribute("placeholder");
+                        document.querySelector('#deadline').setAttribute("type", "date");
+                        document.querySelector('#deadline').value = "{{ box.deadline|date:'Y-m-d' }}";
+                        document.querySelector('#deadline').disabled = false;
+                        document.querySelector('#deadline').required = true;
+                        document.querySelector('#deadlineStar').setAttribute('style', 'color: #007DC5; font-weight: 600;');
+                        document.querySelector('#deadlineInfo').innerText = '기한이 만료되면 문서함이 자동으로 닫힙니다. 무기한으로 설정하려면 오른쪽 토글 스위치를 누르세요.'
+                        document.querySelector('#deadlineDetail').setAttribute('style', '');
+                        document.querySelector('#deadlineChangeInfo').setAttribute('style', '');
+                    }
+                }
+            </script>
+            <div class="form-group mb-3">
                 <label for="content" class="form-label">내용<span style="color: #007DC5; font-weight: 600;"> *</span></label>
                 <div id="editor">
                 {{ form.media }}
@@ -826,455 +927,173 @@
             </script>
 
         <!-- Deadline Validation -->
-        {% if box.deadline_update_flag %}
-            {% if box.category == 'bluemover' %}
-                <script>
-                    window.onerror = function(){
-                    return true;
+        <script>
+            window.onerror = function(){
+            return true;
+            }
+            $("#boxForm").submit( function( e ) {
+                var form = this;
+                e.preventDefault();
+                if ( !document.querySelector("#category").value ) {
+                    alert("대상을 선택하세요.")
+                }
+                else if ( !document.querySelector("#project_id").value ) {
+                    alert("소속 프로젝트를 선택하세요.")
+                }
+                {% if box.category == 'bluemover' %}
+                else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                    alert("해당 공유 드라이브를 선택하세요.")
+                }
+                else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
+                    alert("최종 디렉토리를 선택하세요.")
+                }
+                {% endif %}
+                else if ( !document.querySelector("#title").value ) {
+                    alert("문서명을 입력하세요.")
+                }
+                else if ( !document.querySelector("#document_id").value ) {
+                    alert("템플릿 문서 링크를 입력하세요.")
+                }
+                else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
+                    alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
+                }
+                else if ( !document.querySelector("#channel_id").value ) {
+                    alert("연동 Slack 채널을 선택하세요.")
+                }
+                else if ( !document.querySelector("#deadline").value && document.querySelector('#regular').checked == true ) {
+                    alert("기한을 입력하세요.")
+                }
+                else if ( document.querySelector("#deadline").value < today && document.querySelector('#regular').checked == true ) {
+                    alert("유효 범위 내 기한을 입력하세요.")
+                    document.querySelector("#deadline").value = '';
+                }
+                else if ( document.querySelector("#deadline").value > oneYearFromToday && document.querySelector('#regular').checked == true ) {
+                    alert("유효 범위 내 기한을 입력하세요.")
+                    document.querySelector("#deadline").value = '';
+                }
+                else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
+                    alert("내용을 입력하세요.")
+                }
+                else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
+                    alert("내용을 입력하세요.")
+                }
+                // 유저가 새로운 기한을 입력하지 않았을 경우
+                else if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
+                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                        document.querySelectorAll(".btn")[i].disabled = true;
+                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
                     }
-                    $("#boxForm").submit( function( e ) {
-                        var form = this;
-                        e.preventDefault();
-                        // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
+                    form.submit();
+                }
+                // 유저가 새로운 기한을 입력했을 경우 (수정된 적 있음, 일반 문서함)
+                {% if box.deadline_update_flag and not box.regular_flag %}
+                else {
+                    // 기한 변경
+                    if ( document.querySelector('#regular').checked == true ) {
+                        if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
                             }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("해당 공유 드라이브를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("최종 디렉토리를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                    document.querySelectorAll(".btn")[i].disabled = true;
-                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                }
-                                form.submit();
-                            }
+                            form.submit();
                         }
-                        // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("해당 공유 드라이브를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("최종 디렉토리를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
-                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                        document.querySelectorAll(".btn")[i].disabled = true;
-                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                    }
-                                    form.submit();
-                                }
-                                else {
-                                    return false;
-                                }
-                            }
+                            return false;
                         }
-                    });
-                </script>
-            {% else %}
-                <script>
-                    window.onerror = function(){
-                    return true;
+                    // 기한 삭제
+                    } else {
+                        if ( confirm("기한을 삭제하려고 합니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: 없음 (무기한)\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                            }
+                            form.submit();
+                        }
+                        else {
+                            return false;
+                        }
                     }
-                    $("#boxForm").submit( function( e ) {
-                        var form = this;
-                        e.preventDefault();
-                        // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
+                }
+                // 유저가 새로운 기한을 입력했을 경우 (수정된 적 있음, 무기한 문서함)
+                {% elif box.deadline_update_flag and box.regular_flag %}
+                else {
+                    // 기한 추가
+                    if ( document.querySelector('#regular').checked == true ) {
+                        if ( confirm("기한 추가 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: 없음 (무기한)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
                             }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                    document.querySelectorAll(".btn")[i].disabled = true;
-                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                }
-                                form.submit();
-                            }
+                            form.submit();
                         }
-                        // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                if ( confirm("이 문서함의 기한은 이미 수정된 적이 있습니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + " (일정 변경)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경)\n\n기한을 다시 수정하시겠어요?") ) {
-                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                        document.querySelectorAll(".btn")[i].disabled = true;
-                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                    }
-                                    form.submit();
-                                }
-                                else {
-                                    return false;
-                                }
-                            }
+                            return false;
                         }
-                    });
-                </script>
-            {% endif %}
-        {% else %}
-            {% if box.category == 'bluemover' %}
-                <script>
-                    window.onerror = function(){
-                    return true;
+                    // 무기한 유지
+                    } else {
+                        for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                            document.querySelectorAll(".btn")[i].disabled = true;
+                            document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                        }
+                        form.submit();
                     }
-                    $("#boxForm").submit( function( e ) {
-                        var form = this;
-                        e.preventDefault();
-                        // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
+                }
+                // 유저가 새로운 기한을 입력했을 경우 (수정된 적 없음, 일반 문서함)
+                {% elif not box.deadline_update_flag and not box.regular_flag %}
+                else {
+                    // 기한 변경
+                    if ( document.querySelector('#regular').checked == true ) {
+                        if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
                             }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("해당 공유 드라이브를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("최종 디렉토리를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                    document.querySelectorAll(".btn")[i].disabled = true;
-                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                }
-                                form.submit();
-                            }
+                            form.submit();
                         }
-                        // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#drive_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("해당 공유 드라이브를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#folder_id").value && document.querySelector("#category").value == 'bluemover' ) {
-                                alert("최종 디렉토리를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
-                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                        document.querySelectorAll(".btn")[i].disabled = true;
-                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                    }
-                                    form.submit();
-                                }
-                                else {
-                                    return false;
-                                }
-                            }
+                            return false;
                         }
-                    });
-                </script>
-            {% else %}
-                <script>
-                    window.onerror = function(){
-                    return true;
+                    // 기한 삭제
+                    } else {
+                        if ( confirm("기한을 삭제하려고 합니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: 없음 (무기한)\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                            }
+                            form.submit();
+                        }
+                        else {
+                            return false;
+                        }
                     }
-                    $("#boxForm").submit( function( e ) {
-                        var form = this;
-                        e.preventDefault();
-                        // 유저가 새로운 기한을 입력하지 않았을 경우
-                        if ( "{{ box.deadline|date:'Y-m-d' }}" == document.querySelector("#deadline").value ) {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
+                }
+                // 유저가 새로운 기한을 입력했을 경우 (수정된 적 없음, 무기한 문서함)
+                {% else %}
+                else {
+                    // 기한 추가
+                    if ( document.querySelector('#regular').checked == true ) {
+                        if ( confirm("기한 추가 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: 없음 (무기한)\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
+                            for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                                document.querySelectorAll(".btn")[i].disabled = true;
+                                document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
                             }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                    document.querySelectorAll(".btn")[i].disabled = true;
-                                    document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                }
-                                form.submit();
-                            }
+                            form.submit();
                         }
-                        // 유저가 새로운 기한을 입력했을 경우
                         else {
-                            if ( !document.querySelector("#category").value ) {
-                                alert("대상을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#project_id").value ) {
-                                alert("소속 프로젝트를 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#title").value ) {
-                                alert("문서명을 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#document_id").value ) {
-                                alert("템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( document.querySelector("#document_etcid").required == true && document.querySelector("#document_etcid").value.length < 79 ) {
-                                alert("유효한 임의 템플릿 문서 링크를 입력하세요.")
-                            }
-                            else if ( !document.querySelector("#channel_id").value ) {
-                                alert("연동 Slack 채널을 선택하세요.")
-                            }
-                            else if ( !document.querySelector("#deadline").value ) {
-                                alert("기한을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#deadline").value < today ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#deadline").value > oneYearFromToday ) {
-                                alert("유효 범위 내 기한을 입력하세요.")
-                                document.querySelector("#deadline").value = '';
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else if ( document.querySelector("#editor > .django-ckeditor-widget > #cke_id_content > .cke_inner > #cke_1_contents > .cke_wysiwyg_frame").contentWindow.document.querySelector("html").innerText == '\n\n\n\n' ) {
-                                alert("내용을 입력하세요.")
-                            }
-                            else {
-                                if ( confirm("기한 수정 시 본문과 목록에 '일정 변경' 텍스트가 표시됩니다.\n\n▶ 기존 기한: " + "{{ box.deadline|date:'Y-m-d' }}" + "\n▶ 수정 기한: " + document.querySelector("#deadline").value + " (일정 변경) → 텍스트가 추가됩니다.\n\n계속하시겠어요?") ) {
-                                    for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
-                                        document.querySelectorAll(".btn")[i].disabled = true;
-                                        document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
-                                    }
-                                    form.submit();
-                                }
-                                else {
-                                    return false;
-                                }
-                            }
+                            return false;
                         }
-                    });
-                </script>
-            {% endif %}
-        {% endif %}
+                    // 무기한 유지
+                    } else {
+                        for (var i = 0; i < document.querySelectorAll(".btn").length; i++) {
+                            document.querySelectorAll(".btn")[i].disabled = true;
+                            document.querySelector(".submit").innerText = '⏳ 수정 등록하기';
+                        }
+                        form.submit();
+                    }
+                }
+                {% endif %}
+            });
+        </script>
     </div>
 </main>
 {% endblock %}
