@@ -21,12 +21,12 @@ from svgpathtools import wsvg, Line, QuadraticBezier, Path
 from freetype import Face
 from bs4 import BeautifulSoup
 ##### START: Ubuntu(Production) only
-import cairosvg
+# import cairosvg
 ##### END!!: Ubuntu(Production) only
 ##### START: Windows(Local) only
-# from wand.api import library
-# import wand.color
-# import wand.image
+from wand.api import library
+import wand.color
+import wand.image
 ##### END!!: Windows(Local) only
 import os
 from slack_sdk import WebClient
@@ -2214,133 +2214,133 @@ def submit_doc(request, doc_id):
         ).execute()
         ####################
         try:
-            def tuple_to_imag(t):
-                return t[0] + t[1] * 1j
-
-            letter = []
-            stampName = str(doc.user.last_name + doc.user.first_name)
-            if len(stampName) == 3:
-                letter.append(stampName[0])
-                letter.append(stampName[1])
-                letter.append(stampName[2])
-                letter.append('인')
-            else:
-                letter.append(stampName[0])
-                letter.append(stampName[1])
-                letter.append(stampName[2])
-                letter.append(stampName[3])
-
-            face = Face('HJHanjeonseoB.ttf')
-            face.set_char_size(48 * 64)
-            dValueList = []
-            for i in letter:
-                face.load_char(i)
-                outline = face.glyph.outline
-                y = [t[1] for t in outline.points]
-                outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
-                start, end = 0, 0
-                paths = []
-
-                for i in range(len(outline.contours)):
-                    end = outline.contours[i]
-                    points = outline_points[start:end + 1]
-                    points.append(points[0])
-                    tags = outline.tags[start:end + 1]
-                    tags.append(tags[0])
-
-                    segments = [[points[0], ], ]
-                    for j in range(1, len(points)):
-                        segments[-1].append(points[j])
-                        if tags[j] and j < (len(points) - 1):
-                            segments.append([points[j], ])
-                    for segment in segments:
-                        if len(segment) == 2:
-                            paths.append(Line(start=tuple_to_imag(segment[0]),
-                                            end=tuple_to_imag(segment[1])))
-                        elif len(segment) == 3:
-                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
-                                                        control=tuple_to_imag(segment[1]),
-                                                        end=tuple_to_imag(segment[2])))
-                        elif len(segment) == 4:
-                            C = ((segment[1][0] + segment[2][0]) / 2.0,
-                                (segment[1][1] + segment[2][1]) / 2.0)
-
-                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
-                                                        control=tuple_to_imag(segment[1]),
-                                                        end=tuple_to_imag(C)))
-                            paths.append(QuadraticBezier(start=tuple_to_imag(C),
-                                                        control=tuple_to_imag(segment[2]),
-                                                        end=tuple_to_imag(segment[3])))
-                    start = end + 1
-
-                path = Path(*paths)
-                wsvg(path, filename=doc.user.profile.sub_id + "stamp.html")
-
-                with open(doc.user.profile.sub_id + 'stamp.html') as stampRaw:
-                    soup = BeautifulSoup(stampRaw.read(), features='html.parser')
-                    dValue = soup.find('path')['d']
-                    dValueList.append(dValue)
-
-            stampTemp = \
-            """<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" width="180px" height="180px" version="1.1" viewBox="0 0 3500 3500">
-                <svg width="3500" height="3500" viewBox="0 0 3500 3500" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="1750" cy="1750" fill="none" stroke="#C90000" stroke-width="100" r="1700"></circle>
-                    <svg x="500" y="530">
-                        <path id='stamp01' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[0] + """'/>
-                    </svg>
-                    <svg x="1750" y="530">
-                        <path id='stamp02' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[1] + """'/>
-                    </svg>
-                    <svg x="500" y="1780">
-                        <path id='stamp03' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[2] + """'/>
-                    </svg>
-                    <svg x="1750" y="1780">
-                        <path id='stamp04' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[3] + """'/>
-                    </svg>
-                </svg>
-            </svg>"""
-
-            with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
-                stampSVG.write(stampTemp)
-
-            ##### Ubuntu(Production) only
-            cairosvg.svg2png(url=doc.user.profile.sub_id + 'stamp.svg',
-                            write_to=doc.user.profile.sub_id + 'stamp.png',
-                            dpi=72)
-
-            ##### Windows(Local) only
-            # with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
-            #     with wand.image.Image() as stampPNG:
-            #         with wand.color.Color('transparent') as background_color:
-            #             library.MagickSetBackgroundColor(stampPNG.wand,
-            #                                             background_color.resource)
-            #         svg_blob = stampSVG.read().encode('utf-8')
-            #         stampPNG.read(blob=svg_blob, resolution = 72)
-            #         png_image = stampPNG.make_blob("png32")
-            # with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
-            #     out.write(png_image)
-
-            drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
-                                                        media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
-                                                        fields='id').execute()
-            stampFileId = drive_response.get('id')
-            drive_response = drive_service.permissions().create(
-                fileId = stampFileId,
-                body = {
-                    'role': 'reader',
-                    'type': 'anyone'
-                }
-            ).execute()
-            drive_response = drive_service.files().get(
-                fileId = stampFileId,
-                fields = 'webContentLink'
-            ).execute()
-            stampUri = drive_response.get('webContentLink')
             docs_response = docs_service.documents().get(
                 documentId = file_id
             ).execute()
             inlineObjects = docs_response.get('inlineObjects')
             for stampId in inlineObjects:
+                def tuple_to_imag(t):
+                    return t[0] + t[1] * 1j
+
+                letter = []
+                stampName = str(doc.user.last_name + doc.user.first_name)
+                if len(stampName) == 3:
+                    letter.append(stampName[0])
+                    letter.append(stampName[1])
+                    letter.append(stampName[2])
+                    letter.append('인')
+                else:
+                    letter.append(stampName[0])
+                    letter.append(stampName[1])
+                    letter.append(stampName[2])
+                    letter.append(stampName[3])
+
+                face = Face('HJHanjeonseoB.ttf')
+                face.set_char_size(48 * 64)
+                dValueList = []
+                for i in letter:
+                    face.load_char(i)
+                    outline = face.glyph.outline
+                    y = [t[1] for t in outline.points]
+                    outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
+                    start, end = 0, 0
+                    paths = []
+
+                    for i in range(len(outline.contours)):
+                        end = outline.contours[i]
+                        points = outline_points[start:end + 1]
+                        points.append(points[0])
+                        tags = outline.tags[start:end + 1]
+                        tags.append(tags[0])
+
+                        segments = [[points[0], ], ]
+                        for j in range(1, len(points)):
+                            segments[-1].append(points[j])
+                            if tags[j] and j < (len(points) - 1):
+                                segments.append([points[j], ])
+                        for segment in segments:
+                            if len(segment) == 2:
+                                paths.append(Line(start=tuple_to_imag(segment[0]),
+                                                end=tuple_to_imag(segment[1])))
+                            elif len(segment) == 3:
+                                paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                            control=tuple_to_imag(segment[1]),
+                                                            end=tuple_to_imag(segment[2])))
+                            elif len(segment) == 4:
+                                C = ((segment[1][0] + segment[2][0]) / 2.0,
+                                    (segment[1][1] + segment[2][1]) / 2.0)
+
+                                paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                            control=tuple_to_imag(segment[1]),
+                                                            end=tuple_to_imag(C)))
+                                paths.append(QuadraticBezier(start=tuple_to_imag(C),
+                                                            control=tuple_to_imag(segment[2]),
+                                                            end=tuple_to_imag(segment[3])))
+                        start = end + 1
+
+                    path = Path(*paths)
+                    wsvg(path, filename=doc.user.profile.sub_id + "stamp.html")
+
+                    with open(doc.user.profile.sub_id + 'stamp.html') as stampRaw:
+                        soup = BeautifulSoup(stampRaw.read(), features='html.parser')
+                        dValue = soup.find('path')['d']
+                        dValueList.append(dValue)
+
+                stampTemp = \
+                """<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" width="180px" height="180px" version="1.1" viewBox="0 0 3500 3500">
+                    <svg width="3500" height="3500" viewBox="0 0 3500 3500" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="1750" cy="1750" fill="none" stroke="#C90000" stroke-width="100" r="1700"></circle>
+                        <svg x="500" y="530">
+                            <path id='stamp01' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[0] + """'/>
+                        </svg>
+                        <svg x="1750" y="530">
+                            <path id='stamp02' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[1] + """'/>
+                        </svg>
+                        <svg x="500" y="1780">
+                            <path id='stamp03' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[2] + """'/>
+                        </svg>
+                        <svg x="1750" y="1780">
+                            <path id='stamp04' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[3] + """'/>
+                        </svg>
+                    </svg>
+                </svg>"""
+
+                with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
+                    stampSVG.write(stampTemp)
+
+                ##### Ubuntu(Production) only
+                # cairosvg.svg2png(url=doc.user.profile.sub_id + 'stamp.svg',
+                #                 write_to=doc.user.profile.sub_id + 'stamp.png',
+                #                 dpi=72)
+
+                ##### Windows(Local) only
+                with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
+                    with wand.image.Image() as stampPNG:
+                        with wand.color.Color('transparent') as background_color:
+                            library.MagickSetBackgroundColor(stampPNG.wand,
+                                                            background_color.resource)
+                        svg_blob = stampSVG.read().encode('utf-8')
+                        stampPNG.read(blob=svg_blob, resolution = 72)
+                        png_image = stampPNG.make_blob("png32")
+                with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
+                    out.write(png_image)
+
+                drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
+                                                            media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
+                                                            fields='id').execute()
+                stampFileId = drive_response.get('id')
+                drive_response = drive_service.permissions().create(
+                    fileId = stampFileId,
+                    body = {
+                        'role': 'reader',
+                        'type': 'anyone'
+                    }
+                ).execute()
+                drive_response = drive_service.files().get(
+                    fileId = stampFileId,
+                    fields = 'webContentLink'
+                ).execute()
+                stampUri = drive_response.get('webContentLink')
                 docs_service.documents().batchUpdate(
                     documentId = file_id,
                     body = {
@@ -2929,133 +2929,133 @@ def submit_doc(request, doc_id):
         ).execute()
         ####################
         try:
-            def tuple_to_imag(t):
-                return t[0] + t[1] * 1j
-
-            letter = []
-            stampName = str(doc.user.last_name + doc.user.first_name)
-            if len(stampName) == 3:
-                letter.append(stampName[0])
-                letter.append(stampName[1])
-                letter.append(stampName[2])
-                letter.append('인')
-            else:
-                letter.append(stampName[0])
-                letter.append(stampName[1])
-                letter.append(stampName[2])
-                letter.append(stampName[3])
-
-            face = Face('HJHanjeonseoB.ttf')
-            face.set_char_size(48 * 64)
-            dValueList = []
-            for i in letter:
-                face.load_char(i)
-                outline = face.glyph.outline
-                y = [t[1] for t in outline.points]
-                outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
-                start, end = 0, 0
-                paths = []
-
-                for i in range(len(outline.contours)):
-                    end = outline.contours[i]
-                    points = outline_points[start:end + 1]
-                    points.append(points[0])
-                    tags = outline.tags[start:end + 1]
-                    tags.append(tags[0])
-
-                    segments = [[points[0], ], ]
-                    for j in range(1, len(points)):
-                        segments[-1].append(points[j])
-                        if tags[j] and j < (len(points) - 1):
-                            segments.append([points[j], ])
-                    for segment in segments:
-                        if len(segment) == 2:
-                            paths.append(Line(start=tuple_to_imag(segment[0]),
-                                            end=tuple_to_imag(segment[1])))
-                        elif len(segment) == 3:
-                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
-                                                        control=tuple_to_imag(segment[1]),
-                                                        end=tuple_to_imag(segment[2])))
-                        elif len(segment) == 4:
-                            C = ((segment[1][0] + segment[2][0]) / 2.0,
-                                (segment[1][1] + segment[2][1]) / 2.0)
-
-                            paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
-                                                        control=tuple_to_imag(segment[1]),
-                                                        end=tuple_to_imag(C)))
-                            paths.append(QuadraticBezier(start=tuple_to_imag(C),
-                                                        control=tuple_to_imag(segment[2]),
-                                                        end=tuple_to_imag(segment[3])))
-                    start = end + 1
-
-                path = Path(*paths)
-                wsvg(path, filename=doc.user.profile.sub_id + "stamp.html")
-
-                with open(doc.user.profile.sub_id + 'stamp.html') as stampRaw:
-                    soup = BeautifulSoup(stampRaw.read(), features='html.parser')
-                    dValue = soup.find('path')['d']
-                    dValueList.append(dValue)
-
-            stampTemp = \
-            """<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" width="180px" height="180px" version="1.1" viewBox="0 0 3500 3500">
-                <svg width="3500" height="3500" viewBox="0 0 3500 3500" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="1750" cy="1750" fill="none" stroke="#C90000" stroke-width="100" r="1700"></circle>
-                    <svg x="500" y="530">
-                        <path id='stamp01' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[0] + """'/>
-                    </svg>
-                    <svg x="1750" y="530">
-                        <path id='stamp02' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[1] + """'/>
-                    </svg>
-                    <svg x="500" y="1780">
-                        <path id='stamp03' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[2] + """'/>
-                    </svg>
-                    <svg x="1750" y="1780">
-                        <path id='stamp04' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[3] + """'/>
-                    </svg>
-                </svg>
-            </svg>"""
-
-            with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
-                stampSVG.write(stampTemp)
-
-            ##### Ubuntu(Production) only
-            cairosvg.svg2png(url=doc.user.profile.sub_id + "stamp.svg",
-                            write_to=doc.user.profile.sub_id + "stamp.png",
-                            dpi=72)
-
-            ##### Windows(Local) only
-            # with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
-            #     with wand.image.Image() as stampPNG:
-            #         with wand.color.Color('transparent') as background_color:
-            #             library.MagickSetBackgroundColor(stampPNG.wand,
-            #                                             background_color.resource)
-            #         svg_blob = stampSVG.read().encode('utf-8')
-            #         stampPNG.read(blob=svg_blob, resolution = 72)
-            #         png_image = stampPNG.make_blob("png32")
-            # with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
-            #     out.write(png_image)
-
-            drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
-                                                        media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
-                                                        fields='id').execute()
-            stampFileId = drive_response.get('id')
-            drive_response = drive_service.permissions().create(
-                fileId = stampFileId,
-                body = {
-                    'role': 'reader',
-                    'type': 'anyone'
-                }
-            ).execute()
-            drive_response = drive_service.files().get(
-                fileId = stampFileId,
-                fields = 'webContentLink'
-            ).execute()
-            stampUri = drive_response.get('webContentLink')
             docs_response = docs_service.documents().get(
                 documentId = file_id,
             ).execute()
             inlineObjects = docs_response.get('inlineObjects')
             for stampId in inlineObjects:
+                def tuple_to_imag(t):
+                    return t[0] + t[1] * 1j
+
+                letter = []
+                stampName = str(doc.user.last_name + doc.user.first_name)
+                if len(stampName) == 3:
+                    letter.append(stampName[0])
+                    letter.append(stampName[1])
+                    letter.append(stampName[2])
+                    letter.append('인')
+                else:
+                    letter.append(stampName[0])
+                    letter.append(stampName[1])
+                    letter.append(stampName[2])
+                    letter.append(stampName[3])
+
+                face = Face('HJHanjeonseoB.ttf')
+                face.set_char_size(48 * 64)
+                dValueList = []
+                for i in letter:
+                    face.load_char(i)
+                    outline = face.glyph.outline
+                    y = [t[1] for t in outline.points]
+                    outline_points = [(p[0], max(y) - p[1]) for p in outline.points]
+                    start, end = 0, 0
+                    paths = []
+
+                    for i in range(len(outline.contours)):
+                        end = outline.contours[i]
+                        points = outline_points[start:end + 1]
+                        points.append(points[0])
+                        tags = outline.tags[start:end + 1]
+                        tags.append(tags[0])
+
+                        segments = [[points[0], ], ]
+                        for j in range(1, len(points)):
+                            segments[-1].append(points[j])
+                            if tags[j] and j < (len(points) - 1):
+                                segments.append([points[j], ])
+                        for segment in segments:
+                            if len(segment) == 2:
+                                paths.append(Line(start=tuple_to_imag(segment[0]),
+                                                end=tuple_to_imag(segment[1])))
+                            elif len(segment) == 3:
+                                paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                            control=tuple_to_imag(segment[1]),
+                                                            end=tuple_to_imag(segment[2])))
+                            elif len(segment) == 4:
+                                C = ((segment[1][0] + segment[2][0]) / 2.0,
+                                    (segment[1][1] + segment[2][1]) / 2.0)
+
+                                paths.append(QuadraticBezier(start=tuple_to_imag(segment[0]),
+                                                            control=tuple_to_imag(segment[1]),
+                                                            end=tuple_to_imag(C)))
+                                paths.append(QuadraticBezier(start=tuple_to_imag(C),
+                                                            control=tuple_to_imag(segment[2]),
+                                                            end=tuple_to_imag(segment[3])))
+                        start = end + 1
+
+                    path = Path(*paths)
+                    wsvg(path, filename=doc.user.profile.sub_id + "stamp.html")
+
+                    with open(doc.user.profile.sub_id + 'stamp.html') as stampRaw:
+                        soup = BeautifulSoup(stampRaw.read(), features='html.parser')
+                        dValue = soup.find('path')['d']
+                        dValueList.append(dValue)
+
+                stampTemp = \
+                """<svg xmlns="http://www.w3.org/2000/svg" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xlink="http://www.w3.org/1999/xlink" baseProfile="full" width="180px" height="180px" version="1.1" viewBox="0 0 3500 3500">
+                    <svg width="3500" height="3500" viewBox="0 0 3500 3500" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="1750" cy="1750" fill="none" stroke="#C90000" stroke-width="100" r="1700"></circle>
+                        <svg x="500" y="530">
+                            <path id='stamp01' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[0] + """'/>
+                        </svg>
+                        <svg x="1750" y="530">
+                            <path id='stamp02' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[1] + """'/>
+                        </svg>
+                        <svg x="500" y="1780">
+                            <path id='stamp03' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[2] + """'/>
+                        </svg>
+                        <svg x="1750" y="1780">
+                            <path id='stamp04' transform="scale(0.4, 0.435)" fill="#C90000" stroke="none" d='""" + dValueList[3] + """'/>
+                        </svg>
+                    </svg>
+                </svg>"""
+
+                with open(doc.user.profile.sub_id + 'stamp.svg', 'w') as stampSVG:
+                    stampSVG.write(stampTemp)
+
+                ##### Ubuntu(Production) only
+                # cairosvg.svg2png(url=doc.user.profile.sub_id + "stamp.svg",
+                #                 write_to=doc.user.profile.sub_id + "stamp.png",
+                #                 dpi=72)
+
+                ##### Windows(Local) only
+                with open(doc.user.profile.sub_id + 'stamp.svg', "r") as stampSVG:
+                    with wand.image.Image() as stampPNG:
+                        with wand.color.Color('transparent') as background_color:
+                            library.MagickSetBackgroundColor(stampPNG.wand,
+                                                            background_color.resource)
+                        svg_blob = stampSVG.read().encode('utf-8')
+                        stampPNG.read(blob=svg_blob, resolution = 72)
+                        png_image = stampPNG.make_blob("png32")
+                with open(doc.user.profile.sub_id + 'stamp.png', "wb") as out:
+                    out.write(png_image)
+
+                drive_response=drive_service.files().create(body={'name': doc.user.profile.sub_id + 'stamp.png'},
+                                                            media_body=MediaFileUpload(doc.user.profile.sub_id + 'stamp.png', mimetype='image/png'),
+                                                            fields='id').execute()
+                stampFileId = drive_response.get('id')
+                drive_response = drive_service.permissions().create(
+                    fileId = stampFileId,
+                    body = {
+                        'role': 'reader',
+                        'type': 'anyone'
+                    }
+                ).execute()
+                drive_response = drive_service.files().get(
+                    fileId = stampFileId,
+                    fields = 'webContentLink'
+                ).execute()
+                stampUri = drive_response.get('webContentLink')
                 docs_service.documents().batchUpdate(
                     documentId = file_id,
                     body = {
